@@ -1,0 +1,104 @@
+// Content for the site. All copy here is PUBLIC-SAFE: it describes the operating
+// machinery and architecture only — no private vault data, spend figures, client
+// names, or host identifiers. Source: the brothers' public configs.
+
+export const SITE = {
+  name: 'Joshua Sutcliff',
+  tagline: 'Agentic systems and a compounding AI operating practice.',
+  subtagline: 'The public face of a private R&D habit.',
+  github: 'https://github.com/joshuadsutcliff',
+  githubHandle: 'joshuadsutcliff',
+}
+
+export const SYSTEM = {
+  name: 'Compound AI: Enforced Runtime',
+  thesis:
+    "A portable AI operating doctrine, made real by a mechanically-enforced runtime. Conventions stop being prose an agent is trusted to honor — and become guardrails it cannot route around.",
+  origin: {
+    headline: 'Built after a real incident.',
+    body: "The enforcement layer wasn't designed in the abstract. It was written after a single session spun up 57 subagents and burned through a 5-hour usage cap in 30 minutes. The fix wasn't a stern note in a config file — it was a hook that hard-stops the spawn. Every layer since has followed that principle: if it matters, enforce it in code.",
+  },
+}
+
+export type Layer = {
+  n: string
+  title: string
+  origin: 'Doctrine' | 'Runtime' | 'Blend'
+  body: string
+}
+
+export const LAYERS: Layer[] = [
+  {
+    n: '01',
+    title: 'Portable Doctrine',
+    origin: 'Doctrine',
+    body: 'Vendor-neutral root contracts define how any capable agent should operate — across Claude, Cursor, Codex, Aider, or Continue. The standard for what good operation looks like, independent of any one tool.',
+  },
+  {
+    n: '02',
+    title: 'Executable Enforcement',
+    origin: 'Runtime',
+    body: 'Hook scripts turn prose conventions into real blocks. A session router classifies every prompt by weight; a usage guard hard-stops agent spawns at 90% of the cap and warns at 70%. The hooks fail open — a broken guard never blocks legitimate work.',
+  },
+  {
+    n: '03',
+    title: 'Goal Contracts & Loop Specs',
+    origin: 'Blend',
+    body: 'Substantial work starts with a six-field contract: objective, completion condition, validation, budget, stop conditions, memory. Recurring loops require three hard stops — max iterations, a no-progress halt, and a budget ceiling wired directly to the usage guard, so the ceiling is a real halt rather than a promise.',
+  },
+  {
+    n: '04',
+    title: 'Delegation Economics',
+    origin: 'Runtime',
+    body: "A conductor/worker model. The expensive main model only orchestrates, plans, and judges — token-heavy work is handed to cheaper named workers for research, edits, and test runs. Spec-vs-code reviews fan out in waves, each gated by a usage check.",
+  },
+  {
+    n: '05',
+    title: 'Compounding Memory',
+    origin: 'Blend',
+    body: "Lessons from real runs are scored, not asserted. A pattern only graduates to permanent, queryable memory once it earns its keep across multiple runs with zero recorded harm. Knowledge compounds instead of resetting every session.",
+  },
+  {
+    n: '06',
+    title: 'Integrity & Adoption',
+    origin: 'Doctrine',
+    body: 'SHA-256 manifests and provenance checks let any shared copy be verified as authentic or flagged as forked. A staged adoption process layers the system into an existing repo additively, with atomic rollback — so the runtime travels safely.',
+  },
+  {
+    n: '07',
+    title: 'Cognitive Skills',
+    origin: 'Doctrine',
+    body: 'A toolkit of techniques that auto-invoke when the situation matches: multi-angle synthesis before a decision, adversarial pressure-testing of findings, negating your own default to catch overconfidence, consequence simulation before irreversible actions, and detached judgment to counter sycophancy.',
+  },
+]
+
+export const FUSION = {
+  heading: 'Two systems, near-perfect complements.',
+  body: "This is a fusion of two brothers' independent approaches to operating AI agents. One is a clean, portable doctrine — a standard for what good operation looks like, enforced only by prose. The other is a battle-tested runtime — personal, mechanically enforced, hardened by real incidents. Doctrine says what should happen; the runtime makes it actually happen.",
+  best:
+    "The single best idea in the blend: take the doctrine's budget ceilings and stop conditions — fields an agent is merely trusted to honor — and back them with the runtime's programmatic guard. The ceiling stops being a suggestion.",
+}
+
+export type Project = {
+  title: string
+  blurb: string
+  href: string
+  cta: string
+}
+
+export const PROJECTS: Project[] = [
+  {
+    title: 'claude-config (public)',
+    blurb:
+      'The shareable core of the enforced runtime: usage-guard and session-router hooks, named worker agents, the phased-review workflow, goal-contract scaffolds, cognitive skills, and provenance scripts. Operating machinery, zero work data.',
+    href: 'https://github.com/joshuadsutcliff',
+    cta: 'View on GitHub',
+  },
+]
+
+export const ATTRIBUTION = {
+  text: 'Compound AI: Enforced Runtime builds on the Compound AI Operating Standards by Cameron Sutcliff — a portable, vendor-neutral operating doctrine. Doctrine, goal-contract structure, integrity tooling, and the cognitive-skills toolkit derive from CAOS, used under CC BY 4.0.',
+  caosSite: 'https://cameronsutcliff.com/compound-ai',
+  caosRepo: 'https://github.com/cameronpsutcliff/compound-ai-operating-standards',
+  caosAuthor: 'Cameron Sutcliff',
+}

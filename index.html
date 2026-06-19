@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Joshua Sutcliff — agentic systems and a compounding AI operating practice. Home of Compound AI: Enforced Runtime." />
+    <title>Joshua Sutcliff</title>
+
+    <!-- OpenGraph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Joshua Sutcliff" />
+    <meta property="og:title" content="Joshua Sutcliff" />
+    <meta property="og:description" content="Agentic systems and a compounding AI operating practice. The public face of a private R&D habit." />
+    <meta property="og:url" content="https://www.joshuasutcliff.com" />
+    <meta property="og:image" content="https://www.joshuasutcliff.com/og-card.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Joshua Sutcliff" />
+    <meta name="twitter:description" content="Agentic systems and a compounding AI operating practice." />
+    <meta name="twitter:image" content="https://www.joshuasutcliff.com/og-card.png" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Schibsted+Grotesk:wght@400..900&family=Martian+Mono:wght@300..800&display=swap" rel="stylesheet" />
+
+    <!-- Theme bootstrap: set before paint to avoid FOUC -->
+    <script>
+      (function () {
+        var m = document.cookie.match(/(?:^|; )theme=(\w+)/)
+        var theme = m ? m[1] : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+        document.documentElement.setAttribute('data-theme', theme)
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
