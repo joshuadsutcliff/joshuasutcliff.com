@@ -15,8 +15,8 @@ export const SYSTEM = {
   thesis:
     "A portable AI operating doctrine, made real by a mechanically-enforced runtime. Conventions stop being prose an agent is trusted to honor — and become guardrails it cannot route around.",
   origin: {
-    headline: 'Built after a real incident.',
-    body: "The enforcement layer wasn't designed in the abstract. It was written after a single session spun up 57 subagents and burned through a 5-hour usage cap in 30 minutes. The fix wasn't a stern note in a config file — it was a hook that hard-stops the spawn. Every layer since has followed that principle: if it matters, enforce it in code.",
+    headline: 'Built for trust under pressure.',
+    body: "Agentic systems are powerful right up until they aren't — runaway loops, blown budgets, silent drift. This runtime makes those failure modes structurally impossible: enforced limits, verifiable contracts, and a memory that compounds. Hardened against real-world workloads, not just the happy path.",
   },
 }
 
