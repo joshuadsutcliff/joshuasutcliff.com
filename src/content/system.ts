@@ -38,7 +38,7 @@ export const LAYERS: Layer[] = [
     n: '02',
     title: 'Executable Enforcement',
     origin: 'Runtime',
-    body: 'Hook scripts turn prose conventions into real blocks. A session router classifies every prompt by weight; a usage guard hard-stops agent spawns at 90% of the cap and warns at 70%. The hooks fail open — a broken guard never blocks legitimate work.',
+    body: 'Hook scripts turn prose conventions into real blocks. A session router classifies every prompt by weight; a usage guard hard-stops agent spawns at 90% of the cap and warns at 70%. A compaction-recovery hook re-grounds the session when context is auto-compacted — restating the objective, reloading the active plan, re-confirming open tasks — so long runs hold their thread mechanically, not by recall. The hooks fail open — a broken guard never blocks legitimate work.',
   },
   {
     n: '03',
@@ -56,7 +56,7 @@ export const LAYERS: Layer[] = [
     n: '05',
     title: 'Compounding Memory',
     origin: 'Blend',
-    body: "Lessons from real runs are scored, not asserted. A pattern only graduates to permanent, queryable memory once it earns its keep across multiple runs with zero recorded harm. Knowledge compounds instead of resetting every session.",
+    body: "Lessons from real runs are scored, not asserted. A pattern only graduates to permanent, queryable memory once it earns its keep across multiple runs with zero recorded harm. Knowledge compounds instead of resetting every session. The always-loaded context stays lean by design — only what every session needs rides in the core, and depth is pulled on demand from a structured memory map, so cost stays bounded and signal stays high. Session start also pulls in live context — the day's scheduled events and a scoped alert digest — so work begins from a current picture, not static notes.",
   },
   {
     n: '06',
