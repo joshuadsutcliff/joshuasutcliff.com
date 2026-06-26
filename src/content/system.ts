@@ -38,7 +38,7 @@ export const LAYERS: Layer[] = [
     n: '02',
     title: 'Executable Enforcement',
     origin: 'Runtime',
-    body: 'Hook scripts turn prose conventions into real blocks. A session router classifies every prompt by weight; a usage guard hard-stops agent spawns at 90% of the cap and warns at 70%. A compaction-recovery hook re-grounds the session when context is auto-compacted — restating the objective, reloading the active plan, re-confirming open tasks — so long runs hold their thread mechanically, not by recall. The hooks fail open — a broken guard never blocks legitimate work.',
+    body: 'Hook scripts turn prose conventions into real blocks. A session router classifies every prompt by weight — behavioral, not a model-swapper, so the real savings come from delegating heavy work down rather than from the hook itself. A usage guard hard-stops agent spawns at 90% of the cap and warns at 70%, and the same guard rejects any subagent that would inherit the expensive conductor model — forcing heavy work onto cheaper models by default. A compaction-recovery hook re-grounds the session when context is auto-compacted — restating the objective, reloading the active plan, re-confirming open tasks — so long runs hold their thread mechanically, not by recall. The hooks fail open — a broken guard never blocks legitimate work.',
   },
   {
     n: '03',
@@ -50,19 +50,19 @@ export const LAYERS: Layer[] = [
     n: '04',
     title: 'Delegation Economics',
     origin: 'Runtime',
-    body: "A conductor/worker model. The expensive main model only orchestrates, plans, and judges — token-heavy work is handed to cheaper named workers for research, edits, and test runs. Spec-vs-code reviews fan out in waves, each gated by a usage check.",
+    body: "A conductor/worker model — and the conductor is a role, not a fixed model: the machinery runs unchanged when the occupant model changes. The expensive main model only orchestrates, plans, and judges — token-heavy work is handed to cheaper named workers for research, edits, and test runs. Spec-vs-code reviews fan out in waves, each gated by a usage check. Which work gets delegated, and how, is governed by a scored living playbook — handoff patterns earn their place from recorded run outcomes, not abstract best practice, so the system gets better at delegating from its own history.",
   },
   {
     n: '05',
     title: 'Compounding Memory',
     origin: 'Blend',
-    body: "Lessons from real runs are scored, not asserted. A pattern only graduates to permanent, queryable memory once it earns its keep across multiple runs with zero recorded harm. Knowledge compounds instead of resetting every session. The always-loaded context stays lean by design — only what every session needs rides in the core, and depth is pulled on demand from a structured memory map, so cost stays bounded and signal stays high. Session start also pulls in live context — the day's scheduled events and a scoped alert digest — so work begins from a current picture, not static notes.",
+    body: "Lessons from real runs are scored, not asserted. A pattern graduates to permanent, queryable memory only when its track record across multiple runs earns it — never on a single good outcome. Knowledge compounds instead of resetting every session. The always-loaded context stays lean by design — only what every session needs rides in the core, and depth is pulled on demand from a structured memory map, so cost stays bounded and signal stays high. Session start also pulls in live context — the day's scheduled events and a scoped alert digest — so work begins from a current picture, not static notes.",
   },
   {
     n: '06',
     title: 'Integrity & Adoption',
     origin: 'Doctrine',
-    body: 'SHA-256 manifests and provenance checks let any shared copy be verified as authentic or flagged as forked. A staged adoption process layers the system into an existing repo additively, with atomic rollback — so the runtime travels safely.',
+    body: 'SHA-256 manifests and provenance checks let any shared copy be verified as authentic or flagged as forked. A staged adoption process layers the system into an existing repo additively, with atomic rollback — so the runtime travels safely. In practice it is versioned and mirrored across every machine it runs on, with one-step onboarding, so the same enforced runtime follows the work everywhere.',
   },
   {
     n: '07',
@@ -91,7 +91,7 @@ export const PROJECTS: Project[] = [
     title: 'claude-config (public)',
     blurb:
       'The shareable core of the enforced runtime: usage-guard and session-router hooks, named worker agents, the phased-review workflow, goal-contract scaffolds, cognitive skills, and provenance scripts. Operating machinery, zero work data.',
-    href: 'https://github.com/joshuadsutcliff',
+    href: 'https://github.com/brass458/claude-config-public',
     cta: 'View on GitHub',
   },
 ]
