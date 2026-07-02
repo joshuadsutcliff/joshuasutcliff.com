@@ -62,13 +62,13 @@ export const LAYERS: Layer[] = [
     n: '06',
     title: 'Integrity & Adoption',
     origin: 'Doctrine',
-    body: 'SHA-256 manifests and provenance checks let any shared copy be verified as authentic or flagged as forked. A staged adoption process layers the system into an existing repo additively, with atomic rollback — so the runtime travels safely. In practice it is versioned and mirrored across every machine it runs on, with one-step onboarding, so the same enforced runtime follows the work everywhere.',
+    body: 'SHA-256 manifests and provenance checks let any shared copy be verified as authentic or flagged as forked. A staged adoption process layers the system into an existing repo additively, with atomic rollback — so the runtime travels safely. In practice it is versioned and mirrored across every machine it runs on, with one-step onboarding, so the same enforced runtime follows the work everywhere. Adoption extends to strangers: the public mirror carries an agent-executable integration guide, so pointing a fresh Claude at the repo is enough for it to install the vault workflow and adapt every placeholder to its own host.',
   },
   {
     n: '07',
     title: 'Cognitive Skills',
     origin: 'Doctrine',
-    body: 'A toolkit of techniques that auto-invoke when the situation matches: multi-angle synthesis before a decision, adversarial pressure-testing of findings, negating your own default to catch overconfidence, consequence simulation before irreversible actions, and detached judgment to counter sycophancy.',
+    body: 'A toolkit of techniques that auto-invoke when the situation matches: multi-angle synthesis before a decision, adversarial pressure-testing of findings, negating your own default to catch overconfidence, consequence simulation before irreversible actions, and detached judgment to counter sycophancy. Alongside them ride the operational skills the runtime leans on daily — conductor/worker delegation design, usage-aware pacing across long work, and a status-line convention that makes completion state legible at a glance.',
   },
 ]
 
@@ -90,7 +90,7 @@ export const PROJECTS: Project[] = [
   {
     title: 'claude-config (public)',
     blurb:
-      'The shareable core of the enforced runtime: usage-guard and session-router hooks, named worker agents, the phased-review workflow, goal-contract scaffolds, cognitive skills, and provenance scripts. Operating machinery, zero work data.',
+      'The shareable core of the enforced runtime: usage-guard, session-router, and compaction-recovery hooks, named worker and reviewer agents, the phased-review workflow, goal-contract scaffolds, cognitive and delegation skills, and provenance scripts — plus the full memory-vault workflow with an integration guide written for the agent itself: point a fresh Claude at the repo and it installs and adapts the system end-to-end. Operating machinery, zero work data.',
     href: 'https://github.com/brass458/claude-config-public',
     cta: 'View on GitHub',
   },
