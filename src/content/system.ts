@@ -50,7 +50,7 @@ export const LAYERS: Layer[] = [
     n: '04',
     title: 'Delegation Economics',
     origin: 'Runtime',
-    body: "A conductor/worker model — and the conductor is a role, not a fixed model: the machinery runs unchanged when the occupant model changes. The expensive main model only orchestrates, plans, and judges — token-heavy work is handed to cheaper named workers for research, edits, and test runs. Spec-vs-code reviews fan out in waves, each gated by a usage check. Which work gets delegated, and how, is governed by a scored living playbook — handoff patterns earn their place from recorded run outcomes, not abstract best practice, so the system gets better at delegating from its own history.",
+    body: "A conductor/worker model, built around the efficient-fable delegation skill: Claude Fable 5 — the premiere model of the day — holds the conductor seat, and the seat tracks the frontier. When a new premiere model ships, it takes the podium and the lesser models fill the worker pool; the machinery runs unchanged when the occupant changes. The conductor only orchestrates, plans, and judges — token-heavy work is handed to cheaper named workers for research, edits, and test runs. Spec-vs-code reviews fan out in waves, each gated by a usage check. Which work gets delegated, and how, is governed by a scored living playbook — handoff patterns earn their place from recorded run outcomes, not abstract best practice, so the system gets better at delegating from its own history.",
   },
   {
     n: '05',
