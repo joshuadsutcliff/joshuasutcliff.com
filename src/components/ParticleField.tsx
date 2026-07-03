@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 
 /**
- * Lightweight canvas particle field — subtle drifting nodes with near-neighbor
+ * Lightweight canvas particle field - subtle drifting nodes with near-neighbor
  * links, tinted by the active accent. Pauses when offscreen / reduced-motion.
  */
 export default function ParticleField() {

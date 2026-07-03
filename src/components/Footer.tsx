@@ -18,7 +18,7 @@ export default function Footer() {
             </a>
           </div>
 
-          {/* Attribution — CC BY 4.0 obligation to CAOS / Cameron Sutcliff */}
+          {/* Attribution - CC BY 4.0 obligation to CAOS / Cameron Sutcliff */}
           <div className="max-w-md">
             <p className="font-mono text-[11px] uppercase tracking-wider text-dim">Built on</p>
             <p className="mt-2 text-xs leading-relaxed text-muted">{ATTRIBUTION.text}</p>

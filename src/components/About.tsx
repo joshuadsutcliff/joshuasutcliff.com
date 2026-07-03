@@ -11,11 +11,11 @@ export default function About() {
         <p className="mt-5 leading-relaxed text-muted">
           I build the scaffolding that makes AI agents dependable: hooks that enforce limits,
           contracts that make work verifiable, and a memory that compounds instead of resetting.
-          Most of the practice is private R&amp;D — this site is the part worth sharing.
+          Most of the practice is private R&amp;D; this site is the part worth sharing.
         </p>
         <p className="mt-4 leading-relaxed text-muted">
-          The throughline is simple: if a rule matters, don&rsquo;t write it down and hope —
-          enforce it in code.
+          The throughline is simple: if a rule matters, don&rsquo;t write it down and hope.
+          Enforce it in code.
         </p>
         <div className="mt-7">
           <a

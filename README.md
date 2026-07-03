@@ -1,6 +1,6 @@
 # joshuasutcliff.com
 
-Personal site for Joshua Sutcliff — a landing page and the public face of
+Personal site for Joshua Sutcliff: a landing page and the public face of
 **Compound AI: Enforced Runtime**, a blended AI operating system.
 
 Built with **Vite + React + Tailwind CSS v4**, deployed on **Vercel**.
@@ -16,11 +16,20 @@ npm run preview  # serve the production build locally
 
 ## Structure
 
-- `src/content/system.ts` — all site copy (public-safe content only).
-- `src/components/` — Hero, SystemSection, Projects, About, Footer, ThemeToggle, ParticleField.
-- `src/index.css` — Tailwind import + design tokens (dark default, light via `[data-theme]`).
-- `public/` — `favicon.svg`, `og-card.png`.
-- `scripts/og-card.svg` — source for the social card (`sharp` rasterizes it to `public/og-card.png`).
+- `src/content/system.ts` - all site copy (public-safe content only).
+- `src/components/` - Hero, SystemSection, Projects, About, Footer, ThemeToggle, ParticleField.
+- `src/index.css` - Tailwind import + design tokens (dark default, light via `[data-theme]`).
+- `public/` - `favicon.svg`, `og-card.png`.
+- `scripts/og-card.svg` - source for the social card (`sharp` rasterizes it to `public/og-card.png`).
+
+## Hooks
+
+The repo carries the CAOS `no-em-dashes` pre-commit hook in `.githooks/`.
+Enable it per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
 
 ## Attribution
 

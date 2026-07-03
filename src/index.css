@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 /* ----------------------------------------------------------------------------
-   Design tokens — sibling-consistent with cameronsutcliff.com
+   Design tokens - sibling-consistent with cameronsutcliff.com
    Dark is the default; [data-theme="light"] flips the palette.
 ---------------------------------------------------------------------------- */
 :root,

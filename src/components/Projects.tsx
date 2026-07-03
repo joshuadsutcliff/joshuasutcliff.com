@@ -9,7 +9,7 @@ export default function Projects() {
           Projects & code
         </h2>
         <p className="mt-4 text-muted">
-          What&rsquo;s public flows from a private practice — operating machinery and blank-state
+          What&rsquo;s public flows from a private practice: operating machinery and blank-state
           templates, never the work data behind them.
         </p>
       </div>
