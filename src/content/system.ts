@@ -12,6 +12,7 @@ export const SITE = {
 
 export const SYSTEM = {
   name: 'Compound AI: Enforced Runtime',
+  repo: 'https://github.com/joshuadsutcliff/claude-config-public',
   thesis:
     "A portable AI operating doctrine, made real by a mechanically-enforced runtime. Conventions stop being prose an agent is trusted to honor and become guardrails it cannot route around.",
   origin: {
@@ -91,7 +92,7 @@ export const PROJECTS: Project[] = [
     title: 'claude-config (public)',
     blurb:
       'The shareable core of the enforced runtime: usage-guard, session-router, and compaction-recovery hooks, named worker and reviewer agents, the phased-review workflow, goal-contract scaffolds, cognitive and delegation skills, and provenance scripts, plus the full memory-vault workflow with an integration guide written for the agent itself. Point a fresh Claude at the repo and it installs and adapts the system end-to-end. Operating machinery, zero work data.',
-    href: 'https://github.com/brass458/claude-config-public',
+    href: 'https://github.com/joshuadsutcliff/claude-config-public',
     cta: 'View on GitHub',
   },
 ]
