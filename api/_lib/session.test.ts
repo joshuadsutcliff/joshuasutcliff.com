@@ -10,6 +10,15 @@ describe('session token', () => {
   it('rejects a tampered token', () => {
     expect(verifySession(signSession('s3cret') + 'x', 's3cret')).toBe(false)
   })
+  it('rejects an equal-length forged signature', () => {
+    const t = signSession('s3cret')
+    const dot = t.indexOf('.')
+    const i = dot + 20
+    const c = t[i] === '0' ? '1' : '0'
+    const forged = t.slice(0, i) + c + t.slice(i + 1)
+    expect(forged.length).toBe(t.length)
+    expect(verifySession(forged, 's3cret')).toBe(false)
+  })
   it('rejects the wrong secret', () => {
     expect(verifySession(signSession('a'), 'b')).toBe(false)
   })
