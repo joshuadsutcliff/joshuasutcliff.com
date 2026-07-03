@@ -1,20 +1,23 @@
-import Hero from './components/Hero'
-import SystemSection from './components/SystemSection'
-import Projects from './components/Projects'
-import About from './components/About'
-import Footer from './components/Footer'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import Layout from './components/Layout'
+import Home from './pages/Home'
+import Work from './pages/Work'
+import Projects from './pages/Projects'
+import About from './pages/About'
+import Resume from './pages/Resume'
 
 function App() {
   return (
-    <div className="min-h-screen bg-bg text-fg">
-      <Hero />
-      <main>
-        <SystemSection />
-        <Projects />
-        <About />
-      </main>
-      <Footer />
-    </div>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/work" element={<Work />} />
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/resume" element={<Resume />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Route>
+    </Routes>
   )
 }
 
