@@ -16,8 +16,9 @@ npm run preview  # serve the production build locally
 
 ## Structure
 
-- `src/content/system.ts` - all site copy (public-safe content only).
-- `src/components/` - Hero, SystemSection, Projects, About, Footer, ThemeToggle, ParticleField.
+- `src/content/` - all site copy as typed modules (public-safe content only): `site.ts`, `home.ts`, `work.ts`, `projects.ts`, `about.ts`, `resume.ts`.
+- `src/pages/` - Home, Work, Projects, About, Resume (react-router routes).
+- `src/components/` - Layout, Footer, ThemeToggle, ParticleField, icons.
 - `src/index.css` - Tailwind import + design tokens (dark default, light via `[data-theme]`).
 - `public/` - `favicon.svg`, `og-card.png`.
 - `scripts/og-card.svg` - source for the social card (`sharp` rasterizes it to `public/og-card.png`).
