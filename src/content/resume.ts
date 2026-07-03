@@ -1,6 +1,6 @@
 export const RESUME = {
   summary:
-    'Systems administrator and network specialist with eight years of contract IT across southern New Mexico. I keep small-business infrastructure secure, monitored, and recoverable: servers, networks, and device fleets.',
+    'Systems administrator and network specialist with nine years of contract IT across southern New Mexico. I keep small-business infrastructure secure, monitored, and recoverable: servers, networks, and device fleets.',
   skills: [
     { area: 'Systems Administration', detail: 'Windows Server, Active Directory, Group Policy' },
     { area: 'Networking', detail: 'Firewalls, managed switching, VLANs, VPN' },

@@ -114,14 +114,6 @@ body {
   border-color: var(--border-bright);
 }
 
-/* Neon gradient text */
-.neon-text {
-  background: linear-gradient(120deg, var(--cyan), var(--purple));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
