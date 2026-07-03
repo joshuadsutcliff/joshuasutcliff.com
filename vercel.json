@@ -1,6 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }],
+  "rewrites": [
+    { "source": "/u/script.js", "destination": "https://umami.sigmalabs.us/script.js" },
+    { "source": "/u/api/send", "destination": "https://umami.sigmalabs.us/api/send" },
+    { "source": "/(.*)", "destination": "/" }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",
