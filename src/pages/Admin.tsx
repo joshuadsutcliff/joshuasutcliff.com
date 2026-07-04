@@ -58,7 +58,14 @@ export default function Admin() {
   const [data, setData] = useState<Stats | null>(null)
 
   const load = useCallback(async (r: Range) => {
-    const res = await fetch(`/api/admin/stats?range=${r}`)
+    let res: Response
+    try {
+      res = await fetch(`/api/admin/stats?range=${r}`)
+    } catch {
+      setError('Analytics backend unreachable.')
+      setAuthed(true)
+      return
+    }
     if (res.status === 401) {
       setAuthed(false)
       return
@@ -80,11 +87,17 @@ export default function Admin() {
   async function login(e: FormEvent) {
     e.preventDefault()
     setError('')
-    const res = await fetch('/api/admin/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password }),
-    })
+    let res: Response
+    try {
+      res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      })
+    } catch {
+      setError('Network error. Try again.')
+      return
+    }
     if (res.status === 204) {
       setPassword('')
       void load(range)
