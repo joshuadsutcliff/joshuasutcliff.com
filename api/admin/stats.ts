@@ -61,7 +61,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       umamiGet(base, `/api/websites/${site}/active`),
     ])
     return res.status(200).json({ range, stats, pages, referrers, active })
-  } catch {
+  } catch (err) {
+    console.error('umami stats proxy failure:', err instanceof Error ? err.message : String(err))
     return res.status(502).json({ error: 'analytics backend unreachable' })
   }
 }
