@@ -23,6 +23,9 @@ describe('classifyAsn', () => {
     expect(classifyAsn(1234, 'Observer Media Group')).toBe(false)
     expect(classifyAsn(1235, 'Clawson Communications LLC')).toBe(false)
   })
+  it('flags Quintex (AirVPN exit ASN) by number', () => {
+    expect(classifyAsn(62744, 'Quintex Alliance Consulting')).toBe(true)
+  })
   it('catches concatenated VPN brand names', () => {
     expect(classifyAsn(0, 'NordVPN Ltd')).toBe(true)
     expect(classifyAsn(0, 'ExpressVPN Services')).toBe(true)

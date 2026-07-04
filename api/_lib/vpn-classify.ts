@@ -10,6 +10,7 @@ export const VPN_ASNS = new Set<number>([
   46562, // Performive/Total Server
   199524, // G-Core
   20473, // Vultr/Choopa
+  62744, // Quintex Alliance Consulting (AirVPN and privacy-network exits)
 ])
 
 export const HOSTING_KEYWORDS =
