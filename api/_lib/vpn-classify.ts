@@ -13,7 +13,7 @@ export const VPN_ASNS = new Set<number>([
 ])
 
 export const HOSTING_KEYWORDS =
-  /hosting|host(?:ed)?[ -]?(?:service|solution)|datacenter|data[ -]center|colo(?:cation)?|\bvpn\b|proxy|server|cloud|amazon|aws|google[ -]?cloud|gcp|microsoft|azure|digitalocean|linode|akamai|ovh|hetzner|vultr|leaseweb|contabo|choopa|m247|datacamp|packet|scaleway|oracle/i
+  /hosting|host(?:ed)?[ -]?(?:service|solution)|datacenter|data[ -]center|\bcolo(?:cation)?\b|vpn\b|proxy|\bserver\b|cloud|amazon|\baws\b|google[ -]?cloud|gcp|microsoft|azure|digitalocean|linode|akamai|ovh|hetzner|vultr|leaseweb|contabo|choopa|m247|datacamp|\bpacket\b|scaleway|oracle|surfshark|mullvad|windscribe|ipvanish|cyberghost|private[ -]?internet[ -]?access/i
 
 export function classifyAsn(asn: number, org: string): boolean {
   if (VPN_ASNS.has(asn)) return true
