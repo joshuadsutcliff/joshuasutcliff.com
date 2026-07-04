@@ -2,9 +2,12 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     { "source": "/u/script.js", "destination": "https://umami.sigmalabs.us/script.js" },
-    { "source": "/u/api/send", "destination": "https://umami.sigmalabs.us/api/send" },
+    { "source": "/u/api/send", "destination": "/api/track" },
     { "source": "/(.*)", "destination": "/" }
   ],
+  "functions": {
+    "api/track.ts": { "includeFiles": "api/_lib/GeoLite2-ASN.mmdb" }
+  },
   "headers": [
     {
       "source": "/assets/(.*)",
