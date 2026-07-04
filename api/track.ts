@@ -39,7 +39,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const base = process.env.UMAMI_API_URL
   if (!base) return res.status(502).json({ error: 'not configured' })
 
-  const body = typeof req.body === 'object' && req.body !== null ? (req.body as Record<string, unknown>) : null
+  let body: Record<string, unknown> | null = null
+  try {
+    body = typeof req.body === 'object' && req.body !== null ? (req.body as Record<string, unknown>) : null
+  } catch {
+    body = null
+  }
   const ua = typeof req.headers['user-agent'] === 'string' ? req.headers['user-agent'] : ''
   const ip = clientIp(req)
 
@@ -70,7 +75,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const reader = await getReader()
       const rec = reader?.get(ip)
       if (rec && classifyAsn(rec.autonomous_system_number ?? 0, rec.autonomous_system_organization ?? '')) {
-        void fetch(`${base}/api/send`, {
+        await fetch(`${base}/api/send`, {
           method: 'POST',
           headers: fwdHeaders,
           body: JSON.stringify({
