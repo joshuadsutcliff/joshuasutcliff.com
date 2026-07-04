@@ -9,6 +9,7 @@ type Stats = {
   pages: Metric[]
   referrers: Metric[]
   active: unknown
+  vpnVisits?: number
 }
 
 const RANGES = ['24h', '7d', '30d'] as const
@@ -179,10 +180,11 @@ export default function Admin() {
       {error && <p className="mt-6 text-sm text-purple">{error}</p>}
       {view === 'stats' && (
         <>
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-4">
             <Card label="Visitors" value={visitors} />
             <Card label="Pageviews" value={pageviews} />
             <Card label="Live now" value={activeCount(data?.active)} />
+            <Card label="VPN visits" value={data?.vpnVisits ?? 0} />
           </div>
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <MetricList title="Top pages" items={data?.pages ?? []} />

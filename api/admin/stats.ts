@@ -54,13 +54,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const q = `startAt=${startAt}&endAt=${endAt}`
 
   try {
-    const [stats, pages, referrers, active] = await Promise.all([
+    const [stats, pages, referrers, active, events] = await Promise.all([
       umamiGet(base, `/api/websites/${site}/stats?${q}`),
       umamiGet(base, `/api/websites/${site}/metrics?type=url&limit=10&${q}`),
       umamiGet(base, `/api/websites/${site}/metrics?type=referrer&limit=10&${q}`),
       umamiGet(base, `/api/websites/${site}/active`),
+      umamiGet(base, `/api/websites/${site}/metrics?type=event&limit=50&${q}`),
     ])
-    return res.status(200).json({ range, stats, pages, referrers, active })
+    const vpnVisits = (Array.isArray(events) ? (events as Array<{ x: string | null; y: number }>) : []).find(
+      (e) => e.x === 'vpn-visit',
+    )?.y ?? 0
+    return res.status(200).json({ range, stats, pages, referrers, active, vpnVisits })
   } catch (err) {
     console.error('umami stats proxy failure:', err instanceof Error ? err.message : String(err))
     return res.status(502).json({ error: 'analytics backend unreachable' })
