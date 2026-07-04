@@ -5,7 +5,7 @@ type GeoData = { range: string; points: GeoPoint[]; unmatched: Array<{ city: str
 
 export default function AdminGlobe({ range }: { range: string }) {
   const mountRef = useRef<HTMLDivElement>(null)
-  const globeRef = useRef<{ dispose?: () => void; instance?: unknown } | null>(null)
+  const globeRef = useRef<{ _destructor?: () => void } | null>(null)
   const [data, setData] = useState<GeoData | null>(null)
   const [error, setError] = useState('')
 
@@ -17,11 +17,11 @@ export default function AdminGlobe({ range }: { range: string }) {
       try {
         res = await fetch(`/api/admin/geo?range=${range}`)
       } catch {
-        setError('Analytics backend unreachable.')
+        if (!cancelled) setError('Analytics backend unreachable.')
         return
       }
       if (!res.ok) {
-        setError(res.status === 401 ? 'Session expired: reload and sign in.' : 'Analytics backend unreachable.')
+        if (!cancelled) setError(res.status === 401 ? 'Session expired: reload and sign in.' : 'Analytics backend unreachable.')
         return
       }
       const geo = (await res.json()) as GeoData
@@ -30,6 +30,7 @@ export default function AdminGlobe({ range }: { range: string }) {
       try {
         const { default: Globe } = await import('globe.gl')
         if (cancelled || !mountRef.current) return
+        globeRef.current?._destructor?.()
         mountRef.current.innerHTML = ''
         const g = new Globe(mountRef.current)
           .globeImageUrl('/earth-night.jpg')
@@ -48,14 +49,16 @@ export default function AdminGlobe({ range }: { range: string }) {
           })
         g.controls().autoRotate = true
         g.controls().autoRotateSpeed = 0.6
-        globeRef.current = { instance: g }
+        globeRef.current = g as unknown as { _destructor?: () => void }
       } catch {
-        setError('Globe failed to load.')
+        if (!cancelled) setError('Globe failed to load.')
       }
     }
     void run()
     return () => {
       cancelled = true
+      globeRef.current?._destructor?.()
+      globeRef.current = null
     }
   }, [range])
 
