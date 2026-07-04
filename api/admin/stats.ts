@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { verifySession } from '../_lib/session'
+import { verifySession } from '../_lib/session.js'
 
 const RANGES: Record<string, number> = {
   '24h': 86_400_000,

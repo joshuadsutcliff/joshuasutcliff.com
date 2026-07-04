@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { createHash, timingSafeEqual } from 'node:crypto'
-import { signSession } from '../_lib/session'
+import { signSession } from '../_lib/session.js'
 
 const LIMIT = 10
 const WINDOW_MS = 15 * 60_000
