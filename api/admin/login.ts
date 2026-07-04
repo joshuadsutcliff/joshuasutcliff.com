@@ -27,7 +27,8 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'method not allowed' })
   }
-  const fwd = (req.headers['x-forwarded-for'] as string | undefined) ?? ''
+  const fwdRaw = req.headers['x-forwarded-for']
+  const fwd = Array.isArray(fwdRaw) ? (fwdRaw[0] ?? '') : (fwdRaw ?? '')
   const ip = fwd.split(',')[0].trim() || 'unknown'
   if (throttled(ip)) return res.status(429).json({ error: 'too many attempts' })
 
@@ -35,7 +36,12 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
   const secret = process.env.ADMIN_SECRET
   if (!expected || !secret) return res.status(500).json({ error: 'server not configured' })
 
-  const body = (typeof req.body === 'object' && req.body !== null ? req.body : {}) as Record<string, unknown>
+  let body: Record<string, unknown>
+  try {
+    body = (typeof req.body === 'object' && req.body !== null ? req.body : {}) as Record<string, unknown>
+  } catch {
+    return res.status(401).json({ error: 'invalid password' })
+  }
   const password = body.password
   if (typeof password !== 'string' || !safeEqual(password, expected)) {
     return res.status(401).json({ error: 'invalid password' })
