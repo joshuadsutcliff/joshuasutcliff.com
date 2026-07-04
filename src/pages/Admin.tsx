@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useState, type FormEvent } from 'react'
+
+const AdminGlobe = lazy(() => import('./AdminGlobe'))
 
 type Metric = { x: string | null; y: number }
 type Stats = {
@@ -56,6 +58,7 @@ export default function Admin() {
   const [error, setError] = useState('')
   const [range, setRange] = useState<Range>('7d')
   const [data, setData] = useState<Stats | null>(null)
+  const [view, setView] = useState<'stats' | 'globe'>('stats')
 
   const load = useCallback(async (r: Range) => {
     let res: Response
@@ -145,6 +148,19 @@ export default function Admin() {
     <section className="mx-auto max-w-3xl px-6 py-20">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-cyan">Admin</p>
       <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-fg">Site analytics</h1>
+      <div className="mt-4 flex gap-2">
+        {(['stats', 'globe'] as const).map((v) => (
+          <button
+            key={v}
+            onClick={() => setView(v)}
+            className={`rounded-full border px-4 py-1.5 font-mono text-xs uppercase tracking-widest transition-colors ${
+              v === view ? 'border-border-bright bg-card-hover text-fg' : 'border-border text-muted hover:text-fg'
+            }`}
+          >
+            {v}
+          </button>
+        ))}
+      </div>
       <div className="mt-6 flex gap-2">
         {RANGES.map((r) => (
           <button
@@ -161,15 +177,24 @@ export default function Admin() {
         ))}
       </div>
       {error && <p className="mt-6 text-sm text-purple">{error}</p>}
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card label="Visitors" value={visitors} />
-        <Card label="Pageviews" value={pageviews} />
-        <Card label="Live now" value={activeCount(data?.active)} />
-      </div>
-      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <MetricList title="Top pages" items={data?.pages ?? []} />
-        <MetricList title="Referrers" items={data?.referrers ?? []} />
-      </div>
+      {view === 'stats' && (
+        <>
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <Card label="Visitors" value={visitors} />
+            <Card label="Pageviews" value={pageviews} />
+            <Card label="Live now" value={activeCount(data?.active)} />
+          </div>
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <MetricList title="Top pages" items={data?.pages ?? []} />
+            <MetricList title="Referrers" items={data?.referrers ?? []} />
+          </div>
+        </>
+      )}
+      {view === 'globe' && (
+        <Suspense fallback={<p className="mt-6 text-muted">Loading globe...</p>}>
+          <AdminGlobe range={range} />
+        </Suspense>
+      )}
     </section>
   )
 }
