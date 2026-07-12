@@ -86,7 +86,10 @@ export default function Admin() {
   }, [])
 
   useEffect(() => {
-    void load(range)
+    const run = async () => {
+      await load(range)
+    }
+    void run()
   }, [load, range])
 
   async function login(e: FormEvent) {

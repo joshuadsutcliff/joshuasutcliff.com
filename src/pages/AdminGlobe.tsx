@@ -23,8 +23,6 @@ export default function AdminGlobe({ range }: { range: string }) {
   const [selected, setSelected] = useState<GeoPoint | null>(null)
   const [error, setError] = useState('')
 
-  selectedRef.current = selected
-
   function pointStyle(g: GlobeInst, points: GeoPoint[]) {
     g.pointsData(points.map((p) => ({ ...p })))
   }
@@ -132,7 +130,13 @@ export default function AdminGlobe({ range }: { range: string }) {
         <div className="lg:col-span-2">
           <div ref={mountRef} className="overflow-hidden rounded-xl border border-border bg-card" />
         </div>
-        <CityPanel points={data?.points ?? []} range={range} selected={selected} onSelect={handleSelect} />
+        <CityPanel
+          key={selected ? `${selected.city}|${range}` : 'none'}
+          points={data?.points ?? []}
+          range={range}
+          selected={selected}
+          onSelect={handleSelect}
+        />
       </div>
       {data && data.unmatched.length > 0 && (
         <p className="mt-3 font-mono text-xs text-dim">

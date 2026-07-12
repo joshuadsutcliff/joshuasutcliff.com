@@ -43,14 +43,11 @@ export default function CityPanel({
 }) {
   const [detail, setDetail] = useState<CityDetail | null>(null)
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(!!selected)
 
   useEffect(() => {
     let cancelled = false
-    setDetail(null)
-    setError('')
     if (!selected) return
-    setLoading(true)
     ;(async () => {
       let res: Response
       try {
