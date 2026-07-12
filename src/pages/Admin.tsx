@@ -86,6 +86,7 @@ export default function Admin() {
   }, [])
 
   useEffect(() => {
+    // wrapper satisfies react-hooks/set-state-in-effect: load's state updates all happen after await
     const run = async () => {
       await load(range)
     }

@@ -131,7 +131,7 @@ export default function AdminGlobe({ range }: { range: string }) {
           <div ref={mountRef} className="overflow-hidden rounded-xl border border-border bg-card" />
         </div>
         <CityPanel
-          key={selected ? `${selected.city}|${range}` : 'none'}
+          key={selected ? `${selected.city}|${selected.country}|${range}` : 'none'}
           points={data?.points ?? []}
           range={range}
           selected={selected}
