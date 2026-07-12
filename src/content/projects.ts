@@ -18,8 +18,8 @@ export const PROJECT_GROUPS: ProjectGroup[] = [
       {
         title: 'Nexus System Monitor',
         blurb:
-          'A modern, cross-platform system monitor built with .NET and Avalonia. Real-time CPU, GPU, memory, network, and per-process telemetry in a clean desktop UI.',
-        status: 'Active · v0.4.0',
+          'A modern system monitor built with .NET and Avalonia: the monitor you design yourself. Real-time CPU, GPU, memory, network, and per-process telemetry with native sensor depth on Windows, Linux, and macOS (including Apple Silicon temperatures and GPU telemetry), on a fully customizable dashboard. Honest by design: no fabricated readings, ever.',
+        status: 'Active · v0.7.0',
         href: 'https://github.com/joshuadsutcliff/nexus-system-monitor',
       },
       {
