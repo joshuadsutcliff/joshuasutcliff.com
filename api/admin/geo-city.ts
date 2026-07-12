@@ -38,8 +38,12 @@ type UmamiStats = { pageviews?: { value: number }; visitors?: { value: number } 
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const secret = process.env.ADMIN_SECRET
-  if (!secret || !verifySession(req.cookies?.admin_session, secret)) {
+  const role = secret ? verifySession(req.cookies?.admin_session, secret) : null
+  if (!role) {
     return res.status(401).json({ error: 'unauthorized' })
+  }
+  if (role !== 'admin') {
+    return res.status(403).json({ error: 'forbidden' })
   }
   const base = process.env.UMAMI_API_URL
   const site = process.env.UMAMI_WEBSITE_ID

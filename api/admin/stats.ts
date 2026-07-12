@@ -40,7 +40,8 @@ async function umamiGet(base: string, path: string): Promise<unknown> {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const secret = process.env.ADMIN_SECRET
-  if (!secret || !verifySession(req.cookies?.admin_session, secret)) {
+  const role = secret ? verifySession(req.cookies?.admin_session, secret) : null
+  if (!role) {
     return res.status(401).json({ error: 'unauthorized' })
   }
   const base = process.env.UMAMI_API_URL
@@ -64,7 +65,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const vpnVisits = (Array.isArray(events) ? (events as Array<{ x: string | null; y: number }>) : []).find(
       (e) => e.x === 'vpn-visit',
     )?.y ?? 0
-    return res.status(200).json({ range, stats, pages, referrers, active, vpnVisits })
+    return res.status(200).json({ range, role, stats, pages, referrers, active, vpnVisits })
   } catch (err) {
     console.error('umami stats proxy failure:', err instanceof Error ? err.message : String(err))
     return res.status(502).json({ error: 'analytics backend unreachable' })
