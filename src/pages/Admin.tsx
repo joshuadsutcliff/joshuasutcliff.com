@@ -148,7 +148,7 @@ export default function Admin() {
 
   const pageviews = data?.stats?.pageviews?.value ?? 0
   const visitors = data?.stats?.visitors?.value ?? 0
-  const isAdminRole = data?.role !== 'viewer'
+  const isAdminRole = data ? data.role !== 'viewer' : false
 
   return (
     <section className="mx-auto max-w-3xl px-6 py-20">
