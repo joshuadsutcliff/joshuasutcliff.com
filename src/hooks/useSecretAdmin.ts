@@ -18,6 +18,7 @@ export default function useSecretAdmin(): boolean {
   const { pathname } = useLocation()
   const taps = useRef({ count: 0, last: 0 })
   const busy = useRef(false)
+  const timer = useRef<number | null>(null)
 
   const trigger = useCallback(() => {
     if (busy.current || pathname === '/admin') return
@@ -28,9 +29,10 @@ export default function useSecretAdmin(): boolean {
       return
     }
     setFlourish(true)
-    window.setTimeout(() => {
+    timer.current = window.setTimeout(() => {
       setFlourish(false)
       busy.current = false
+      timer.current = null
       navigate('/admin')
     }, FLOURISH_MS)
   }, [navigate, pathname])
@@ -62,6 +64,13 @@ export default function useSecretAdmin(): boolean {
       document.removeEventListener('click', onClick)
     }
   }, [trigger])
+
+  useEffect(
+    () => () => {
+      if (timer.current !== null) window.clearTimeout(timer.current)
+    },
+    [],
+  )
 
   return flourish
 }
