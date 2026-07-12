@@ -136,3 +136,40 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* Secret /admin entry flourish */
+@keyframes secret-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--cyan-rgb), 0.5);
+    opacity: 1;
+    transform: scale(0.4);
+  }
+  70% {
+    box-shadow: 0 0 60px 30px rgba(var(--purple-rgb), 0.25);
+  }
+  100% {
+    box-shadow: 0 0 120px 60px rgba(var(--purple-rgb), 0);
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+@keyframes secret-caption {
+  0% {
+    opacity: 0;
+    letter-spacing: 0.6em;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    letter-spacing: 0.2em;
+  }
+}
+.secret-pulse {
+  border: 1px solid var(--cyan);
+  animation: secret-pulse 0.7s ease-out forwards;
+}
+.secret-caption {
+  animation: secret-caption 0.7s ease-out forwards;
+}

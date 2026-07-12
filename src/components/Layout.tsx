@@ -3,6 +3,8 @@ import ThemeToggle from './ThemeToggle'
 import Footer from './Footer'
 import { GithubIcon } from './icons'
 import { SITE } from '../content/site'
+import useSecretAdmin from '../hooks/useSecretAdmin'
+import AccessFlourish from './AccessFlourish'
 
 const TABS = [
   { to: '/', label: 'Home' },
@@ -13,8 +15,10 @@ const TABS = [
 ]
 
 export default function Layout() {
+  const flourish = useSecretAdmin()
   return (
     <div className="min-h-screen bg-bg text-fg">
+      {flourish && <AccessFlourish />}
       <nav className="relative z-10 mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-y-3 px-6 py-6 print:hidden">
         <NavLink to="/" className="font-mono text-sm tracking-tight text-muted">
           js<span className="text-cyan">.</span>

@@ -34,7 +34,10 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col gap-2 border-t border-border pt-6 text-xs text-dim sm:flex-row sm:items-center sm:justify-between">
-          <span>© {SITE.name}. Doctrine contributions © {SITE.attribution.caosAuthor}, CC BY 4.0.</span>
+          <span>
+            <span data-secret-admin>©</span> {SITE.name}. Doctrine contributions ©{' '}
+            {SITE.attribution.caosAuthor}, CC BY 4.0.
+          </span>
           <span className="font-mono">{SITE.tagline}</span>
         </div>
       </div>
