@@ -5,6 +5,7 @@ const AdminGlobe = lazy(() => import('./AdminGlobe'))
 type Metric = { x: string | null; y: number }
 type Stats = {
   range: string
+  role?: 'admin' | 'viewer'
   stats: { pageviews?: { value: number }; visitors?: { value: number } }
   pages: Metric[]
   referrers: Metric[]
@@ -144,13 +145,21 @@ export default function Admin() {
 
   const pageviews = data?.stats?.pageviews?.value ?? 0
   const visitors = data?.stats?.visitors?.value ?? 0
+  const isAdminRole = data?.role !== 'viewer'
 
   return (
     <section className="mx-auto max-w-3xl px-6 py-20">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-cyan">Admin</p>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-cyan">
+        Admin
+        {data?.role === 'viewer' && (
+          <span className="ml-3 rounded-full border border-border px-2 py-0.5 text-[10px] tracking-widest text-dim">
+            Viewer
+          </span>
+        )}
+      </p>
       <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-fg">Site analytics</h1>
       <div className="mt-4 flex gap-2">
-        {(['stats', 'globe'] as const).map((v) => (
+        {(isAdminRole ? (['stats', 'globe'] as const) : (['stats'] as const)).map((v) => (
           <button
             key={v}
             onClick={() => setView(v)}
@@ -192,7 +201,7 @@ export default function Admin() {
           </div>
         </>
       )}
-      {view === 'globe' && (
+      {view === 'globe' && isAdminRole && (
         <Suspense fallback={<p className="mt-6 text-muted">Loading globe...</p>}>
           <AdminGlobe range={range} />
         </Suspense>
