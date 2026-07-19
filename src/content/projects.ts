@@ -44,7 +44,7 @@ export const PROJECT_GROUPS: ProjectGroup[] = [
       {
         title: 'Compound AI: Enforced Runtime',
         blurb:
-          'The shareable core of my AI operating practice: usage guards, a session router, worker agents, goal contracts, and provenance scripts. Point a fresh agent at the repo and it installs the system end-to-end.',
+          'The shareable core of my AI operating practice: usage guards, a session router, worker agents, goal contracts, and provenance scripts, now extended with a usage-adaptive delegation ladder. A free-model tier (Forge running OpenRouter free models, plus a direct Gemini free-tier lane as a congestion-proof reserve) absorbs second opinions, adjudications, and copy review at zero token cost. Routing shifts down-ladder as the paid usage window fills, and a capability floor keeps repo-dependent and precision work on capable models: regulation, not degradation. A spec-driven planning IDE (Kiro) feeds source-verified product interviews into the same loop. Point a fresh agent at the repo and it installs the system end-to-end.',
         status: 'Active',
         href: 'https://github.com/joshuadsutcliff/claude-config-public',
         note: 'Built on the Compound AI Operating Standards by Cameron Sutcliff, CC BY 4.0.',
