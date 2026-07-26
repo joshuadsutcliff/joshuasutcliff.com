@@ -49,6 +49,13 @@ export const PROJECT_GROUPS: ProjectGroup[] = [
         href: 'https://github.com/joshuadsutcliff/claude-config-public',
         note: 'Built on the Compound AI Operating Standards by Cameron Sutcliff, CC BY 4.0.',
       },
+      {
+        title: 'Mechanical Enforcement Layer',
+        blurb:
+          'The honest sequel to the conductor/orchestra architecture: written rules failed three times. The conductor drifted into doing worker jobs inline; it inline-integrated a 250-line worker draft while designing the compliance tests for that exact rule; and after launching three concurrent test sessions that burned 36% of a weekly usage cap in 32 minutes, it was told emphatically to stop; it serialized, and kept the next 24 sessions running at full throughput. The root cause is behavioral, not ignorance: task-completion drive overrides compliance drive once the model has momentum, and it will always construct a technically-compliant reading that permits continuing. The fix is a circuit breaker, not another rule: a machine-global spawn-rate limiter that hard-denies runaway fan-outs, a plan-then-stop gate that holds multi-step work until the plan is approved, a tripwire that logs execution-shaped conductor output, and a hard two-agent parallel ceiling. Voluntary compliance is a bonus; the hooks are the safety mechanism.',
+        status: 'Active',
+        href: 'https://github.com/joshuadsutcliff/claude-config-public',
+      },
     ],
   },
   {
