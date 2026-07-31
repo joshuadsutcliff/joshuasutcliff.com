@@ -1,6 +1,7 @@
 import { GithubIcon } from '../components/icons'
 import { PROJECT_GROUPS } from '../content/projects'
 import { CHANGELOG_ENTRIES, CHANGELOG_HEADING, CHANGELOG_INTRO } from '../content/changelog'
+import { DIAGRAMS_ENTRIES, DIAGRAMS_HEADING, DIAGRAMS_INTRO } from '../content/diagrams'
 
 export default function Projects() {
   return (
@@ -53,6 +54,34 @@ export default function Projects() {
           </div>
         </div>
       ))}
+
+      <div className="mt-12">
+        <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-muted">{DIAGRAMS_HEADING}</h2>
+        <p className="mt-3 text-sm leading-relaxed text-muted">{DIAGRAMS_INTRO}</p>
+        <div className="mt-5 grid gap-5">
+          {DIAGRAMS_ENTRIES.map((entry) => (
+            <div key={entry.id} className="glass flex flex-col rounded-2xl p-7">
+              <p className="font-display text-xl font-semibold text-fg">{entry.title}</p>
+              <img
+                src={entry.image}
+                alt={entry.alt}
+                loading="lazy"
+                className="mt-4 w-full rounded-xl border border-border"
+              />
+              <div className="mt-4 space-y-3">
+                <div>
+                  <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-dim">What it shows</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted">{entry.what}</p>
+                </div>
+                <div>
+                  <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-dim">Why it's built this way</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted">{entry.why}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       <div className="mt-12">
         <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-muted">{CHANGELOG_HEADING}</h2>
