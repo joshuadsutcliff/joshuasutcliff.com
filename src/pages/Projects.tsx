@@ -1,5 +1,6 @@
 import { GithubIcon } from '../components/icons'
 import { PROJECT_GROUPS } from '../content/projects'
+import { CHANGELOG_ENTRIES, CHANGELOG_HEADING, CHANGELOG_INTRO } from '../content/changelog'
 
 export default function Projects() {
   return (
@@ -52,6 +53,37 @@ export default function Projects() {
           </div>
         </div>
       ))}
+
+      <div className="mt-12">
+        <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-muted">{CHANGELOG_HEADING}</h2>
+        <p className="mt-3 text-sm leading-relaxed text-muted">{CHANGELOG_INTRO}</p>
+        <div className="mt-5 grid gap-5">
+          {CHANGELOG_ENTRIES.map((entry) => (
+            <div key={entry.title} className="glass flex flex-col rounded-2xl p-7">
+              <div className="flex items-start justify-between gap-3">
+                <p className="font-display text-xl font-semibold text-fg">{entry.title}</p>
+                <span className="shrink-0 rounded-full border border-border px-2.5 py-0.5 font-mono text-[11px] text-muted">
+                  {entry.date}
+                </span>
+              </div>
+              <div className="mt-4 space-y-3">
+                <div>
+                  <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-dim">What changed</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted">{entry.what}</p>
+                </div>
+                <div>
+                  <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-dim">Why</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted">{entry.why}</p>
+                </div>
+                <div>
+                  <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-dim">The win</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted">{entry.improvement}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
   )
 }
