@@ -194,9 +194,13 @@ export const SCHEMATICS: Record<string, SchematicSpec> = {
     ],
     edges: [
       { from: 'field-rules', to: 'check-secrets', style: 'flow' },
+      { from: 'field-rules', to: 'check-burn', style: 'flow' },
       { from: 'field-rules', to: 'max-2', style: 'flow' },
+      { from: 'field-rules', to: 'sandbox', style: 'flow' },
       { from: 'field-rules', to: 'two-strike', style: 'flow' },
+      { from: 'field-rules', to: 'stuck-rule', style: 'flow' },
       { from: 'field-rules', to: 'pace', style: 'flow' },
+      { from: 'field-rules', to: 'inline', style: 'flow' },
     ],
     footnote: 'Hooks catch what a script can detect; these rules encode postmortem lessons that need judgment to apply.',
   },
