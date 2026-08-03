@@ -258,3 +258,27 @@ Acceptance: six schematics readable on a 375px-wide phone without zooming;
 all animation obeys reduced-motion; bundle budget unchanged (+10 KB gzip
 total for the whole redesign still holds); pilot diagram (master
 architecture) approved visually by Josh before the remaining five are built.
+
+### Amendment (2026-08-03, Josh direction): background intensity parity
+
+The restrained calibration undershot. Every mode must match the Home
+constellation's visual presence and perceptibility: motion noticeable within
+a few seconds of landing, particle brightness comparable to Home, cinematic
+cosmic character:
+
+- Spiral: a visibly swirling galaxy: clear arm structure, brighter core,
+  rotation perceptible at a glance (target full revolution ~60-90s), subtle
+  particle trails acceptable.
+- Singularity: a Gargantua-style rotating black hole: bright thin accretion
+  ring with glow and mild brightness asymmetry, dark core, visible rotation
+  shimmer. A present visual element (upper right, clear of the content
+  column), not a corner easter egg.
+- Nebula: more and brighter puffs, clearly drifting.
+- Orbital: orbit motion visible at a glance; faint orbit-path arcs more
+  frequent.
+
+Per-mode particle cap raised from 70 to 140 where the design needs it;
+performance guardrails unchanged (single rAF, no per-frame gradient
+construction storms, pause on hidden, reduced-motion static frame). The
+"refined HUD" restraint still applies to the schematics and page chrome;
+backgrounds are the cinematic layer.
