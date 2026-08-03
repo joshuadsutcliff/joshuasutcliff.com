@@ -2,11 +2,36 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import type { SchematicGate, SchematicNode, SchematicSpec } from '../content/schematics'
 
 type Point = { x: number; y: number }
+type NodeRect = Point & { hw: number; hh: number }
+
+const EDGE_GAP = 3
 
 function quadraticMidpoint(from: Point, control: Point, to: Point): Point {
   return {
     x: 0.25 * from.x + 0.5 * control.x + 0.25 * to.x,
     y: 0.25 * from.y + 0.5 * control.y + 0.25 * to.y,
+  }
+}
+
+// Clips the point where a ray from a node's center toward `toward` exits the
+// node's bounding box, then nudges it outward by `gap` so no stroke ever
+// enters the box (and crosses its label text).
+function clipToNodeBorder(node: NodeRect, toward: Point, gap: number = EDGE_GAP): Point {
+  const dx = toward.x - node.x
+  const dy = toward.y - node.y
+  if (dx === 0 && dy === 0) return { x: node.x, y: node.y }
+
+  const scaleX = dx !== 0 ? node.hw / Math.abs(dx) : Infinity
+  const scaleY = dy !== 0 ? node.hh / Math.abs(dy) : Infinity
+  const s = Math.min(scaleX, scaleY)
+
+  const length = Math.sqrt(dx * dx + dy * dy)
+  const ux = dx / length
+  const uy = dy / length
+
+  return {
+    x: node.x + dx * s + ux * gap,
+    y: node.y + dy * s + uy * gap,
   }
 }
 
@@ -114,7 +139,7 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
 
   const containerRef = useRef<HTMLDivElement | null>(null)
   const nodeElements = useRef<Map<string, HTMLDivElement>>(new Map())
-  const [points, setPoints] = useState<Map<string, Point>>(new Map())
+  const [points, setPoints] = useState<Map<string, NodeRect>>(new Map())
   const [box, setBox] = useState({ width: 0, height: 0 })
 
   const registerRef = useCallback((id: string, el: HTMLDivElement | null) => {
@@ -126,12 +151,14 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
     const container = containerRef.current
     if (!container) return
     const containerRect = container.getBoundingClientRect()
-    const next = new Map<string, Point>()
+    const next = new Map<string, NodeRect>()
     nodeElements.current.forEach((el, id) => {
       const rect = el.getBoundingClientRect()
       next.set(id, {
         x: rect.left - containerRect.left + rect.width / 2,
         y: rect.top - containerRect.top + rect.height / 2,
+        hw: rect.width / 2,
+        hh: rect.height / 2,
       })
     })
     setPoints(next)
@@ -202,11 +229,17 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
 
               if (edge.style === 'orbit') {
                 const control = { x: (from.x + to.x) / 2, y: Math.min(from.y, to.y) - 36 }
-                const labelPoint = quadraticMidpoint(from, control, to)
+                // Clip each endpoint toward the control point so the curve
+                // visually exits the box edge cleanly (not toward the other
+                // node's center, which would clip at the wrong angle for a
+                // curved path).
+                const clippedFrom = clipToNodeBorder(from, control)
+                const clippedTo = clipToNodeBorder(to, control)
+                const labelPoint = quadraticMidpoint(clippedFrom, control, clippedTo)
                 return (
                   <g key={index}>
                     <path
-                      d={`M ${from.x} ${from.y} Q ${control.x} ${control.y} ${to.x} ${to.y}`}
+                      d={`M ${clippedFrom.x} ${clippedFrom.y} Q ${control.x} ${control.y} ${clippedTo.x} ${clippedTo.y}`}
                       fill="none"
                       stroke="var(--purple)"
                       strokeWidth={1.25}
@@ -220,16 +253,24 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
                 )
               }
 
-              const midPoint = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 }
+              // Straight edges (flow/return): clip each endpoint toward the
+              // other node's raw center so the stroke starts/ends at the box
+              // border, never crossing into the box over its label text.
+              const clippedFrom = clipToNodeBorder(from, to)
+              const clippedTo = clipToNodeBorder(to, from)
+              const midPoint = {
+                x: (clippedFrom.x + clippedTo.x) / 2,
+                y: (clippedFrom.y + clippedTo.y) / 2,
+              }
 
               if (edge.style === 'return') {
                 return (
                   <g key={index}>
                     <line
-                      x1={from.x}
-                      y1={from.y}
-                      x2={to.x}
-                      y2={to.y}
+                      x1={clippedFrom.x}
+                      y1={clippedFrom.y}
+                      x2={clippedTo.x}
+                      y2={clippedTo.y}
                       stroke="var(--dim)"
                       strokeWidth={1}
                       strokeDasharray="1 5"
@@ -244,10 +285,10 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
               return (
                 <g key={index}>
                   <line
-                    x1={from.x}
-                    y1={from.y}
-                    x2={to.x}
-                    y2={to.y}
+                    x1={clippedFrom.x}
+                    y1={clippedFrom.y}
+                    x2={clippedTo.x}
+                    y2={clippedTo.y}
                     stroke="var(--cyan)"
                     strokeWidth={1.25}
                     strokeDasharray="4 4"
