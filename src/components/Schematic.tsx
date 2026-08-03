@@ -96,35 +96,75 @@ function computeOrbitControl(
   return { x: controlX, y: baseY - lift }
 }
 
-// Picks a point along the edge's path (straight or curved, via `pathPoint`)
-// for the label to sit at, preferring the midpoint but shifting toward
-// t=0.35/0.65 (then further out) whenever the label pill would overlap
-// another node's box.
+type LabelRect = Point & { hw: number; hh: number }
+
+const LABEL_TANGENT_EPS = 0.02
+const LABEL_PERP_OFFSET = 11
+
+// Unit tangent of `pathPoint` at `t`, estimated by central difference so it
+// works for straight (lerp) and curved (quadratic) paths alike.
+function pathTangent(pathPoint: (t: number) => Point, t: number): Point {
+  const t0 = Math.max(0, t - LABEL_TANGENT_EPS)
+  const t1 = Math.min(1, t + LABEL_TANGENT_EPS)
+  const a = pathPoint(t0)
+  const b = pathPoint(t1)
+  const dx = b.x - a.x
+  const dy = b.y - a.y
+  const len = Math.sqrt(dx * dx + dy * dy) || 1
+  return { x: dx / len, y: dy / len }
+}
+
+// Picks a point beside the edge's path (straight or curved, via `pathPoint`)
+// for the label to sit at. Candidates are offset perpendicular to the path
+// (never dead-center on the stroke) and biased toward the source end
+// (t~0.2-0.35) so a label like 'no' visually belongs to the gate it left,
+// rather than floating at the path's raw midpoint. A candidate is accepted
+// only once it clears every other node's box AND every label already
+// placed for a prior edge in this render pass; both perpendicular
+// directions are tried at each t. If nothing clears, the source-biased,
+// perpendicular-offset fallback is used anyway - the raw path midpoint
+// (which can land squarely on an unrelated node) is never returned.
 function resolveLabelAnchor(
   pathPoint: (t: number) => Point,
   labelSize: { width: number; height: number },
   rects: Map<string, NodeRect>,
   excludeIds: Set<string>,
+  placedLabels: LabelRect[],
 ): Point {
   const entries = Array.from(rects.entries()).filter(([id]) => !excludeIds.has(id))
-  const isClear = (p: Point) => {
-    const pillCenter = { x: p.x, y: p.y - 10 }
-    return entries.every(
-      ([, rect]) => !boxIntersectsRect(pillCenter, labelSize.width / 2, labelSize.height / 2, rect, 6),
-    )
+  const halfW = labelSize.width / 2
+  const halfH = labelSize.height / 2
+
+  const isClear = (p: Point) =>
+    entries.every(([, rect]) => !boxIntersectsRect(p, halfW, halfH, rect, 6)) &&
+    placedLabels.every((label) => !boxIntersectsRect(p, halfW, halfH, label, 2))
+
+  const commit = (p: Point) => {
+    placedLabels.push({ x: p.x, y: p.y, hw: halfW, hh: halfH })
+    return p
   }
 
-  for (const t of [0.5, 0.35, 0.65, 0.25, 0.75]) {
-    const candidate = pathPoint(t)
-    if (isClear(candidate)) return candidate
+  const ts = [0.3, 0.25, 0.35, 0.2, 0.5, 0.65, 0.75]
+  for (const t of ts) {
+    const base = pathPoint(t)
+    const tangent = pathTangent(pathPoint, t)
+    const perp = { x: -tangent.y, y: tangent.x }
+    for (const side of [1, -1]) {
+      const candidate = {
+        x: base.x + perp.x * LABEL_PERP_OFFSET * side,
+        y: base.y + perp.y * LABEL_PERP_OFFSET * side,
+      }
+      if (isClear(candidate)) return commit(candidate)
+    }
   }
 
-  const base = pathPoint(0.5)
-  for (let extra = 14; extra <= 60; extra += 14) {
-    const candidate = { x: base.x, y: base.y - extra }
-    if (isClear(candidate)) return candidate
-  }
-  return base
+  const fallbackBase = pathPoint(0.25)
+  const fallbackTangent = pathTangent(pathPoint, 0.25)
+  const fallbackPerp = { x: -fallbackTangent.y, y: fallbackTangent.x }
+  return commit({
+    x: fallbackBase.x + fallbackPerp.x * LABEL_PERP_OFFSET,
+    y: fallbackBase.y + fallbackPerp.y * LABEL_PERP_OFFSET,
+  })
 }
 
 // Builds the mobile/screen-reader caption from the graph itself rather than
@@ -171,7 +211,7 @@ function deriveCaption(spec: SchematicSpec): string {
 function EdgeLabel({ point, text }: { point: Point; text: string }) {
   const { width, height } = measureLabel(text)
   return (
-    <g transform={`translate(${point.x}, ${point.y - 10})`}>
+    <g transform={`translate(${point.x}, ${point.y})`}>
       <rect
         x={-width / 2}
         y={-height / 2}
@@ -226,8 +266,14 @@ function NodeBox({ node }: { node: SchematicNode }) {
       className="hud-panel relative flex flex-col items-center justify-center gap-0.5 rounded-xl px-3 py-2 text-center"
       style={style}
     >
-      <span className="font-mono text-xs text-fg">{node.label}</span>
-      {node.sub && <span className="font-mono text-[10px] text-dim">{node.sub}</span>}
+      {/* Opaque backing layer, painted between the hud-panel's translucent
+          background and the label text, so an edge line routed behind this
+          box (z-index below the node layer, see the SVG overlay) never
+          shows through the box onto the text - even where the panel's own
+          background is only ~3% opaque. */}
+      <span aria-hidden="true" className="absolute inset-0 rounded-xl bg-bg" />
+      <span className="relative font-mono text-xs text-fg">{node.label}</span>
+      {node.sub && <span className="relative font-mono text-[10px] text-dim">{node.sub}</span>}
     </div>
   )
 }
@@ -237,7 +283,7 @@ function GateChip({ gate }: { gate: SchematicGate }) {
   return (
     <div
       data-schematic-id={gate.id}
-      className="flex items-center gap-2 rounded-full border border-border bg-bg2/60 px-3 py-1.5"
+      className="relative flex items-center gap-2 rounded-full border border-border bg-bg2 px-3 py-1.5"
     >
       <span
         aria-hidden="true"
@@ -337,12 +383,26 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
         {box.width > 0 && (
           <svg
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 hidden md:block"
+            // Negative z-index (within the container's own stacking
+            // context, established by its `relative`) paints this overlay
+            // BEFORE the in-flow, non-positioned node/gate boxes above -
+            // so any edge that has to cross an unrelated box's rect (e.g.
+            // a hub-to-group fan-out with several destinations roughly
+            // collinear) is hidden behind that box rather than drawn over
+            // its label text. Endpoint clipping (clipToNodeBorder) still
+            // keeps strokes off the boxes they actually connect to.
+            className="pointer-events-none absolute inset-0 z-[-1] hidden md:block"
             width={box.width}
             height={box.height}
             viewBox={`0 0 ${box.width} ${box.height}`}
           >
-            {spec.edges.map((edge, index) => {
+            {(() => {
+              // Shared across every edge in this render pass so labels
+              // placed for earlier edges are treated as obstacles for
+              // later ones (prevents label-on-label collisions, e.g. the
+              // four 'no' labels in hook-flow all wanting the same slot).
+              const placedLabelRects: LabelRect[] = []
+              return spec.edges.map((edge, index) => {
               const from = points.get(edge.from)
               const to = points.get(edge.to)
               if (!from || !to) return null
@@ -368,6 +428,7 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
                       labelSize,
                       points,
                       excludeIds,
+                      placedLabelRects,
                     )
                   : null
                 return (
@@ -394,7 +455,13 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
               const clippedTo = clipToNodeBorder(to, from)
               const labelSize = edge.label ? measureLabel(edge.label) : null
               const labelPoint = labelSize
-                ? resolveLabelAnchor((t) => lerp(clippedFrom, clippedTo, t), labelSize, points, excludeIds)
+                ? resolveLabelAnchor(
+                    (t) => lerp(clippedFrom, clippedTo, t),
+                    labelSize,
+                    points,
+                    excludeIds,
+                    placedLabelRects,
+                  )
                 : null
 
               if (edge.style === 'return') {
@@ -433,7 +500,8 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
                   {edge.label && labelPoint && <EdgeLabel point={labelPoint} text={edge.label} />}
                 </g>
               )
-            })}
+              })
+            })()}
           </svg>
         )}
       </div>

@@ -17,8 +17,8 @@ const TABS = [
 function modeForPath(pathname: string): ParticleMode {
   if (pathname === '/') return 'constellation'
   if (pathname === '/work') return 'orbital'
-  if (pathname === '/about') return 'nebula'
-  if (pathname === '/resume') return 'singularity'
+  if (pathname === '/about') return 'singularity'
+  if (pathname === '/resume') return 'nebula'
   return 'spiral'
 }
 
