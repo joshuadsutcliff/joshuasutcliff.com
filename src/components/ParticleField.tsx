@@ -356,7 +356,17 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
     }
 
     function frame(now: number) {
-      const dt = lastTime ? Math.min((now - lastTime) / 1000, 0.1) : 0
+      // Clamp dt against pathological gaps only (tab asleep for minutes,
+      // debugger pause, etc). 1s is generous: rAF delivery is already
+      // throttled to roughly 1/s for an occluded-but-visible window (no
+      // visibilitychange fires in that case, so lastTime is never reset),
+      // and the old 0.1s clamp discarded ~90% of that elapsed real time on
+      // every such callback, so motion nearly stalled under exactly the
+      // conditions a real screenshot-diff check hits (window not focused
+      // during the wait). Genuine hidden -> visible transitions already
+      // reset lastTime to 0 in handleVisibility, so they never hit this
+      // clamp at all.
+      const dt = lastTime ? Math.min((now - lastTime) / 1000, 1) : 0
       lastTime = now
       draw(dt)
       raf = requestAnimationFrame(frame)
