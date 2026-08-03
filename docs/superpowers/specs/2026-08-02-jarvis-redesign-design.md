@@ -55,9 +55,10 @@ eyebrow labels, status dots) that neither sibling has.
 
 Each tile is compact and uniform:
 
-- Mono uppercase **eyebrow row**: group label + status dot + status text
-  (e.g. `ACTIVE · v0.7.0`). Status dot colors: green = active/live/always-on,
-  amber = on hold.
+- Mono uppercase **eyebrow row**: status dot + status text (e.g.
+  `ACTIVE · v0.7.0`); the group label is carried by the section heading
+  above the tiles, not repeated per tile. Status dot colors: green =
+  active/live/always-on, amber = on hold.
 - **Title** (display font).
 - **TL;DR blurb, 1-2 sentences max** (final copy below).
 - **GitHub icon-link** when the project has a repo (stops click propagation).
