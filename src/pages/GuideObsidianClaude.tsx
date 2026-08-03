@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { OBSIDIAN_CLAUDE_GUIDE, type GuideBlock, type GuideInline } from '../content/guides'
+import CopyButton from '../components/CopyButton'
 
 function RenderInline({ inline }: { inline: GuideInline[] }) {
   return (
@@ -78,12 +79,12 @@ function RenderBlock({ block, index }: { block: GuideBlock; index: number }) {
       )
     case 'code':
       return (
-        <pre
-          key={index}
-          className="mt-4 overflow-x-auto rounded-xl border border-border bg-bg2 p-4 text-xs leading-relaxed text-fg"
-        >
-          <code className="font-mono">{block.text}</code>
-        </pre>
+        <div key={index} className="relative mt-4">
+          <pre className="whitespace-pre-wrap [overflow-wrap:anywhere] rounded-xl border border-border bg-bg2 p-4 pr-20 text-xs leading-relaxed text-fg">
+            <code className="font-mono">{block.text}</code>
+          </pre>
+          <CopyButton text={block.text} />
+        </div>
       )
     case 'divider':
       return <hr key={index} className="mt-10 border-border" />

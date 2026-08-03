@@ -37,6 +37,36 @@ export const OBSIDIAN_CLAUDE_GUIDE = {
     t(" setup. Finish this page first; the last section tells you how to layer that config on top."),
   ] as GuideInline[],
   blocks: [
+    { kind: 'heading2', text: 'Fast path: one-click install' },
+    {
+      kind: 'paragraph',
+      inline: [
+        t(
+          "Don't want to walk through every step by hand? Run a single command and it installs Obsidian and Claude Code, creates a vault, and drops in a starter ",
+        ),
+        c('CLAUDE.md'),
+        t(' rulebook for you, all in one go.'),
+      ],
+    },
+    {
+      kind: 'paragraph',
+      inline: [
+        t(
+          'The manual steps below cover the exact same ground, just broken out one at a time, in case you would rather see what is happening at each stage (or something needs troubleshooting).',
+        ),
+      ],
+    },
+    { kind: 'paragraph', inline: [b('macOS / Linux:')] },
+    {
+      kind: 'code',
+      text: 'curl -fsSL https://raw.githubusercontent.com/joshuadsutcliff/claude-config-public/main/scripts/install.sh | bash',
+    },
+    { kind: 'paragraph', inline: [b('Windows (PowerShell):')] },
+    {
+      kind: 'code',
+      text: 'irm https://raw.githubusercontent.com/joshuadsutcliff/claude-config-public/main/scripts/install.ps1 | iex',
+    },
+    { kind: 'divider' },
     { kind: 'heading2', text: 'Step 1: Install Obsidian' },
     {
       kind: 'paragraph',
