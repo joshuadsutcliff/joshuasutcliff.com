@@ -27,7 +27,23 @@ export const PROJECT_DETAILS: Record<string, ProjectDetailEntry> = {
       'Fully customizable dashboard: design the monitor yourself',
       'Honest by design: no fabricated readings, ever',
     ],
-    images: [],
+    images: [
+      {
+        src: '/screenshots/nexus/dashboard.jpg',
+        alt: 'Nexus System Monitor dashboard on macOS: System Health view with an overall health score ring, CPU, memory, disk, and GPU status cards, and a performance bottleneck analysis panel.',
+        caption: 'System Health dashboard (macOS, Apple Silicon)',
+      },
+      {
+        src: '/screenshots/nexus/performance.jpg',
+        alt: 'Nexus System Monitor Performance view: live CPU utilization, memory usage, disk I/O, and network charts for an Apple M4, with a per-core utilization grid and per-drive usage bars.',
+        caption: 'Performance view with live charts and per-core utilization',
+      },
+      {
+        src: '/screenshots/nexus/processes.jpg',
+        alt: 'Nexus System Monitor Processes view: a sortable process table with per-process CPU, memory, threads, and user columns, plus search, grouping, and an info panel.',
+        caption: 'Processes view with search, grouping, and per-process telemetry',
+      },
+    ],
   },
   ghostpane: {
     slug: 'ghostpane',
