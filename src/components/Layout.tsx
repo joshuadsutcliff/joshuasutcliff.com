@@ -4,6 +4,7 @@ import { GithubIcon } from './icons'
 import { SITE } from '../content/site'
 import useSecretAdmin from '../hooks/useSecretAdmin'
 import AccessFlourish from './AccessFlourish'
+import ParticleField, { type ParticleMode } from './ParticleField'
 
 const TABS = [
   { to: '/', label: 'Home' },
@@ -13,13 +14,23 @@ const TABS = [
   { to: '/resume', label: 'Resume' },
 ]
 
+function modeForPath(pathname: string): ParticleMode {
+  if (pathname === '/') return 'constellation'
+  if (pathname === '/work') return 'orbital'
+  if (pathname === '/about') return 'nebula'
+  if (pathname === '/resume') return 'singularity'
+  return 'spiral'
+}
+
 export default function Layout() {
   const flourish = useSecretAdmin()
   const location = useLocation()
+  const mode = modeForPath(location.pathname)
   return (
     <div className="min-h-screen text-fg">
       <div aria-hidden className="ambient-wash" />
       <div aria-hidden className="ambient-grid" />
+      <ParticleField mode={mode} key={mode} />
       {flourish && <AccessFlourish />}
       <nav className="relative z-10 mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-y-3 px-6 py-6 print:hidden">
         <NavLink to="/" className="font-mono text-sm tracking-tight text-muted">

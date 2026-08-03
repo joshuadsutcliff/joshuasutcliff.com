@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom'
-import ParticleField from '../components/ParticleField'
 import { GithubIcon, MailIcon } from '../components/icons'
 import { SITE } from '../content/site'
 import { HOME } from '../content/home'
 
 export default function Home() {
   return (
-    <div className="relative isolate overflow-hidden">
+    <div className="relative overflow-hidden">
       <div
         className="absolute inset-0 -z-10"
         style={{
@@ -14,7 +13,6 @@ export default function Home() {
             'radial-gradient(60% 50% at 50% 0%, rgba(var(--purple-rgb), 0.14), transparent 70%), radial-gradient(50% 40% at 80% 20%, rgba(var(--cyan-rgb), 0.12), transparent 70%)',
         }}
       />
-      <ParticleField />
 
       <section className="relative mx-auto max-w-5xl px-6 pb-16 pt-14 sm:pt-20">
         <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs text-muted">

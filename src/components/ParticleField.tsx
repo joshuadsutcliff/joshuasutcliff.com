@@ -1,10 +1,19 @@
 import { useEffect, useRef } from 'react'
 
+export type ParticleMode = 'constellation' | 'spiral' | 'orbital' | 'nebula' | 'singularity'
+
+interface ParticleFieldProps {
+  mode: ParticleMode
+}
+
 /**
- * Lightweight canvas particle field - subtle drifting nodes with near-neighbor
- * links, tinted by the active accent. Pauses when offscreen / reduced-motion.
+ * Route-aware cosmic background canvas, mounted once in Layout. One rAF
+ * loop, one mode active at a time (constellation / spiral / orbital /
+ * nebula / singularity). Pauses when the tab is hidden and renders a
+ * single static frame under prefers-reduced-motion. The constellation
+ * mode reproduces the original Home particle field unchanged.
  */
-export default function ParticleField() {
+export default function ParticleField({ mode }: ParticleFieldProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -18,24 +27,159 @@ export default function ParticleField() {
     let width = 0
     let height = 0
     let raf = 0
+    let lastTime = 0
     const dpr = Math.min(window.devicePixelRatio || 1, 2)
 
-    type P = { x: number; y: number; vx: number; vy: number }
-    let particles: P[] = []
+    const rootStyles = getComputedStyle(document.documentElement)
+    const cyanRgb = rootStyles.getPropertyValue('--cyan-rgb').trim() || '6, 182, 212'
+    const purpleRgb = rootStyles.getPropertyValue('--purple-rgb').trim() || '139, 92, 246'
+    const cyanParts = cyanRgb.split(',').map((n) => parseFloat(n))
+    const purpleParts = purpleRgb.split(',').map((n) => parseFloat(n))
+    const baseAlpha = parseFloat(rootStyles.getPropertyValue('--particle-alpha')) || 0.55
 
+    function lerpColor(t: number) {
+      const cl = Math.max(0, Math.min(1, t))
+      const r = cyanParts[0] + (purpleParts[0] - cyanParts[0]) * cl
+      const g = cyanParts[1] + (purpleParts[1] - cyanParts[1]) * cl
+      const b = cyanParts[2] + (purpleParts[2] - cyanParts[2]) * cl
+      return `${r.toFixed(0)}, ${g.toFixed(0)}, ${b.toFixed(0)}`
+    }
+
+    // deterministic-ish jitter without a Math.random dependency
     function rand(min: number, max: number) {
-      // deterministic-ish jitter without Math.random dependency concerns
       return min + (max - min) * Math.abs(Math.sin((performance.now() + min * 97.3) * 0.0001 + max))
     }
 
-    function seed() {
+    // ---- constellation state (unchanged from the original Home field) ----
+    type Node = { x: number; y: number; vx: number; vy: number }
+    let nodes: Node[] = []
+
+    // ---- spiral state ----
+    type SpiralP = { r: number; baseAngle: number; t: number; alpha: number }
+    let spiralParticles: SpiralP[] = []
+    let spiralCenter = { x: 0, y: 0 }
+    let spiralRotation = 0
+
+    // ---- orbital state ----
+    type OrbitP = { cx: number; cy: number; a: number; b: number; phi: number; theta: number; omega: number }
+    let orbitParticles: OrbitP[] = []
+    let orbitArcTimer = 0
+    let orbitArcNextAt = 0
+    let orbitArc: { index: number; start: number; duration: number } | null = null
+
+    // ---- nebula state ----
+    type NebulaP = { x: number; y: number; vx: number; vy: number; radius: number; layer: number; hue: number }
+    let nebulaParticles: NebulaP[] = []
+
+    // ---- singularity state ----
+    type RingP = { angle: number; radiusJitter: number }
+    let ringParticles: RingP[] = []
+    let ringCenter = { x: 0, y: 0 }
+    let ringRadiusX = 0
+    let ringRadiusY = 0
+    const ringPhi = -0.35
+    let ringRotation = 0
+
+    function seedConstellation() {
       const count = Math.min(70, Math.floor((width * height) / 18000))
-      particles = Array.from({ length: count }, (_, i) => ({
+      nodes = Array.from({ length: count }, (_, i) => ({
         x: rand(i * 13, width),
         y: rand(i * 7, height),
         vx: (rand(i, 1) - 0.5) * 0.25,
         vy: (rand(1, i + 2) - 0.5) * 0.25,
       }))
+    }
+
+    function seedSpiral() {
+      const armCount = 3
+      const total = 100 // within the brief's 80-140 range, kept toward the lower end
+      const perArm = Math.ceil(total / armCount)
+      const thetaMax = Math.PI * 4
+      const b = 0.21 // within the 0.18-0.25 range
+      const maxRadius = Math.min(width, height) * 0.5
+      const a = maxRadius / Math.exp(b * thetaMax)
+      spiralCenter = { x: width * 0.64, y: height * 0.32 } // offset toward the top-right third
+      spiralRotation = 0
+      spiralParticles = []
+      for (let arm = 0; arm < armCount; arm++) {
+        const armOffset = (arm * Math.PI * 2) / armCount
+        for (let i = 0; i < perArm; i++) {
+          const t = i / perArm
+          const jitterAngle = (rand(arm * 31 + i, 2) - 0.5) * 0.35
+          const jitterR = (rand(arm * 17 + i, 3) - 0.5) * 0.12
+          const thetaLocal = t * thetaMax
+          const r = a * Math.exp(b * thetaLocal) * (1 + jitterR)
+          spiralParticles.push({
+            r,
+            baseAngle: thetaLocal + armOffset + jitterAngle,
+            t,
+            alpha: 0.5 - 0.25 * t, // 0.25-0.5 range, brighter toward the core
+          })
+        }
+      }
+    }
+
+    function seedOrbital() {
+      const attractorCount = 3
+      const attractors = Array.from({ length: attractorCount }, (_, i) => ({
+        x: width * (0.22 + 0.28 * i + rand(i, 5) * 0.06),
+        y: height * (0.3 + rand(i + 1, 6) * 0.4),
+      }))
+      const total = 55 // within the brief's 40-70 range
+      const scale = Math.min(width, height)
+      orbitParticles = Array.from({ length: total }, (_, i) => {
+        const attractor = attractors[i % attractors.length]
+        const semiMajor = scale * (0.1 + rand(i, 7) * 0.18)
+        return {
+          cx: attractor.x,
+          cy: attractor.y,
+          a: semiMajor,
+          b: semiMajor * (0.4 + rand(i, 8) * 0.4),
+          phi: rand(i, 9) * Math.PI * 2,
+          theta: rand(i, 10) * Math.PI * 2,
+          omega: (rand(i, 11) - 0.5) * 0.25,
+        }
+      })
+      orbitArcTimer = 0
+      orbitArcNextAt = 4 + rand(1, 12) * 3
+      orbitArc = null
+    }
+
+    function seedNebula() {
+      const total = 32 // within the brief's 25-40 range
+      nebulaParticles = Array.from({ length: total }, (_, i) => {
+        const layer = i % 2
+        return {
+          x: rand(i * 5, width),
+          y: rand(i * 9, height),
+          vx: (rand(i, 13) - 0.5) * (layer === 0 ? 0.03 : 0.07),
+          vy: (rand(i + 1, 14) - 0.5) * (layer === 0 ? 0.03 : 0.07),
+          radius: 8 + rand(i, 15) * 16, // 8-24px
+          layer,
+          hue: rand(i, 16),
+        }
+      })
+    }
+
+    function seedSingularity() {
+      ringCenter = { x: width * 0.86, y: height * 0.24 } // right edge, upper third
+      const scale = Math.min(width, height)
+      ringRadiusX = scale * 0.18
+      ringRadiusY = ringRadiusX * 0.32
+      const total = 60 // within the brief's 50-70 range
+      ringParticles = Array.from({ length: total }, (_, i) => ({
+        angle: (i / total) * Math.PI * 2,
+        radiusJitter: 1 + (rand(i, 17) - 0.5) * 0.08,
+      }))
+      ringRotation = 0
+    }
+
+    function seed() {
+      if (mode === 'constellation') seedConstellation()
+      else if (mode === 'spiral') seedSpiral()
+      else if (mode === 'orbital') seedOrbital()
+      else if (mode === 'nebula') seedNebula()
+      else seedSingularity()
     }
 
     function resize() {
@@ -47,38 +191,26 @@ export default function ParticleField() {
       seed()
     }
 
-    function accent() {
-      const styles = getComputedStyle(document.documentElement)
-      return styles.getPropertyValue('--cyan-rgb').trim() || '6, 182, 212'
-    }
-    function alpha() {
-      const styles = getComputedStyle(document.documentElement)
-      return parseFloat(styles.getPropertyValue('--particle-alpha')) || 0.4
-    }
-
-    function frame() {
-      const rgb = accent()
-      const a = alpha()
+    function drawConstellation() {
       ctx!.clearRect(0, 0, width, height)
 
-      for (const p of particles) {
+      for (const p of nodes) {
         p.x += p.vx
         p.y += p.vy
         if (p.x < 0 || p.x > width) p.vx *= -1
         if (p.y < 0 || p.y > height) p.vy *= -1
       }
 
-      // links
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const a1 = particles[i]
-          const b1 = particles[j]
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const a1 = nodes[i]
+          const b1 = nodes[j]
           const dx = a1.x - b1.x
           const dy = a1.y - b1.y
           const dist = Math.hypot(dx, dy)
           if (dist < 130) {
-            const o = (1 - dist / 130) * a * 0.5
-            ctx!.strokeStyle = `rgba(${rgb}, ${o})`
+            const o = (1 - dist / 130) * baseAlpha * 0.5
+            ctx!.strokeStyle = `rgba(${cyanRgb}, ${o})`
             ctx!.lineWidth = 1
             ctx!.beginPath()
             ctx!.moveTo(a1.x, a1.y)
@@ -88,36 +220,168 @@ export default function ParticleField() {
         }
       }
 
-      // nodes
-      for (const p of particles) {
-        ctx!.fillStyle = `rgba(${rgb}, ${a})`
+      for (const p of nodes) {
+        ctx!.fillStyle = `rgba(${cyanRgb}, ${baseAlpha})`
         ctx!.beginPath()
         ctx!.arc(p.x, p.y, 1.4, 0, Math.PI * 2)
         ctx!.fill()
       }
+    }
 
+    function drawSpiral(dt: number) {
+      spiralRotation += dt * 0.02 // ~0.02 rad/s
+      ctx!.clearRect(0, 0, width, height)
+      for (const p of spiralParticles) {
+        const angle = p.baseAngle + spiralRotation
+        const x = spiralCenter.x + p.r * Math.cos(angle)
+        const y = spiralCenter.y + p.r * Math.sin(angle)
+        ctx!.fillStyle = `rgba(${lerpColor(p.t)}, ${p.alpha})`
+        ctx!.beginPath()
+        ctx!.arc(x, y, 1.5, 0, Math.PI * 2)
+        ctx!.fill()
+      }
+    }
+
+    function drawOrbital(dt: number) {
+      ctx!.clearRect(0, 0, width, height)
+      orbitArcTimer += dt
+
+      for (const p of orbitParticles) {
+        p.theta += p.omega * dt
+        const cosT = Math.cos(p.theta)
+        const sinT = Math.sin(p.theta)
+        const cosPhi = Math.cos(p.phi)
+        const sinPhi = Math.sin(p.phi)
+        const ex = p.a * cosT
+        const ey = p.b * sinT
+        const x = p.cx + ex * cosPhi - ey * sinPhi
+        const y = p.cy + ex * sinPhi + ey * cosPhi
+        ctx!.fillStyle = `rgba(${cyanRgb}, ${baseAlpha * 0.6})`
+        ctx!.beginPath()
+        ctx!.arc(x, y, 1.3, 0, Math.PI * 2)
+        ctx!.fill()
+      }
+
+      if (!orbitArc && orbitArcTimer >= orbitArcNextAt) {
+        const index = Math.floor(rand(orbitArcTimer, 20) * orbitParticles.length) % orbitParticles.length
+        orbitArc = { index, start: orbitArcTimer, duration: 3 }
+      }
+      if (orbitArc) {
+        const elapsed = orbitArcTimer - orbitArc.start
+        const halfDur = orbitArc.duration / 2
+        let envelope = elapsed < halfDur ? elapsed / halfDur : 1 - (elapsed - halfDur) / halfDur
+        envelope = Math.max(0, Math.min(1, envelope))
+        const arcAlpha = envelope * 0.06 // stroke alpha <= 0.06
+        const op = orbitParticles[orbitArc.index]
+        ctx!.strokeStyle = `rgba(${purpleRgb}, ${arcAlpha})`
+        ctx!.lineWidth = 1
+        ctx!.beginPath()
+        ctx!.ellipse(op.cx, op.cy, op.a, op.b, op.phi, 0, Math.PI * 2)
+        ctx!.stroke()
+        if (elapsed >= orbitArc.duration) {
+          orbitArc = null
+          orbitArcTimer = 0
+          orbitArcNextAt = 4 + rand(elapsed, 21) * 3
+        }
+      }
+    }
+
+    function drawNebula(dt: number) {
+      ctx!.clearRect(0, 0, width, height)
+      const step = dt * 60 // normalize velocities tuned for a ~60fps cadence
+      for (const p of nebulaParticles) {
+        p.x += p.vx * step
+        p.y += p.vy * step
+        if (p.x < -p.radius) p.x = width + p.radius
+        if (p.x > width + p.radius) p.x = -p.radius
+        if (p.y < -p.radius) p.y = height + p.radius
+        if (p.y > height + p.radius) p.y = -p.radius
+
+        const color = lerpColor(p.hue)
+        const peakAlpha = 0.05 * (p.layer === 0 ? 0.6 : 1) // <= 0.05 per circle
+        const gradient = ctx!.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius)
+        gradient.addColorStop(0, `rgba(${color}, ${peakAlpha})`)
+        gradient.addColorStop(1, `rgba(${color}, 0)`)
+        ctx!.fillStyle = gradient
+        ctx!.beginPath()
+        ctx!.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
+        ctx!.fill()
+      }
+    }
+
+    function drawSingularity(dt: number) {
+      ringRotation += dt * 0.004 // near-static
+      ctx!.clearRect(0, 0, width, height)
+
+      const coreRadius = ringRadiusX * 0.9
+      const core = ctx!.createRadialGradient(ringCenter.x, ringCenter.y, 0, ringCenter.x, ringCenter.y, coreRadius)
+      core.addColorStop(0, 'rgba(0, 0, 0, 0.35)')
+      core.addColorStop(1, 'rgba(0, 0, 0, 0)')
+      ctx!.fillStyle = core
+      ctx!.beginPath()
+      ctx!.arc(ringCenter.x, ringCenter.y, coreRadius, 0, Math.PI * 2)
+      ctx!.fill()
+
+      for (const p of ringParticles) {
+        const angle = p.angle + ringRotation
+        const ex = ringRadiusX * p.radiusJitter * Math.cos(angle)
+        const ey = ringRadiusY * p.radiusJitter * Math.sin(angle)
+        const x = ringCenter.x + ex * Math.cos(ringPhi) - ey * Math.sin(ringPhi)
+        const y = ringCenter.y + ex * Math.sin(ringPhi) + ey * Math.cos(ringPhi)
+        ctx!.fillStyle = `rgba(${cyanRgb}, ${baseAlpha * 0.5})`
+        ctx!.beginPath()
+        ctx!.arc(x, y, 1, 0, Math.PI * 2)
+        ctx!.fill()
+      }
+    }
+
+    function draw(dt: number) {
+      if (mode === 'constellation') drawConstellation()
+      else if (mode === 'spiral') drawSpiral(dt)
+      else if (mode === 'orbital') drawOrbital(dt)
+      else if (mode === 'nebula') drawNebula(dt)
+      else drawSingularity(dt)
+    }
+
+    function frame(now: number) {
+      const dt = lastTime ? Math.min((now - lastTime) / 1000, 0.1) : 0
+      lastTime = now
+      draw(dt)
       raf = requestAnimationFrame(frame)
+    }
+
+    function handleVisibility() {
+      if (document.hidden) {
+        cancelAnimationFrame(raf)
+        raf = 0
+      } else if (!reduced) {
+        lastTime = 0
+        raf = requestAnimationFrame(frame)
+      }
     }
 
     resize()
     window.addEventListener('resize', resize)
+    document.addEventListener('visibilitychange', handleVisibility)
+
     if (!reduced) {
       raf = requestAnimationFrame(frame)
     } else {
-      frame() // render one static frame
+      draw(0) // render one static frame, no loop
     }
 
     return () => {
       cancelAnimationFrame(raf)
       window.removeEventListener('resize', resize)
+      document.removeEventListener('visibilitychange', handleVisibility)
     }
-  }, [])
+  }, [mode])
 
   return (
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 h-full w-full"
+      className="pointer-events-none fixed inset-0 z-0 h-full w-full print:hidden"
     />
   )
 }
