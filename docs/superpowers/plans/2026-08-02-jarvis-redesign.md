@@ -221,3 +221,70 @@
 - Spec coverage: IA (T1-T3), tile copy (T1), sub-pages (T2), AI Ops merge + diagrams + changelog (T3), visual layer + dark-only (T4), site-wide adoption (T5), images (T6), constraints/acceptance (T7), push gate + live verify + vault note (T8). Guide-page adoption covered in T5. No gaps found.
 - Placeholder scan: none. Type consistency: `ProjectCard`/`ProjectDetailEntry`/class names repeated verbatim across tasks.
 - Known judgment calls: nav pills keep `glass` (small chrome, not content panels); scroll-reveal skipped per spec YAGNI clause.
+
+---
+
+# Addendum tasks (2026-08-03): cosmic backgrounds + native schematics
+
+Approved continuation. Same Global Constraints as above, plus: all canvas
+work stays inside the single background component (one rAF loop, pause on
+document.hidden, static frame under prefers-reduced-motion), and the spec
+addendum in 2026-08-02-jarvis-redesign-design.md ("Addendum (2026-08-03)")
+is the authoritative description.
+
+### Task 9: Route-aware cosmic background component
+
+**Files:**
+- Modify: `src/components/ParticleField.tsx` (full evolution; may rename internals but keep the exported component name)
+- Modify: `src/components/Layout.tsx` (mount it above the ambient divs, aria-hidden, fixed canvas)
+- Modify: `src/pages/Home.tsx` (remove its own ParticleField mount)
+
+**Interfaces:**
+- Produces: `<ParticleField mode={mode} />` where `mode: 'constellation' | 'spiral' | 'orbital' | 'nebula' | 'singularity'`. Layout derives mode from `useLocation().pathname`: `/` constellation; `/work` orbital; `/about` nebula; `/resume` singularity; everything else (projects, sub-pages, guides) spiral.
+
+- [ ] **Step 1:** Evolve ParticleField: keep the existing constellation renderer as mode `constellation` (visually unchanged on Home). Add renderers:
+  - `spiral`: 2-3 logarithmic spiral arms (r = a * e^(b*theta), b ~ 0.18-0.25), 80-140 particles seeded along arms with jitter, whole field rotating at ~0.02 rad/s around a point offset toward the top-right third; particle color lerps cyan (core) to purple (tips); alpha 0.25-0.5.
+  - `orbital`: 2-3 invisible attractor points; 40-70 particles on precomputed elliptical orbits (parametric angles advanced per frame, no n-body integration); every few seconds one faint elliptical path arc fades in/out (stroke alpha <= 0.06).
+  - `nebula`: 25-40 large (8-24px) heavily blurred circles (shadowBlur or radial gradients), drifting slowly with 2-layer parallax; alpha <= 0.05 each.
+  - `singularity`: one thin particle ellipse (accretion ring) of 50-70 tiny particles positioned in the viewport corner away from the content column (right edge, upper third), rotating extremely slowly; plus a faint darker radial core. Near-static feel.
+  Shared: cap total particles at the current Home count or lower per mode; single rAF; pause when document.hidden (visibilitychange); prefers-reduced-motion renders one static frame and stops; resize handling preserved; canvas remains `position: fixed`, `pointer-events: none`, behind content but above the ambient wash (z-index between the ambient layers and content, e.g. 0 with content wrappers already above; verify layering against the ambient-grid fix: do NOT reintroduce an opaque background on the Layout root).
+- [ ] **Step 2:** Layout mounts `<ParticleField mode={...} />` keyed by mode (so mode changes remount cleanly); Home.tsx drops its local mount and any `isolate` wrapper that existed only for it (verify Home visuals unchanged otherwise).
+- [ ] **Step 3:** Verify: build exit 0; all routes 200; grep confirms exactly one `<ParticleField` mount in src/pages+components (the Layout one); no em dashes.
+- [ ] **Step 4:** Commit `git add -A && git commit -m "cosmic backgrounds: route-aware particle modes (constellation/spiral/orbital/nebula/singularity)"`
+
+### Task 10: Schematic vocabulary + pilot diagram (master architecture)
+
+**Files:**
+- Create: `src/components/Schematic.tsx`
+- Create: `src/content/schematics.ts` (types + the `architecture` entry only)
+- Modify: `src/pages/ProjectDetail.tsx` (diagram rows render `<Schematic>` when a schematic entry exists for the diagram id, else fall back to the PNG thumbnail; PNG stays available behind a mono "view original" link that opens the existing Lightbox either way)
+
+**Interfaces:**
+- Produces (types in schematics.ts, used by Tasks 11-12 verbatim):
+```ts
+export type SchematicNode = { id: string; label: string; sub?: string; accent?: 'star' | 'none' }
+export type SchematicGroup = { id: string; title?: string; nodes: SchematicNode[]; direction?: 'row' | 'column' }
+export type SchematicEdge = { from: string; to: string; style?: 'flow' | 'return' | 'orbit'; label?: string }
+export type SchematicGate = { id: string; label: string; kind: 'deny' | 'limit' }
+export type SchematicSpec = { id: string; title: string; groups: SchematicGroup[]; edges: SchematicEdge[]; gates?: SchematicGate[]; footnote?: string }
+export const SCHEMATICS: Record<string, SchematicSpec>
+```
+- `<Schematic spec={SchematicSpec} />` renders groups as HUD panels of node boxes (mono labels, real text), edges as SVG connectors overlaying the flex/grid layout (measured via refs; straight `flow` = thin cyan line with slow dash animation, `return` = dotted dim line, `orbit` = curved quadratic path), gates as small chips with a gravity-well ring motif (`kind: 'deny'` = darker core + thin event-horizon ring), star-accent nodes get a soft radial glow. Fully responsive: below md, groups stack and edges hide (order + group structure carries the flow; add a small "flow: A > B > C" mono caption fallback below the stacked groups so mobile keeps the sequence).
+- [ ] **Step 1:** Build Schematic.tsx + the `architecture` spec entry: hooks column (session router, usage guard, session timer, tripwire as gate chips feeding in), conductor node (star accent), worker pool group (Haiku/Sonnet/Opus/free tier), vault memory node, edges: prompt flow through hooks to conductor, delegation flow to workers, dotted return edges, orbit edge conductor-to-vault. Content mirrors diagrams.ts `architecture` what-text; keep every label under 20 chars.
+- [ ] **Step 2:** ProjectDetail: diagram row renders `<Schematic>` when `SCHEMATICS[entry.id]` exists (architecture only for now), PNG fallback otherwise; "view original" link added in both cases.
+- [ ] **Step 3:** Verify: build exit 0; /projects/ai-operations 200; reduced-motion: dash animation under the global kill switch; no em dashes.
+- [ ] **Step 4:** Commit `git add -A && git commit -m "schematics: component vocabulary + native master-architecture pilot"`
+- [ ] **Step 5:** STOP. Controller presents the pilot to Josh (browser screenshots, desktop + 375px). Remaining diagrams proceed only on his visual approval.
+
+### Task 11: Schematics batch 1 (hook-flow, session-router)
+**Files:** Modify: `src/content/schematics.ts` only.
+- [ ] Add `hook-flow` (four sequential gates as deny/limit chips with the gravity-well motif, spawn flowing through, deny paths dropping to a "denied" node) and `session-router` (prompt node, classifier, three tier lanes LIGHT/MEDIUM/HEAVY with HEAVY ending in a plan-then-stop gate) entries, content mirroring each diagrams.ts what-text. Verify + commit `git add -A && git commit -m "schematics: hook-flow + session-router"`
+
+### Task 12: Schematics batch 2 (field-rules, delegation-ladder, before-after)
+**Files:** Modify: `src/content/schematics.ts` only (check diagrams.ts for the actual ids/titles of diagrams 4-6 and mirror them).
+- [ ] Add the remaining three entries in the same pattern. The before/after diagram becomes two stacked lane groups (before = red-tinted chips, after = green-tinted; extend SchematicNode with optional `tone?: 'good' | 'bad'` if needed, updating the type in place). Verify + commit `git add -A && git commit -m "schematics: remaining three diagrams native"`
+
+### Task 13: Addendum review + ship
+- [ ] Whole-addendum review (Task 9..12 range) on the strongest available reviewer: spec-addendum acceptance criteria, bundle budget (+10 KB total still), reduced-motion, perf sanity (rAF count, particle caps, no layout thrash from edge measurement), a11y (schematic real-text readability, canvas aria-hidden), em dashes, mobile 375px readability of all six schematics.
+- [ ] ONE fix wave + one scoped re-review if findings; controller browser-verifies every schematic + every background mode.
+- [ ] Present to Josh; on push word: push, live verify, vault reference-note update, SDD workspace cleanup.

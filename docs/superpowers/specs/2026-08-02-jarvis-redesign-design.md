@@ -209,3 +209,52 @@ redesign. Resume keeps its print styles untouched (print = plain).
 4. Assets: Nexus screenshot capture and gallery wiring; wanted-images list.
 5. Review pass (code-reviewer), Josh copy confirmation, push, live verify,
    vault reference-note update.
+
+## Addendum (2026-08-03, approved): cosmic background system + native schematics
+
+Approved by Josh after the initial redesign shipped to preview. Two additions.
+
+### Site-wide animated background system (cosmological theme)
+
+The Home ParticleField generalizes into a single route-aware canvas component
+mounted in Layout (Home.tsx no longer mounts its own). One canvas, one rAF
+loop, per-route mode parameterization. Modes:
+
+- **Home: constellation** (existing look preserved).
+- **Projects + /projects/* + guide: galactic spiral.** Particles distributed
+  on 2-3 logarithmic spiral arms around an off-center core, rotating very
+  slowly (full revolution on the order of minutes), cyan core fading to
+  purple arm tips.
+- **Work: orbital / gravity wells.** Sparse particles in slow elliptical
+  orbits around 2-3 invisible masses; occasional faint orbit-path arcs.
+- **About: nebula drift.** Soft, larger, blurred particles drifting with
+  mild parallax; the gentlest mode.
+- **Resume: singularity minimal.** A single faint accretion ring (thin
+  particle ellipse) far from the content column, near-static. Print renders
+  nothing (canvas is screen-only).
+
+Shared guardrails: particle caps per mode (<= current Home count), one
+requestAnimationFrame loop, pause when document.hidden, full stop under
+prefers-reduced-motion (render a static frame), zero new dependencies.
+
+### Native HUD schematics replace diagram PNGs
+
+The six AI Ops diagrams are rebuilt as native, data-driven schematic
+components (HTML/CSS/SVG): real text, responsive, theme-matched. Component
+vocabulary (shared by all six): node box (mono label, optional star-glow
+accent for the active/frontier element), lane/column group, flow connector
+(straight or slow-dash animated; option for curved orbital path), gate chip
+(deny gates styled as a small gravity-well/event-horizon ring motif),
+annotation line. Cosmic styling stays restrained: glow and motifs accent the
+schematic, they do not replace legibility.
+
+Per diagram: a data entry (nodes, groups, edges, gates) rendered by the
+shared component, shown beside the existing What/Why text in the same
+alternating layout slots. The PNG originals remain accessible behind a
+"view original" link (lightbox) for now; removing them entirely is a later
+call. claude-config-public README PNGs are unaffected.
+
+Acceptance: six schematics readable on a 375px-wide phone without zooming;
+all animation obeys reduced-motion; bundle budget unchanged (+10 KB gzip
+total for the whole redesign still holds); pilot diagram (master
+architecture) approved visually by Josh before the remaining five are built.
