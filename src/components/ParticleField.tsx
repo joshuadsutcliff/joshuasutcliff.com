@@ -161,8 +161,16 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
         return {
           x: rand01(i, 30) * width,
           y: rand01(i, 31) * height,
-          vx: (rand01(i, 13) - 0.5) * (layer === 0 ? 0.03 : 0.07), // slow drift, 2-layer parallax
-          vy: (rand01(i + 1, 14) - 0.5) * (layer === 0 ? 0.03 : 0.07),
+          // slow drift, 2-layer parallax. Amplitude here is per-axis max
+          // magnitude (rand01()-0.5 centers on 0, so real max is half the
+          // multiplier); the old 0.03/0.07 multipliers averaged ~0.018
+          // px/frame-equivalent combined speed, ~11px over 10s -- real
+          // motion, but at the <=0.05 peak alpha below it rendered under
+          // real-display color-management rounding, indistinguishable from
+          // static. Raised so displacement clears that floor while staying
+          // the gentlest mode (still far under spiral/orbital/singularity).
+          vx: (rand01(i, 13) - 0.5) * (layer === 0 ? 0.05 : 0.11),
+          vy: (rand01(i + 1, 14) - 0.5) * (layer === 0 ? 0.05 : 0.11),
           radius: 8 + rand01(i, 15) * 16, // 8-24px
           layer,
           hue: rand01(i, 16), // lerps cyan -> purple across 0..1
@@ -310,7 +318,7 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
         if (p.y > height + p.radius) p.y = -p.radius
 
         const color = lerpColor(p.hue)
-        const peakAlpha = 0.05 * (p.layer === 0 ? 0.6 : 1) // <= 0.05 per circle
+        const peakAlpha = 0.14 * (p.layer === 0 ? 0.6 : 1) // <= 0.14 per circle, still the gentlest mode
         const gradient = ctx!.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius)
         gradient.addColorStop(0, `rgba(${color}, ${peakAlpha})`)
         gradient.addColorStop(1, `rgba(${color}, 0)`)
