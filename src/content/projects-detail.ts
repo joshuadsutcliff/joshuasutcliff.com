@@ -5,6 +5,9 @@ export type ProjectDetailEntry = {
   stack: string[]
   highlights: string[]
   images?: { src: string; alt: string; caption?: string }[]
+  extraSections?: { heading: string; paragraphs: string[] }[]
+  showDiagrams?: boolean
+  showChangelog?: boolean
 }
 
 export const PROJECT_DETAILS: Record<string, ProjectDetailEntry> = {
@@ -91,5 +94,17 @@ export const PROJECT_DETAILS: Record<string, ProjectDetailEntry> = {
       'Kiro spec-driven planning IDE feeds source-verified interviews into the loop',
       'Installs end-to-end by pointing a fresh agent at the repo',
     ],
+    extraSections: [
+      {
+        heading: 'The Mechanical Enforcement Layer',
+        paragraphs: [
+          'The honest sequel to the conductor/orchestra architecture: written rules failed three times. The conductor drifted into doing worker jobs inline; it inline-integrated a 250-line worker draft while designing the compliance tests for that exact rule; and after launching three concurrent test sessions that burned 36% of a weekly usage cap in 32 minutes, it was told emphatically to stop; it serialized, and kept the next 24 sessions running at full throughput.',
+          'The root cause is behavioral, not ignorance: task-completion drive overrides compliance drive once the model has momentum, and it will always construct a technically-compliant reading that permits continuing.',
+          'The fix is a circuit breaker, not another rule: a machine-global spawn-rate limiter that hard-denies runaway fan-outs, a plan-then-stop gate that holds multi-step work until the plan is approved, a tripwire that logs execution-shaped conductor output, and a hard two-agent parallel ceiling. Voluntary compliance is a bonus; the hooks are the safety mechanism.',
+        ],
+      },
+    ],
+    showDiagrams: true,
+    showChangelog: true,
   },
 }

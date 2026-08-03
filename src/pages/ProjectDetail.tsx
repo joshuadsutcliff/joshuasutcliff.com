@@ -4,6 +4,8 @@ import { GithubIcon } from '../components/icons'
 import Lightbox from '../components/Lightbox'
 import { PROJECT_GROUPS, type ProjectCard } from '../content/projects'
 import { PROJECT_DETAILS } from '../content/projects-detail'
+import { CHANGELOG_ENTRIES, CHANGELOG_HEADING, CHANGELOG_INTRO } from '../content/changelog'
+import { DIAGRAMS_ENTRIES, DIAGRAMS_HEADING, DIAGRAMS_INTRO } from '../content/diagrams'
 
 export default function ProjectDetail() {
   const { slug } = useParams<{ slug: string }>()
@@ -97,6 +99,99 @@ export default function ProjectDetail() {
           ))}
         </ul>
       </div>
+
+      {detail.extraSections?.map((section) => (
+        <div key={section.heading} className="mt-10">
+          <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-muted">{section.heading}</h2>
+          <div className="glass mt-4 rounded-3xl p-8 sm:p-12">
+            {section.paragraphs.map((paragraph, i) => (
+              <p key={i} className={`leading-relaxed text-muted ${i === 0 ? '' : 'mt-4'}`}>
+                {paragraph}
+              </p>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {detail.showDiagrams && (
+        <div className="mt-10">
+          <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-muted">{DIAGRAMS_HEADING}</h2>
+          <p className="mt-3 text-sm leading-relaxed text-muted">{DIAGRAMS_INTRO}</p>
+          <div className="mt-6 space-y-8">
+            {DIAGRAMS_ENTRIES.map((entry, index) => {
+              const isOddRow = index % 2 === 0
+              return (
+                <div key={entry.id} className="grid gap-5 md:grid-cols-[2fr_3fr]">
+                  <button
+                    type="button"
+                    onClick={() => setLightboxImage({ src: entry.image, alt: entry.alt })}
+                    className={`text-left ${isOddRow ? 'md:order-2' : ''}`}
+                  >
+                    <img
+                      src={entry.image}
+                      alt={entry.alt}
+                      loading="lazy"
+                      className="w-full rounded-xl border border-border"
+                    />
+                  </button>
+                  <div>
+                    <p className="font-display text-lg font-semibold text-fg">{entry.title}</p>
+                    <div className="mt-3 space-y-3">
+                      <div>
+                        <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-dim">What it shows</p>
+                        <p className="mt-1 text-sm text-muted">{entry.what}</p>
+                      </div>
+                      <div>
+                        <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-dim">
+                          Why it's built this way
+                        </p>
+                        <p className="mt-1 text-sm text-muted">{entry.why}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {detail.showChangelog && (
+        <div className="mt-10">
+          <details className="glass rounded-2xl p-6 sm:p-8">
+            <summary className="cursor-pointer font-mono text-sm uppercase tracking-[0.2em] text-muted">
+              {CHANGELOG_HEADING}
+            </summary>
+            <p className="mt-3 text-sm leading-relaxed text-muted">{CHANGELOG_INTRO}</p>
+            <div className="mt-5 grid gap-5">
+              {CHANGELOG_ENTRIES.map((entry) => (
+                <div key={entry.title} className="glass flex flex-col rounded-2xl p-7">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="font-display text-xl font-semibold text-fg">{entry.title}</p>
+                    <span className="shrink-0 rounded-full border border-border px-2.5 py-0.5 font-mono text-[11px] text-muted">
+                      {entry.date}
+                    </span>
+                  </div>
+                  <div className="mt-4 space-y-3">
+                    <div>
+                      <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-dim">What changed</p>
+                      <p className="mt-1 text-sm leading-relaxed text-muted">{entry.what}</p>
+                    </div>
+                    <div>
+                      <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-dim">Why</p>
+                      <p className="mt-1 text-sm leading-relaxed text-muted">{entry.why}</p>
+                    </div>
+                    <div>
+                      <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-dim">The win</p>
+                      <p className="mt-1 text-sm leading-relaxed text-muted">{entry.improvement}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </details>
+        </div>
+      )}
 
       {detail.images && detail.images.length > 0 && (
         <div className="mt-10">
