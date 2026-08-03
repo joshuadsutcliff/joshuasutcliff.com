@@ -22,20 +22,20 @@ export default function Resume() {
         </a>
       </div>
 
-      <h2 className="mt-10 font-mono text-sm uppercase tracking-[0.2em] text-cyan">Summary</h2>
+      <h2 className="mt-10 hud-eyebrow">Summary</h2>
       <p className="mt-3 leading-relaxed text-muted">{RESUME.summary}</p>
 
-      <h2 className="mt-10 font-mono text-sm uppercase tracking-[0.2em] text-cyan">Skills</h2>
+      <h2 className="mt-10 hud-eyebrow">Skills</h2>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {RESUME.skills.map((s) => (
-          <div key={s.area} className="glass rounded-xl p-4">
+          <div key={s.area} className="hud-panel rounded-xl p-4">
             <p className="text-sm font-medium text-fg">{s.area}</p>
             <p className="mt-1 text-xs leading-relaxed text-muted">{s.detail}</p>
           </div>
         ))}
       </div>
 
-      <h2 className="mt-10 font-mono text-sm uppercase tracking-[0.2em] text-cyan">Experience</h2>
+      <h2 className="mt-10 hud-eyebrow">Experience</h2>
       {RESUME.experience.map((e) => (
         <div key={e.role} className="mt-4">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -54,7 +54,7 @@ export default function Resume() {
         </div>
       ))}
 
-      <h2 className="mt-10 font-mono text-sm uppercase tracking-[0.2em] text-cyan">Education</h2>
+      <h2 className="mt-10 hud-eyebrow">Education</h2>
       <p className="mt-3 text-muted">
         <span className="font-medium text-fg">{RESUME.education.school}</span> · {RESUME.education.degree}
       </p>

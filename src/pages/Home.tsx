@@ -37,7 +37,7 @@ export default function Home() {
             href={SITE.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="glass inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium text-fg"
+            className="hud-panel inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium text-fg"
           >
             <GithubIcon /> {SITE.githubHandle}
           </a>
@@ -50,7 +50,7 @@ export default function Home() {
             <Link
               key={t.to}
               to={t.to}
-              className="glass group rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1"
+              className="hud-panel group rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1"
             >
               <p className="font-display text-lg font-semibold text-fg">
                 {t.title} <span className="text-cyan transition-transform group-hover:translate-x-0.5">→</span>

@@ -5,17 +5,20 @@ import { PROJECT_GROUPS } from '../content/projects'
 export default function Projects() {
   return (
     <section className="mx-auto max-w-5xl px-6 py-20">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-cyan">Projects</p>
+      <p className="hud-eyebrow">Projects</p>
       <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-fg sm:text-5xl">
         Things I build and run.
       </h1>
 
       {PROJECT_GROUPS.map((group) => (
         <div key={group.heading} className="mt-12">
-          <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-muted">{group.heading}</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="hud-eyebrow">{group.heading}</h2>
+            <div className="hud-divider flex-1" />
+          </div>
           <div className="mt-5 grid gap-5 sm:grid-cols-2">
             {group.cards.map((card) => {
-              const className = `glass relative flex flex-col rounded-2xl p-7${card.slug ? ' group transition-all duration-300 hover:-translate-y-1' : ''}`
+              const className = `hud-panel relative flex flex-col rounded-2xl p-7${card.slug ? ' group transition-all duration-300 hover:-translate-y-1' : ''}`
               return (
                 <div key={card.title} className={className}>
                   {card.slug && (
@@ -27,7 +30,7 @@ export default function Projects() {
                   )}
                   <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-dim">
                     <span
-                      className={`h-1.5 w-1.5 rounded-full ${card.statusTone === 'green' ? 'bg-green-400' : 'bg-amber-400'}`}
+                      className={`hud-dot ${card.statusTone === 'green' ? 'hud-dot--green' : 'hud-dot--amber'}`}
                     />
                     {card.status}
                   </div>

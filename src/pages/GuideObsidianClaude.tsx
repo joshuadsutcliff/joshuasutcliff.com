@@ -103,7 +103,7 @@ export default function GuideObsidianClaude() {
 
   return (
     <section className="mx-auto max-w-3xl px-6 py-20">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-cyan">Guide</p>
+      <p className="hud-eyebrow">Guide</p>
       <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight text-fg sm:text-4xl">
         {OBSIDIAN_CLAUDE_GUIDE.title}
       </h1>
@@ -111,11 +111,11 @@ export default function GuideObsidianClaude() {
       <p className="mt-4 leading-relaxed text-muted">
         <RenderInline inline={OBSIDIAN_CLAUDE_GUIDE.why} />
       </p>
-      <div className="glass mt-6 rounded-2xl p-5 text-sm leading-relaxed text-muted">
+      <div className="hud-panel mt-6 rounded-2xl p-5 text-sm leading-relaxed text-muted">
         <RenderInline inline={OBSIDIAN_CLAUDE_GUIDE.preImportNote} />
       </div>
 
-      <div className="glass mt-10 rounded-3xl p-8 sm:p-12">
+      <div className="hud-panel mt-10 rounded-3xl p-8 sm:p-12">
         {OBSIDIAN_CLAUDE_GUIDE.blocks.map((block, i) => (
           <RenderBlock key={i} block={block} index={i} />
         ))}

@@ -37,7 +37,7 @@ export default function ProjectDetail() {
 
       <div className="mt-6 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-dim">
         <span
-          className={`h-1.5 w-1.5 rounded-full ${card.statusTone === 'green' ? 'bg-green-400' : 'bg-amber-400'}`}
+          className={`hud-dot ${card.statusTone === 'green' ? 'hud-dot--green' : 'hud-dot--amber'}`}
         />
         {detail.group} &middot; {card.status}
       </div>
@@ -51,7 +51,7 @@ export default function ProjectDetail() {
               href={card.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="glass inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-fg"
+              className="hud-panel inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-fg"
             >
               <GithubIcon className="h-4 w-4" />
               View on GitHub
@@ -69,7 +69,7 @@ export default function ProjectDetail() {
       )}
       {card.note && <p className="mt-3 text-xs leading-relaxed text-dim">{card.note}</p>}
 
-      <div className="glass mt-10 rounded-3xl p-8 sm:p-12">
+      <div className="hud-panel mt-10 rounded-3xl p-8 sm:p-12">
         {detail.overview.map((paragraph, i) => (
           <p key={i} className={`leading-relaxed text-muted ${i === 0 ? '' : 'mt-4'}`}>
             {paragraph}
@@ -78,7 +78,10 @@ export default function ProjectDetail() {
       </div>
 
       <div className="mt-10">
-        <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-muted">Stack</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="hud-eyebrow">Stack</h2>
+          <div className="hud-divider flex-1" />
+        </div>
         <div className="mt-4 flex flex-wrap gap-2">
           {detail.stack.map((item) => (
             <span
@@ -92,7 +95,10 @@ export default function ProjectDetail() {
       </div>
 
       <div className="mt-10">
-        <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-muted">Highlights</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="hud-eyebrow">Highlights</h2>
+          <div className="hud-divider flex-1" />
+        </div>
         <ul className="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-muted">
           {detail.highlights.map((highlight, i) => (
             <li key={i}>{highlight}</li>
@@ -102,8 +108,11 @@ export default function ProjectDetail() {
 
       {detail.extraSections?.map((section) => (
         <div key={section.heading} className="mt-10">
-          <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-muted">{section.heading}</h2>
-          <div className="glass mt-4 rounded-3xl p-8 sm:p-12">
+          <div className="flex items-center gap-3">
+            <h2 className="hud-eyebrow">{section.heading}</h2>
+            <div className="hud-divider flex-1" />
+          </div>
+          <div className="hud-panel mt-4 rounded-3xl p-8 sm:p-12">
             {section.paragraphs.map((paragraph, i) => (
               <p key={i} className={`leading-relaxed text-muted ${i === 0 ? '' : 'mt-4'}`}>
                 {paragraph}
@@ -115,7 +124,10 @@ export default function ProjectDetail() {
 
       {detail.showDiagrams && (
         <div className="mt-10">
-          <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-muted">{DIAGRAMS_HEADING}</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="hud-eyebrow">{DIAGRAMS_HEADING}</h2>
+            <div className="hud-divider flex-1" />
+          </div>
           <p className="mt-3 text-sm leading-relaxed text-muted">{DIAGRAMS_INTRO}</p>
           <div className="mt-6 space-y-8">
             {DIAGRAMS_ENTRIES.map((entry, index) => {
@@ -158,14 +170,14 @@ export default function ProjectDetail() {
 
       {detail.showChangelog && (
         <div className="mt-10">
-          <details className="glass rounded-2xl p-6 sm:p-8">
-            <summary className="cursor-pointer font-mono text-sm uppercase tracking-[0.2em] text-muted">
+          <details className="hud-panel rounded-2xl p-6 sm:p-8">
+            <summary className="hud-eyebrow cursor-pointer">
               {CHANGELOG_HEADING}
             </summary>
             <p className="mt-3 text-sm leading-relaxed text-muted">{CHANGELOG_INTRO}</p>
             <div className="mt-5 grid gap-5">
               {CHANGELOG_ENTRIES.map((entry) => (
-                <div key={entry.title} className="glass flex flex-col rounded-2xl p-7">
+                <div key={entry.title} className="hud-panel flex flex-col rounded-2xl p-7">
                   <div className="flex items-start justify-between gap-3">
                     <p className="font-display text-xl font-semibold text-fg">{entry.title}</p>
                     <span className="shrink-0 rounded-full border border-border px-2.5 py-0.5 font-mono text-[11px] text-muted">
@@ -195,14 +207,17 @@ export default function ProjectDetail() {
 
       {detail.images && detail.images.length > 0 && (
         <div className="mt-10">
-          <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-muted">Screenshots</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="hud-eyebrow">Screenshots</h2>
+            <div className="hud-divider flex-1" />
+          </div>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {detail.images.map((image) => (
               <button
                 key={image.src}
                 type="button"
                 onClick={() => setLightboxImage(image)}
-                className="glass overflow-hidden rounded-2xl text-left"
+                className="hud-panel overflow-hidden rounded-2xl text-left"
               >
                 <img src={image.src} alt={image.alt} loading="lazy" className="w-full" />
                 {image.caption && <p className="p-3 text-xs text-dim">{image.caption}</p>}

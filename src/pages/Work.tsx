@@ -4,7 +4,7 @@ import { WORK } from '../content/work'
 export default function Work() {
   return (
     <section className="mx-auto max-w-3xl px-6 py-20">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-cyan">{WORK.kicker}</p>
+      <p className="hud-eyebrow">{WORK.kicker}</p>
       <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-fg sm:text-5xl">
         {WORK.headline}
       </h1>
