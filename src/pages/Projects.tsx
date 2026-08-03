@@ -17,8 +17,16 @@ export default function Projects() {
           <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-muted">{group.heading}</h2>
           <div className="mt-5 grid gap-5 sm:grid-cols-2">
             {group.cards.map((card) => {
-              const content = (
-                <>
+              const className = `glass relative flex flex-col rounded-2xl p-7${card.slug ? ' group transition-all duration-300 hover:-translate-y-1' : ''}`
+              return (
+                <div key={card.title} className={className}>
+                  {card.slug && (
+                    <Link
+                      to={`/projects/${card.slug}`}
+                      aria-label={card.title}
+                      className="absolute inset-0 rounded-2xl"
+                    />
+                  )}
                   <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-dim">
                     <span
                       className={`h-1.5 w-1.5 rounded-full ${card.statusTone === 'green' ? 'bg-green-400' : 'bg-amber-400'}`}
@@ -29,13 +37,12 @@ export default function Projects() {
                   <p className="mt-2 text-sm leading-relaxed text-muted">{card.tldr}</p>
                   {card.note && <p className="mt-3 text-xs leading-relaxed text-dim">{card.note}</p>}
                   {(card.href || (card.secondaryHref && card.secondaryLabel)) && (
-                    <div className="mt-4 flex items-center gap-4">
+                    <div className="relative z-10 mt-4 flex items-center gap-4">
                       {card.href && (
                         <a
                           href={card.href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
                           aria-label="View on GitHub"
                           className="inline-flex items-center gap-2 font-mono text-xs text-cyan hover:text-purple"
                         >
@@ -45,7 +52,6 @@ export default function Projects() {
                       {card.secondaryHref && card.secondaryLabel && (
                         <Link
                           to={card.secondaryHref}
-                          onClick={(e) => e.stopPropagation()}
                           className="inline-flex items-center gap-2 font-mono text-xs text-cyan hover:text-purple"
                         >
                           {card.secondaryLabel} →
@@ -53,16 +59,6 @@ export default function Projects() {
                       )}
                     </div>
                   )}
-                </>
-              )
-              const className = `glass flex flex-col rounded-2xl p-7${card.slug ? ' group transition-all duration-300 hover:-translate-y-1' : ''}`
-              return card.slug ? (
-                <Link key={card.title} to={`/projects/${card.slug}`} className={className}>
-                  {content}
-                </Link>
-              ) : (
-                <div key={card.title} className={className}>
-                  {content}
                 </div>
               )
             })}
