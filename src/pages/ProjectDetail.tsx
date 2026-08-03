@@ -141,6 +141,10 @@ export default function ProjectDetail() {
                     {schematic ? (
                       <Schematic spec={schematic} />
                     ) : (
+                      /* Deliberate safety net, not currently reachable: every
+                         DIAGRAMS_ENTRIES id has a matching SCHEMATICS spec
+                         today, but this keeps a raw-PNG fallback in place for
+                         any future entry that doesn't. */
                       <button
                         type="button"
                         onClick={() => setLightboxImage({ src: entry.image, alt: entry.alt })}
@@ -157,6 +161,7 @@ export default function ProjectDetail() {
                     <button
                       type="button"
                       onClick={() => setLightboxImage({ src: entry.image, alt: entry.alt })}
+                      aria-label={'View original diagram: ' + entry.title}
                       className="mt-2 font-mono text-[11px] text-dim hover:text-cyan"
                     >
                       view original

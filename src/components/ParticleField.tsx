@@ -50,6 +50,13 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
       return min + (max - min) * Math.abs(Math.sin((performance.now() + min * 97.3) * 0.0001 + max))
     }
 
+    // deterministic hash in [0, 1); seed advances per index so consecutive
+    // particles differ, with no performance.now() term to dominate the mix
+    function rand01(seed: number, salt: number) {
+      const s = Math.sin(seed * 12.9898 + salt * 78.233) * 43758.5453
+      return s - Math.floor(s)
+    }
+
     // ---- constellation state (unchanged from the original Home field) ----
     type Node = { x: number; y: number; vx: number; vy: number }
     let nodes: Node[] = []
@@ -93,7 +100,8 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
     function seedSpiral() {
       const armCount = 3
       const total = 70 // spec cap: particle count <= current Home count (70)
-      const perArm = Math.ceil(total / armCount)
+      const perArmBase = Math.floor(total / armCount)
+      const remainder = total % armCount // distribute so arms sum to exactly `total`
       const thetaMax = Math.PI * 4
       const b = 0.21 // within the 0.18-0.25 range
       const maxRadius = Math.min(width, height) * 0.5
@@ -103,10 +111,11 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
       spiralParticles = []
       for (let arm = 0; arm < armCount; arm++) {
         const armOffset = (arm * Math.PI * 2) / armCount
+        const perArm = perArmBase + (arm < remainder ? 1 : 0)
         for (let i = 0; i < perArm; i++) {
           const t = i / perArm
-          const jitterAngle = (rand(arm * 31 + i, 2) - 0.5) * 0.35
-          const jitterR = (rand(arm * 17 + i, 3) - 0.5) * 0.12
+          const jitterAngle = (rand01(arm * 31 + i, 2) - 0.5) * 0.35 // +/-0.175 rad
+          const jitterR = (rand01(arm * 17 + i, 3) - 0.5) * 0.12 // +/-6%
           const thetaLocal = t * thetaMax
           const r = a * Math.exp(b * thetaLocal) * (1 + jitterR)
           spiralParticles.push({
@@ -122,26 +131,26 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
     function seedOrbital() {
       const attractorCount = 3
       const attractors = Array.from({ length: attractorCount }, (_, i) => ({
-        x: width * (0.22 + 0.28 * i + rand(i, 5) * 0.06),
-        y: height * (0.3 + rand(i + 1, 6) * 0.4),
+        x: width * (0.22 + 0.28 * i + rand01(i, 5) * 0.06),
+        y: height * (0.3 + rand01(i + 1, 6) * 0.4),
       }))
       const total = 55 // within the brief's 40-70 range
       const scale = Math.min(width, height)
       orbitParticles = Array.from({ length: total }, (_, i) => {
         const attractor = attractors[i % attractors.length]
-        const semiMajor = scale * (0.1 + rand(i, 7) * 0.18)
+        const semiMajor = scale * (0.1 + rand01(i, 7) * 0.18) // ellipse fits the viewport
         return {
           cx: attractor.x,
           cy: attractor.y,
           a: semiMajor,
-          b: semiMajor * (0.4 + rand(i, 8) * 0.4),
-          phi: rand(i, 9) * Math.PI * 2,
-          theta: rand(i, 10) * Math.PI * 2,
-          omega: (rand(i, 11) - 0.5) * 0.25,
+          b: semiMajor * (0.4 + rand01(i, 8) * 0.4),
+          phi: rand01(i, 9) * Math.PI * 2,
+          theta: rand01(i, 10) * Math.PI * 2,
+          omega: (rand01(i, 11) - 0.5) * 0.25, // slow, mixed-sign
         }
       })
       orbitArcTimer = 0
-      orbitArcNextAt = 4 + rand(1, 12) * 3
+      orbitArcNextAt = 4 + rand01(1, 12) * 3 // arcs every few seconds
       orbitArc = null
     }
 
@@ -150,26 +159,26 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
       nebulaParticles = Array.from({ length: total }, (_, i) => {
         const layer = i % 2
         return {
-          x: rand(i * 5, width),
-          y: rand(i * 9, height),
-          vx: (rand(i, 13) - 0.5) * (layer === 0 ? 0.03 : 0.07),
-          vy: (rand(i + 1, 14) - 0.5) * (layer === 0 ? 0.03 : 0.07),
-          radius: 8 + rand(i, 15) * 16, // 8-24px
+          x: rand01(i, 30) * width,
+          y: rand01(i, 31) * height,
+          vx: (rand01(i, 13) - 0.5) * (layer === 0 ? 0.03 : 0.07), // slow drift, 2-layer parallax
+          vy: (rand01(i + 1, 14) - 0.5) * (layer === 0 ? 0.03 : 0.07),
+          radius: 8 + rand01(i, 15) * 16, // 8-24px
           layer,
-          hue: rand(i, 16),
+          hue: rand01(i, 16), // lerps cyan -> purple across 0..1
         }
       })
     }
 
     function seedSingularity() {
-      ringCenter = { x: width * 0.86, y: height * 0.24 } // right edge, upper third
+      ringCenter = { x: width * 0.86, y: height * 0.24 } // right edge, upper third, clear of the max-w-5xl column
       const scale = Math.min(width, height)
       ringRadiusX = scale * 0.18
       ringRadiusY = ringRadiusX * 0.32
       const total = 60 // within the brief's 50-70 range
       ringParticles = Array.from({ length: total }, (_, i) => ({
         angle: (i / total) * Math.PI * 2,
-        radiusJitter: 1 + (rand(i, 17) - 0.5) * 0.08,
+        radiusJitter: 1 + (rand01(i, 17) - 0.5) * 0.08, // +/-4%
       }))
       ringRotation = 0
     }
@@ -189,6 +198,9 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
       canvas!.height = height * dpr
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0)
       seed()
+      // canvas.width above clears the bitmap; under reduced motion no rAF
+      // loop is running to repaint it, so force a single static frame.
+      if (reduced) draw(0)
     }
 
     function drawConstellation() {
@@ -263,7 +275,7 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
       }
 
       if (!orbitArc && orbitArcTimer >= orbitArcNextAt) {
-        const index = Math.floor(rand(orbitArcTimer, 20) * orbitParticles.length) % orbitParticles.length
+        const index = Math.floor(rand01(orbitArcTimer, 20) * orbitParticles.length) % orbitParticles.length
         orbitArc = { index, start: orbitArcTimer, duration: 3 }
       }
       if (orbitArc) {
@@ -281,7 +293,7 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
         if (elapsed >= orbitArc.duration) {
           orbitArc = null
           orbitArcTimer = 0
-          orbitArcNextAt = 4 + rand(elapsed, 21) * 3
+          orbitArcNextAt = 4 + rand01(elapsed, 21) * 3
         }
       }
     }

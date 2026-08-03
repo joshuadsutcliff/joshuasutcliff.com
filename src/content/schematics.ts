@@ -17,7 +17,9 @@ export type SchematicSpec = {
   footnote?: string
 }
 
-export const SCHEMATICS: Record<string, SchematicSpec> = {
+// Partial: not every diagram entry id is guaranteed to have a schematic
+// spec (ProjectDetail falls back to the source PNG when one is missing).
+export const SCHEMATICS: Partial<Record<string, SchematicSpec>> = {
   architecture: {
     id: 'architecture',
     title: 'One prompt, end to end',
@@ -240,15 +242,13 @@ export const SCHEMATICS: Record<string, SchematicSpec> = {
       { from: 'pointer-map', to: 'secrets', style: 'flow' },
       { from: 'skills', to: 'core', style: 'orbit', label: 'self-trigger' },
     ],
-    footnote: 'Same idea as paging in operating systems: keep the working set small and fault the rest in on demand.',
   },
   'cost-comparison': {
     id: 'cost-comparison',
     title: 'What the enforcement layer measurably changed',
-    gates: [
-      { id: 'before-gate', label: 'before: unenforced', kind: 'deny' },
-      { id: 'after-gate', label: 'after: enforced', kind: 'limit' },
-    ],
+    // No gates: 'before'/'after' are already carried by the group titles
+    // below (the prior before-gate/after-gate chips were unreferenced by
+    // any edge, i.e. orphan nodes).
     groups: [
       {
         id: 'before',

@@ -88,7 +88,7 @@ function computeOrbitControl(
   for (let attempt = 0; attempt < 6; attempt++) {
     const control = { x: controlX, y: baseY - lift }
     const clashes = entries.some(([, rect]) =>
-      sampleTs.some((t) => pointInRect(quadraticPoint(from, control, to, t), rect, 8)),
+      sampleTs.some((t) => pointInRect(quadraticPoint(from, control, to, t), rect, 12)),
     )
     if (!clashes || lift >= maxLift) return control
     lift = Math.min(maxLift, lift + step)
@@ -110,7 +110,7 @@ function resolveLabelAnchor(
   const isClear = (p: Point) => {
     const pillCenter = { x: p.x, y: p.y - 10 }
     return entries.every(
-      ([, rect]) => !boxIntersectsRect(pillCenter, labelSize.width / 2, labelSize.height / 2, rect, 2),
+      ([, rect]) => !boxIntersectsRect(pillCenter, labelSize.width / 2, labelSize.height / 2, rect, 6),
     )
   }
 
@@ -125,6 +125,47 @@ function resolveLabelAnchor(
     if (isClear(candidate)) return candidate
   }
   return base
+}
+
+// Builds the mobile/screen-reader caption from the graph itself rather than
+// DOM order: walks the 'flow'-style edges from whichever node(s) have no
+// incoming flow edge. field-rules and cost-comparison are hub/comparison
+// layouts, not pipelines, so a linear "a > b > c" caption would misstate
+// them; those two list their group titles instead.
+function deriveCaption(spec: SchematicSpec): string {
+  const isNonFlow = spec.id === 'field-rules' || spec.id === 'cost-comparison'
+  if (isNonFlow) {
+    const titles = spec.groups.map((group) => group.title ?? group.nodes[0]?.label ?? group.id).filter(Boolean)
+    return `groups: ${titles.join(', ')}`
+  }
+
+  const labels = new Map<string, string>()
+  ;(spec.gates ?? []).forEach((gate) => labels.set(gate.id, gate.label))
+  spec.groups.forEach((group) => group.nodes.forEach((node) => labels.set(node.id, node.label)))
+
+  const flowEdges = spec.edges.filter((edge) => (edge.style ?? 'flow') === 'flow')
+  const hasIncoming = new Set(flowEdges.map((edge) => edge.to))
+  const adjacency = new Map<string, string[]>()
+  flowEdges.forEach((edge) => {
+    if (!adjacency.has(edge.from)) adjacency.set(edge.from, [])
+    adjacency.get(edge.from)!.push(edge.to)
+  })
+
+  const roots = Array.from(labels.keys()).filter((id) => adjacency.has(id) && !hasIncoming.has(id))
+  const visited = new Set<string>()
+  const order: string[] = []
+  const queue = [...roots]
+  while (queue.length > 0) {
+    const id = queue.shift()!
+    if (visited.has(id)) continue
+    visited.add(id)
+    order.push(id)
+    for (const next of adjacency.get(id) ?? []) {
+      if (!visited.has(next)) queue.push(next)
+    }
+  }
+
+  return `flow: ${order.map((id) => labels.get(id)).join(' > ')}`
 }
 
 function EdgeLabel({ point, text }: { point: Point; text: string }) {
@@ -171,23 +212,19 @@ function useInjectedStyles() {
   }, [])
 }
 
-function NodeBox({
-  node,
-  registerRef,
-}: {
-  node: SchematicNode
-  registerRef: (id: string, el: HTMLDivElement | null) => void
-}) {
+function NodeBox({ node }: { node: SchematicNode }) {
   const isStar = node.accent === 'star'
+  const toneRgb = node.tone === 'bad' ? '239, 68, 68' : node.tone === 'good' ? '34, 197, 94' : null
+  const style = isStar
+    ? { boxShadow: '0 0 26px 8px rgba(139, 92, 246, 0.18), inset 0 0 0 1px rgba(6, 182, 212, 0.3)' }
+    : toneRgb
+      ? { boxShadow: `inset 0 0 0 1px rgba(${toneRgb}, 0.35)` }
+      : undefined
   return (
     <div
-      ref={(el) => registerRef(node.id, el)}
+      data-schematic-id={node.id}
       className="hud-panel relative flex flex-col items-center justify-center gap-0.5 rounded-xl px-3 py-2 text-center"
-      style={
-        isStar
-          ? { boxShadow: '0 0 26px 8px rgba(139, 92, 246, 0.18), inset 0 0 0 1px rgba(6, 182, 212, 0.3)' }
-          : undefined
-      }
+      style={style}
     >
       <span className="font-mono text-xs text-fg">{node.label}</span>
       {node.sub && <span className="font-mono text-[10px] text-dim">{node.sub}</span>}
@@ -195,17 +232,11 @@ function NodeBox({
   )
 }
 
-function GateChip({
-  gate,
-  registerRef,
-}: {
-  gate: SchematicGate
-  registerRef: (id: string, el: HTMLDivElement | null) => void
-}) {
+function GateChip({ gate }: { gate: SchematicGate }) {
   const isDeny = gate.kind === 'deny'
   return (
     <div
-      ref={(el) => registerRef(gate.id, el)}
+      data-schematic-id={gate.id}
       className="flex items-center gap-2 rounded-full border border-border bg-bg2/60 px-3 py-1.5"
     >
       <span
@@ -227,21 +258,20 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
   useInjectedStyles()
 
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const nodeElements = useRef<Map<string, HTMLDivElement>>(new Map())
   const [points, setPoints] = useState<Map<string, NodeRect>>(new Map())
   const [box, setBox] = useState({ width: 0, height: 0 })
 
-  const registerRef = useCallback((id: string, el: HTMLDivElement | null) => {
-    if (el) nodeElements.current.set(id, el)
-    else nodeElements.current.delete(id)
-  }, [])
-
+  // Node/gate/group-title rects are read straight off the DOM via a data
+  // attribute instead of per-id ref callbacks, so nothing recreates a
+  // closure (and re-fires the ref) on every render.
   const measure = useCallback(() => {
     const container = containerRef.current
     if (!container) return
     const containerRect = container.getBoundingClientRect()
     const next = new Map<string, NodeRect>()
-    nodeElements.current.forEach((el, id) => {
+    container.querySelectorAll<HTMLElement>('[data-schematic-id]').forEach((el) => {
+      const id = el.dataset.schematicId
+      if (!id) return
       const rect = el.getBoundingClientRect()
       next.set(id, {
         x: rect.left - containerRect.left + rect.width / 2,
@@ -257,20 +287,18 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
   useLayoutEffect(() => {
     measure()
     const container = containerRef.current
+    // A ResizeObserver on the container already catches window-resize-driven
+    // layout changes (the container's own box changes size); no separate
+    // window 'resize' listener is needed.
     if (!container || typeof ResizeObserver === 'undefined') return
     const observer = new ResizeObserver(() => measure())
     observer.observe(container)
-    window.addEventListener('resize', measure)
     return () => {
       observer.disconnect()
-      window.removeEventListener('resize', measure)
     }
   }, [measure, spec])
 
-  const flowCaption = [
-    ...(spec.gates ?? []).map((gate) => gate.label),
-    ...spec.groups.flatMap((group) => group.nodes.map((node) => node.label)),
-  ].join(' > ')
+  const caption = deriveCaption(spec)
 
   return (
     <div className="hud-panel rounded-2xl p-5 sm:p-6">
@@ -283,7 +311,7 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
         {spec.gates && spec.gates.length > 0 && (
           <div className="flex flex-row flex-wrap gap-2 md:flex-col md:flex-nowrap md:gap-3">
             {spec.gates.map((gate) => (
-              <GateChip key={gate.id} gate={gate} registerRef={registerRef} />
+              <GateChip key={gate.id} gate={gate} />
             ))}
           </div>
         )}
@@ -291,13 +319,16 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
         {spec.groups.map((group) => (
           <div key={group.id} className="md:flex-1">
             {group.title && (
-              <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-dim">
+              <p
+                data-schematic-id={`${group.id}-title`}
+                className="mb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-dim"
+              >
                 {group.title}
               </p>
             )}
             <div className={`flex gap-2 ${group.direction === 'row' ? 'flex-row flex-wrap' : 'flex-col'}`}>
               {group.nodes.map((node) => (
-                <NodeBox key={node.id} node={node} registerRef={registerRef} />
+                <NodeBox key={node.id} node={node} />
               ))}
             </div>
           </div>
@@ -407,7 +438,7 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
         )}
       </div>
 
-      <p className="mt-4 font-mono text-[11px] leading-relaxed text-dim md:hidden">flow: {flowCaption}</p>
+      <p className="mt-4 font-mono text-[11px] leading-relaxed text-dim md:sr-only">{caption}</p>
       {spec.footnote && <p className="mt-3 text-xs leading-relaxed text-dim">{spec.footnote}</p>}
     </div>
   )
