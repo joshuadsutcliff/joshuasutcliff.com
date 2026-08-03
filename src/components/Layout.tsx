@@ -1,5 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom'
-import ThemeToggle from './ThemeToggle'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import Footer from './Footer'
 import { GithubIcon } from './icons'
 import { SITE } from '../content/site'
@@ -16,8 +15,11 @@ const TABS = [
 
 export default function Layout() {
   const flourish = useSecretAdmin()
+  const location = useLocation()
   return (
     <div className="min-h-screen bg-bg text-fg">
+      <div aria-hidden className="ambient-wash" />
+      <div aria-hidden className="ambient-grid" />
       {flourish && <AccessFlourish />}
       <nav className="relative z-10 mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-y-3 px-6 py-6 print:hidden">
         <NavLink to="/" className="font-mono text-sm tracking-tight text-muted">
@@ -49,10 +51,10 @@ export default function Layout() {
           >
             <GithubIcon />
           </a>
-          <ThemeToggle />
         </div>
       </nav>
-      <main>
+      <hr className="hud-divider mx-auto max-w-5xl" />
+      <main className="page-enter" key={location.pathname}>
         <Outlet />
       </main>
       <Footer />
