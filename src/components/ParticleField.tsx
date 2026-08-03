@@ -62,10 +62,15 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
     let nodes: Node[] = []
 
     // ---- spiral state ----
-    type SpiralP = { r: number; baseAngle: number; t: number; alpha: number }
+    // baseAngle/t/alpha/core baked at seed; trails are drawn by re-evaluating
+    // each particle at the previous two global rotation values (cheap: no
+    // per-particle trail buffers, just two extra scalars).
+    type SpiralP = { r: number; baseAngle: number; t: number; alpha: number; core: boolean }
     let spiralParticles: SpiralP[] = []
     let spiralCenter = { x: 0, y: 0 }
     let spiralRotation = 0
+    let spiralRotationPrev1 = 0
+    let spiralRotationPrev2 = 0
 
     // ---- orbital state ----
     type OrbitP = { cx: number; cy: number; a: number; b: number; phi: number; theta: number; omega: number }
@@ -75,16 +80,33 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
     let orbitArc: { index: number; start: number; duration: number } | null = null
 
     // ---- nebula state ----
-    type NebulaP = { x: number; y: number; vx: number; vy: number; radius: number; layer: number; hue: number }
+    // spriteIndex picks one of the 2-3 precomputed offscreen puff sprites
+    // (built once, tinted, reused every frame via drawImage).
+    type NebulaP = {
+      x: number
+      y: number
+      vx: number
+      vy: number
+      radius: number
+      layer: number
+      spriteIndex: number
+    }
     let nebulaParticles: NebulaP[] = []
+    let nebulaSprites: HTMLCanvasElement[] = []
 
     // ---- singularity state ----
-    type RingP = { angle: number; radiusJitter: number }
+    // brightness is baked once from each particle's seed angle (a fixed
+    // per-particle angular offset from the bias direction), so the bright
+    // side of the ring stays stable in world space as particles orbit
+    // through it, without any per-frame trig beyond position.
+    type RingP = { angle: number; radiusJitter: number; brightness: number }
     let ringParticles: RingP[] = []
+    let ringGlowParticles: RingP[] = []
     let ringCenter = { x: 0, y: 0 }
     let ringRadiusX = 0
     let ringRadiusY = 0
     const ringPhi = -0.35
+    const ringBiasAngle = Math.PI * 0.25
     let ringRotation = 0
 
     function seedConstellation() {
@@ -99,7 +121,7 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
 
     function seedSpiral() {
       const armCount = 3
-      const total = 70 // spec cap: particle count <= current Home count (70)
+      const total = 120 // visibly-populated galaxy, within the 100-140 cap
       const perArmBase = Math.floor(total / armCount)
       const remainder = total % armCount // distribute so arms sum to exactly `total`
       const thetaMax = Math.PI * 4
@@ -108,6 +130,8 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
       const a = maxRadius / Math.exp(b * thetaMax)
       spiralCenter = { x: width * 0.64, y: height * 0.32 } // offset toward the top-right third
       spiralRotation = 0
+      spiralRotationPrev1 = 0
+      spiralRotationPrev2 = 0
       spiralParticles = []
       for (let arm = 0; arm < armCount; arm++) {
         const armOffset = (arm * Math.PI * 2) / armCount
@@ -118,11 +142,19 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
           const jitterR = (rand01(arm * 17 + i, 3) - 0.5) * 0.12 // +/-6%
           const thetaLocal = t * thetaMax
           const r = a * Math.exp(b * thetaLocal) * (1 + jitterR)
+          // the first couple of particles per arm sit nearest the core;
+          // reading them brighter than the rest sells the galaxy-core look
+          const core = i < 2
           spiralParticles.push({
             r,
             baseAngle: thetaLocal + armOffset + jitterAngle,
             t,
-            alpha: 0.5 - 0.25 * t, // 0.25-0.5 range, brighter toward the core
+            // ceiling is baseAlpha (constellation's own particle alpha) --
+            // presence comes from motion/structure, not exceeding Home's
+            // brightness. Core particles touch the ceiling; arm particles
+            // stay dimmer than it, brighter near the core via t.
+            alpha: core ? baseAlpha : baseAlpha * (0.75 - 0.35 * t),
+            core,
           })
         }
       }
@@ -134,11 +166,18 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
         x: width * (0.22 + 0.28 * i + rand01(i, 5) * 0.06),
         y: height * (0.3 + rand01(i + 1, 6) * 0.4),
       }))
-      const total = 55 // within the brief's 40-70 range
+      const total = 75 // within the brief's 60-90 range
       const scale = Math.min(width, height)
+      const semiMajorMin = scale * 0.1
+      const semiMajorSpan = scale * 0.18 // semiMajor ranges [min, min+span]
       orbitParticles = Array.from({ length: total }, (_, i) => {
         const attractor = attractors[i % attractors.length]
-        const semiMajor = scale * (0.1 + rand01(i, 7) * 0.18) // ellipse fits the viewport
+        const semiMajor = semiMajorMin + semiMajorSpan * rand01(i, 7) // ellipse fits the viewport
+        // proportional scheme: smaller ellipses orbit faster (up to ~0.25
+        // rad/s), larger ones slower, like inner vs outer orbits
+        const sizeFrac = (semiMajor - semiMajorMin) / semiMajorSpan // 0 = smallest, 1 = largest
+        const omegaMag = 0.25 - 0.17 * sizeFrac
+        const omegaSign = rand01(i, 11) < 0.5 ? -1 : 1
         return {
           cx: attractor.x,
           cy: attractor.y,
@@ -146,48 +185,92 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
           b: semiMajor * (0.4 + rand01(i, 8) * 0.4),
           phi: rand01(i, 9) * Math.PI * 2,
           theta: rand01(i, 10) * Math.PI * 2,
-          omega: (rand01(i, 11) - 0.5) * 0.25, // slow, mixed-sign
+          omega: omegaSign * omegaMag,
         }
       })
       orbitArcTimer = 0
-      orbitArcNextAt = 4 + rand01(1, 12) * 3 // arcs every few seconds
+      orbitArcNextAt = 3 + rand01(1, 12) * 3 // pulse every ~3-6s
       orbitArc = null
     }
 
+    // Build the 2-3 offscreen puff sprites once (radial gradient baked to a
+    // small canvas at seed/init time). The per-frame render loop only ever
+    // calls drawImage against these -- no createRadialGradient per puff per
+    // frame.
+    function buildNebulaSprites() {
+      const size = 64
+      const tints = [0, 0.5, 1] // cyan, mid-blend, purple
+      nebulaSprites = tints.map((t) => {
+        const sprite = document.createElement('canvas')
+        sprite.width = size
+        sprite.height = size
+        const sctx = sprite.getContext('2d')!
+        const color = lerpColor(t)
+        const gradient = sctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
+        gradient.addColorStop(0, `rgba(${color}, 1)`)
+        gradient.addColorStop(1, `rgba(${color}, 0)`)
+        sctx.fillStyle = gradient
+        sctx.beginPath()
+        sctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2)
+        sctx.fill()
+        return sprite
+      })
+    }
+
     function seedNebula() {
-      const total = 32 // within the brief's 25-40 range
+      const total = 48 // within the brief's 40-55 range
       nebulaParticles = Array.from({ length: total }, (_, i) => {
         const layer = i % 2
+        const hue = rand01(i, 16) // lerps cyan -> purple across 0..1
         return {
           x: rand01(i, 30) * width,
           y: rand01(i, 31) * height,
           // slow drift, 2-layer parallax. Amplitude here is per-axis max
           // magnitude (rand01()-0.5 centers on 0, so real max is half the
-          // multiplier); the old 0.03/0.07 multipliers averaged ~0.018
-          // px/frame-equivalent combined speed, ~11px over 10s -- real
-          // motion, but at the <=0.05 peak alpha below it rendered under
-          // real-display color-management rounding, indistinguishable from
-          // static. Raised so displacement clears that floor while staying
-          // the gentlest mode (still far under spiral/orbital/singularity).
-          vx: (rand01(i, 13) - 0.5) * (layer === 0 ? 0.05 : 0.11),
-          vy: (rand01(i + 1, 14) - 0.5) * (layer === 0 ? 0.05 : 0.11),
-          radius: 8 + rand01(i, 15) * 16, // 8-24px
+          // multiplier). Roughly 3x the prior 0.05/0.11 multipliers so
+          // drift reads as clearly visible motion within a few seconds,
+          // while staying the gentlest mode (still under spiral/orbital/
+          // singularity).
+          vx: (rand01(i, 13) - 0.5) * (layer === 0 ? 0.16 : 0.35),
+          vy: (rand01(i + 1, 14) - 0.5) * (layer === 0 ? 0.16 : 0.35),
+          radius: 10 + rand01(i, 15) * 20, // 10-30px
           layer,
-          hue: rand01(i, 16), // lerps cyan -> purple across 0..1
+          spriteIndex: Math.min(2, Math.round(hue * 2)),
         }
       })
     }
 
     function seedSingularity() {
-      ringCenter = { x: width * 0.86, y: height * 0.24 } // right edge, upper third, clear of the max-w-5xl column
+      // scale/reposition for narrow viewports, same proportional-layout
+      // pattern the other modes already use (fractions of width/height)
+      const narrow = width < 640
+      ringCenter = narrow
+        ? { x: width * 0.78, y: height * 0.14 } // pulled in and up, clear of stacked mobile content
+        : { x: width * 0.86, y: height * 0.24 } // right edge, upper third, clear of the max-w-5xl column
       const scale = Math.min(width, height)
-      ringRadiusX = scale * 0.18
+      ringRadiusX = scale * (narrow ? 0.14 : 0.2)
       ringRadiusY = ringRadiusX * 0.32
-      const total = 60 // within the brief's 50-70 range
-      ringParticles = Array.from({ length: total }, (_, i) => ({
-        angle: (i / total) * Math.PI * 2,
-        radiusJitter: 1 + (rand01(i, 17) - 0.5) * 0.08, // +/-4%
-      }))
+      const total = 90 // within the brief's 80-100 range
+      ringParticles = Array.from({ length: total }, (_, i) => {
+        const angle = (i / total) * Math.PI * 2
+        return {
+          angle,
+          radiusJitter: 1 + (rand01(i, 17) - 0.5) * 0.08, // tight +/-4% radial jitter
+          // brightness asymmetry baked once from the seed angle so the
+          // bright side is a fixed offset that rotates with the ring. Kept
+          // moderate (below baseAlpha, Home's own particle ceiling) -- a
+          // subtle shading across the ring, not a glaring hot spot.
+          brightness: baseAlpha * (0.6 + 0.25 * Math.cos(angle - ringBiasAngle)),
+        }
+      })
+      ringGlowParticles = Array.from({ length: 24 }, (_, i) => {
+        const angle = (i / 24) * Math.PI * 2 + rand01(i, 18) * 0.1
+        return {
+          angle,
+          radiusJitter: 1 + (rand01(i, 19) - 0.5) * 0.3, // looser jitter, sparser outer glow
+          brightness: baseAlpha * (0.6 + 0.25 * Math.cos(angle - ringBiasAngle)) * 0.35,
+        }
+      })
       ringRotation = 0
     }
 
@@ -249,15 +332,39 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
     }
 
     function drawSpiral(dt: number) {
-      spiralRotation += dt * 0.02 // ~0.02 rad/s
+      // ~0.07-0.1 rad/s -> a full revolution roughly every 60-90s
+      spiralRotationPrev2 = spiralRotationPrev1
+      spiralRotationPrev1 = spiralRotation
+      spiralRotation += dt * 0.085
       ctx!.clearRect(0, 0, width, height)
       for (const p of spiralParticles) {
-        const angle = p.baseAngle + spiralRotation
-        const x = spiralCenter.x + p.r * Math.cos(angle)
-        const y = spiralCenter.y + p.r * Math.sin(angle)
-        ctx!.fillStyle = `rgba(${lerpColor(p.t)}, ${p.alpha})`
+        const size = p.core ? 2.4 : 1.5
+        const color = lerpColor(p.t)
+
+        // two short, fading trail positions (previous rotation values),
+        // then the current position -- plain arc draws, decreasing alpha
+        let angle = p.baseAngle + spiralRotationPrev2
+        let x = spiralCenter.x + p.r * Math.cos(angle)
+        let y = spiralCenter.y + p.r * Math.sin(angle)
+        ctx!.fillStyle = `rgba(${color}, ${p.alpha * 0.18})`
         ctx!.beginPath()
-        ctx!.arc(x, y, 1.5, 0, Math.PI * 2)
+        ctx!.arc(x, y, size, 0, Math.PI * 2)
+        ctx!.fill()
+
+        angle = p.baseAngle + spiralRotationPrev1
+        x = spiralCenter.x + p.r * Math.cos(angle)
+        y = spiralCenter.y + p.r * Math.sin(angle)
+        ctx!.fillStyle = `rgba(${color}, ${p.alpha * 0.4})`
+        ctx!.beginPath()
+        ctx!.arc(x, y, size, 0, Math.PI * 2)
+        ctx!.fill()
+
+        angle = p.baseAngle + spiralRotation
+        x = spiralCenter.x + p.r * Math.cos(angle)
+        y = spiralCenter.y + p.r * Math.sin(angle)
+        ctx!.fillStyle = `rgba(${color}, ${p.alpha})`
+        ctx!.beginPath()
+        ctx!.arc(x, y, size, 0, Math.PI * 2)
         ctx!.fill()
       }
     }
@@ -291,7 +398,7 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
         const halfDur = orbitArc.duration / 2
         let envelope = elapsed < halfDur ? elapsed / halfDur : 1 - (elapsed - halfDur) / halfDur
         envelope = Math.max(0, Math.min(1, envelope))
-        const arcAlpha = envelope * 0.06 // stroke alpha <= 0.06
+        const arcAlpha = envelope * 0.12 // pulse peak, still far under baseAlpha
         const op = orbitParticles[orbitArc.index]
         ctx!.strokeStyle = `rgba(${purpleRgb}, ${arcAlpha})`
         ctx!.lineWidth = 1
@@ -301,7 +408,7 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
         if (elapsed >= orbitArc.duration) {
           orbitArc = null
           orbitArcTimer = 0
-          orbitArcNextAt = 4 + rand01(elapsed, 21) * 3
+          orbitArcNextAt = 3 + rand01(elapsed, 21) * 3 // next pulse in ~3-6s
         }
       }
     }
@@ -317,40 +424,58 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
         if (p.y < -p.radius) p.y = height + p.radius
         if (p.y > height + p.radius) p.y = -p.radius
 
-        const color = lerpColor(p.hue)
-        const peakAlpha = 0.14 * (p.layer === 0 ? 0.6 : 1) // <= 0.14 per circle, still the gentlest mode
-        const gradient = ctx!.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius)
-        gradient.addColorStop(0, `rgba(${color}, ${peakAlpha})`)
-        gradient.addColorStop(1, `rgba(${color}, 0)`)
-        ctx!.fillStyle = gradient
-        ctx!.beginPath()
-        ctx!.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
-        ctx!.fill()
+        // <= 0.22 per puff (still the gentlest mode, well under the
+        // constellation-particle ceiling); no per-frame gradient
+        // construction -- draw the precomputed sprite, tinted via alpha
+        const peakAlpha = 0.22 * (p.layer === 0 ? 0.6 : 1)
+        ctx!.globalAlpha = peakAlpha
+        const sprite = nebulaSprites[p.spriteIndex]
+        ctx!.drawImage(sprite, p.x - p.radius, p.y - p.radius, p.radius * 2, p.radius * 2)
       }
+      ctx!.globalAlpha = 1
     }
 
     function drawSingularity(dt: number) {
-      ringRotation += dt * 0.004 // near-static
+      ringRotation += dt * 0.12 // ~0.1-0.15 rad/s, rotation clearly visible
       ctx!.clearRect(0, 0, width, height)
 
-      const coreRadius = ringRadiusX * 0.9
-      const core = ctx!.createRadialGradient(ringCenter.x, ringCenter.y, 0, ringCenter.x, ringCenter.y, coreRadius)
-      core.addColorStop(0, 'rgba(0, 0, 0, 0.35)')
-      core.addColorStop(1, 'rgba(0, 0, 0, 0)')
-      ctx!.fillStyle = core
+      // dark core: a real void at the ring's center, no particles inside
+      // it. Sized under the ring's minor-axis extent (ringRadiusY, its
+      // tightest constraint) so it never covers ring particles. Plain
+      // filled circle -- no gradient, so nothing is built here per frame.
+      const coreRadius = ringRadiusY * 0.72
+      ctx!.fillStyle = 'rgba(4, 6, 14, 0.9)'
       ctx!.beginPath()
       ctx!.arc(ringCenter.x, ringCenter.y, coreRadius, 0, Math.PI * 2)
       ctx!.fill()
 
+      // soft outer glow: sparser, dimmer, slightly larger ellipse than the
+      // main ring -- drawn first so the bright ring sits on top of it
+      for (const p of ringGlowParticles) {
+        const angle = p.angle + ringRotation
+        const ex = ringRadiusX * 1.35 * p.radiusJitter * Math.cos(angle)
+        const ey = ringRadiusY * 1.35 * p.radiusJitter * Math.sin(angle)
+        const x = ringCenter.x + ex * Math.cos(ringPhi) - ey * Math.sin(ringPhi)
+        const y = ringCenter.y + ex * Math.sin(ringPhi) + ey * Math.cos(ringPhi)
+        ctx!.fillStyle = `rgba(${cyanRgb}, ${p.brightness})`
+        ctx!.beginPath()
+        ctx!.arc(x, y, 1, 0, Math.PI * 2)
+        ctx!.fill()
+      }
+
+      // thin, tight accretion ring. Each particle's brightness was baked at
+      // seed time from its angular offset to the bias direction, so the
+      // asymmetry (mild shading, not a hot spot) rotates naturally with the
+      // ring at zero extra per-frame trig.
       for (const p of ringParticles) {
         const angle = p.angle + ringRotation
         const ex = ringRadiusX * p.radiusJitter * Math.cos(angle)
         const ey = ringRadiusY * p.radiusJitter * Math.sin(angle)
         const x = ringCenter.x + ex * Math.cos(ringPhi) - ey * Math.sin(ringPhi)
         const y = ringCenter.y + ex * Math.sin(ringPhi) + ey * Math.cos(ringPhi)
-        ctx!.fillStyle = `rgba(${cyanRgb}, ${baseAlpha * 0.5})`
+        ctx!.fillStyle = `rgba(${cyanRgb}, ${p.brightness})`
         ctx!.beginPath()
-        ctx!.arc(x, y, 1, 0, Math.PI * 2)
+        ctx!.arc(x, y, 1.2, 0, Math.PI * 2)
         ctx!.fill()
       }
     }
@@ -390,6 +515,7 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
       }
     }
 
+    if (mode === 'nebula') buildNebulaSprites() // once per mount, resolution-independent
     resize()
     window.addEventListener('resize', resize)
     document.addEventListener('visibilitychange', handleVisibility)
