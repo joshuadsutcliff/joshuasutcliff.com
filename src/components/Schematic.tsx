@@ -5,11 +5,23 @@ type Point = { x: number; y: number }
 type NodeRect = Point & { hw: number; hh: number }
 
 const EDGE_GAP = 3
+const LABEL_CHAR_WIDTH = 5.4
+const LABEL_PADDING_X = 4
+const LABEL_HEIGHT = 13
 
-function quadraticMidpoint(from: Point, control: Point, to: Point): Point {
+function measureLabel(text: string): { width: number; height: number } {
+  return { width: text.length * LABEL_CHAR_WIDTH + LABEL_PADDING_X * 2, height: LABEL_HEIGHT }
+}
+
+function lerp(from: Point, to: Point, t: number): Point {
+  return { x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t }
+}
+
+function quadraticPoint(from: Point, control: Point, to: Point, t: number): Point {
+  const mt = 1 - t
   return {
-    x: 0.25 * from.x + 0.5 * control.x + 0.25 * to.x,
-    y: 0.25 * from.y + 0.5 * control.y + 0.25 * to.y,
+    x: mt * mt * from.x + 2 * mt * t * control.x + t * t * to.x,
+    y: mt * mt * from.y + 2 * mt * t * control.y + t * t * to.y,
   }
 }
 
@@ -35,11 +47,88 @@ function clipToNodeBorder(node: NodeRect, toward: Point, gap: number = EDGE_GAP)
   }
 }
 
+// True if point p (with an optional padding radius) falls inside rect.
+function pointInRect(p: Point, rect: NodeRect, padding = 0): boolean {
+  return (
+    p.x >= rect.x - rect.hw - padding &&
+    p.x <= rect.x + rect.hw + padding &&
+    p.y >= rect.y - rect.hh - padding &&
+    p.y <= rect.y + rect.hh + padding
+  )
+}
+
+// AABB overlap test between a center+half-extent box (e.g. a label pill) and
+// a node's bounding rect.
+function boxIntersectsRect(center: Point, halfW: number, halfH: number, rect: NodeRect, padding = 0): boolean {
+  return (
+    Math.abs(center.x - rect.x) < halfW + rect.hw + padding &&
+    Math.abs(center.y - rect.y) < halfH + rect.hh + padding
+  )
+}
+
+// Orbit control point: base lift scales with the endpoints' horizontal
+// distance, then increases (capped) until the curve's midpoint region
+// clears every other node's bounding box.
+function computeOrbitControl(
+  from: Point,
+  to: Point,
+  rects: Map<string, NodeRect>,
+  excludeIds: Set<string>,
+): Point {
+  const controlX = (from.x + to.x) / 2
+  const baseY = Math.min(from.y, to.y)
+  const dx = Math.abs(to.x - from.x)
+  const maxLift = 80
+  const step = 14
+  let lift = Math.min(maxLift, Math.max(28, dx * 0.18))
+
+  const sampleTs = [0.3, 0.4, 0.5, 0.6, 0.7]
+  const entries = Array.from(rects.entries()).filter(([id]) => !excludeIds.has(id))
+
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const control = { x: controlX, y: baseY - lift }
+    const clashes = entries.some(([, rect]) =>
+      sampleTs.some((t) => pointInRect(quadraticPoint(from, control, to, t), rect, 8)),
+    )
+    if (!clashes || lift >= maxLift) return control
+    lift = Math.min(maxLift, lift + step)
+  }
+  return { x: controlX, y: baseY - lift }
+}
+
+// Picks a point along the edge's path (straight or curved, via `pathPoint`)
+// for the label to sit at, preferring the midpoint but shifting toward
+// t=0.35/0.65 (then further out) whenever the label pill would overlap
+// another node's box.
+function resolveLabelAnchor(
+  pathPoint: (t: number) => Point,
+  labelSize: { width: number; height: number },
+  rects: Map<string, NodeRect>,
+  excludeIds: Set<string>,
+): Point {
+  const entries = Array.from(rects.entries()).filter(([id]) => !excludeIds.has(id))
+  const isClear = (p: Point) => {
+    const pillCenter = { x: p.x, y: p.y - 10 }
+    return entries.every(
+      ([, rect]) => !boxIntersectsRect(pillCenter, labelSize.width / 2, labelSize.height / 2, rect, 2),
+    )
+  }
+
+  for (const t of [0.5, 0.35, 0.65, 0.25, 0.75]) {
+    const candidate = pathPoint(t)
+    if (isClear(candidate)) return candidate
+  }
+
+  const base = pathPoint(0.5)
+  for (let extra = 14; extra <= 60; extra += 14) {
+    const candidate = { x: base.x, y: base.y - extra }
+    if (isClear(candidate)) return candidate
+  }
+  return base
+}
+
 function EdgeLabel({ point, text }: { point: Point; text: string }) {
-  const paddingX = 4
-  const charWidth = 5.4
-  const width = text.length * charWidth + paddingX * 2
-  const height = 13
+  const { width, height } = measureLabel(text)
   return (
     <g transform={`translate(${point.x}, ${point.y - 10})`}>
       <rect
@@ -227,15 +316,29 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
               const to = points.get(edge.to)
               if (!from || !to) return null
 
+              const excludeIds = new Set([edge.from, edge.to])
+
               if (edge.style === 'orbit') {
-                const control = { x: (from.x + to.x) / 2, y: Math.min(from.y, to.y) - 36 }
+                // Base lift scales with horizontal distance, then grows
+                // (capped at 80px) until the curve clears any intervening
+                // node boxes (e.g. a worker-pool column sitting between the
+                // conductor and the vault).
+                const control = computeOrbitControl(from, to, points, excludeIds)
                 // Clip each endpoint toward the control point so the curve
                 // visually exits the box edge cleanly (not toward the other
                 // node's center, which would clip at the wrong angle for a
                 // curved path).
                 const clippedFrom = clipToNodeBorder(from, control)
                 const clippedTo = clipToNodeBorder(to, control)
-                const labelPoint = quadraticMidpoint(clippedFrom, control, clippedTo)
+                const labelSize = edge.label ? measureLabel(edge.label) : null
+                const labelPoint = labelSize
+                  ? resolveLabelAnchor(
+                      (t) => quadraticPoint(clippedFrom, control, clippedTo, t),
+                      labelSize,
+                      points,
+                      excludeIds,
+                    )
+                  : null
                 return (
                   <g key={index}>
                     <path
@@ -248,7 +351,7 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
                       opacity={0.55}
                       className="schematic-edge-orbit"
                     />
-                    {edge.label && <EdgeLabel point={labelPoint} text={edge.label} />}
+                    {edge.label && labelPoint && <EdgeLabel point={labelPoint} text={edge.label} />}
                   </g>
                 )
               }
@@ -258,10 +361,10 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
               // border, never crossing into the box over its label text.
               const clippedFrom = clipToNodeBorder(from, to)
               const clippedTo = clipToNodeBorder(to, from)
-              const midPoint = {
-                x: (clippedFrom.x + clippedTo.x) / 2,
-                y: (clippedFrom.y + clippedTo.y) / 2,
-              }
+              const labelSize = edge.label ? measureLabel(edge.label) : null
+              const labelPoint = labelSize
+                ? resolveLabelAnchor((t) => lerp(clippedFrom, clippedTo, t), labelSize, points, excludeIds)
+                : null
 
               if (edge.style === 'return') {
                 return (
@@ -277,7 +380,7 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
                       strokeLinecap="round"
                       opacity={0.6}
                     />
-                    {edge.label && <EdgeLabel point={midPoint} text={edge.label} />}
+                    {edge.label && labelPoint && <EdgeLabel point={labelPoint} text={edge.label} />}
                   </g>
                 )
               }
@@ -296,7 +399,7 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
                     opacity={0.75}
                     className="schematic-edge-flow"
                   />
-                  {edge.label && <EdgeLabel point={midPoint} text={edge.label} />}
+                  {edge.label && labelPoint && <EdgeLabel point={labelPoint} text={edge.label} />}
                 </g>
               )
             })}
