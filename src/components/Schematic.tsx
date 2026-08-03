@@ -3,6 +3,42 @@ import type { SchematicGate, SchematicNode, SchematicSpec } from '../content/sch
 
 type Point = { x: number; y: number }
 
+function quadraticMidpoint(from: Point, control: Point, to: Point): Point {
+  return {
+    x: 0.25 * from.x + 0.5 * control.x + 0.25 * to.x,
+    y: 0.25 * from.y + 0.5 * control.y + 0.25 * to.y,
+  }
+}
+
+function EdgeLabel({ point, text }: { point: Point; text: string }) {
+  const paddingX = 4
+  const charWidth = 5.4
+  const width = text.length * charWidth + paddingX * 2
+  const height = 13
+  return (
+    <g transform={`translate(${point.x}, ${point.y - 10})`}>
+      <rect
+        x={-width / 2}
+        y={-height / 2}
+        width={width}
+        height={height}
+        rx={3}
+        fill="var(--bg)"
+        opacity={0.82}
+      />
+      <text
+        className="font-mono"
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fontSize={9}
+        fill="var(--dim)"
+      >
+        {text}
+      </text>
+    </g>
+  )
+}
+
 const STYLE_ID = 'schematic-inline-styles'
 const STYLES = `
 @keyframes schematic-dash-flow { to { stroke-dashoffset: -24; } }
@@ -165,54 +201,62 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
               if (!from || !to) return null
 
               if (edge.style === 'orbit') {
-                const midX = (from.x + to.x) / 2
-                const midY = Math.min(from.y, to.y) - 36
+                const control = { x: (from.x + to.x) / 2, y: Math.min(from.y, to.y) - 36 }
+                const labelPoint = quadraticMidpoint(from, control, to)
                 return (
-                  <path
-                    key={index}
-                    d={`M ${from.x} ${from.y} Q ${midX} ${midY} ${to.x} ${to.y}`}
-                    fill="none"
-                    stroke="var(--purple)"
-                    strokeWidth={1.25}
-                    strokeDasharray="2 6"
-                    strokeLinecap="round"
-                    opacity={0.55}
-                    className="schematic-edge-orbit"
-                  />
+                  <g key={index}>
+                    <path
+                      d={`M ${from.x} ${from.y} Q ${control.x} ${control.y} ${to.x} ${to.y}`}
+                      fill="none"
+                      stroke="var(--purple)"
+                      strokeWidth={1.25}
+                      strokeDasharray="2 6"
+                      strokeLinecap="round"
+                      opacity={0.55}
+                      className="schematic-edge-orbit"
+                    />
+                    {edge.label && <EdgeLabel point={labelPoint} text={edge.label} />}
+                  </g>
                 )
               }
 
+              const midPoint = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 }
+
               if (edge.style === 'return') {
                 return (
-                  <line
-                    key={index}
-                    x1={from.x}
-                    y1={from.y}
-                    x2={to.x}
-                    y2={to.y}
-                    stroke="var(--dim)"
-                    strokeWidth={1}
-                    strokeDasharray="1 5"
-                    strokeLinecap="round"
-                    opacity={0.6}
-                  />
+                  <g key={index}>
+                    <line
+                      x1={from.x}
+                      y1={from.y}
+                      x2={to.x}
+                      y2={to.y}
+                      stroke="var(--dim)"
+                      strokeWidth={1}
+                      strokeDasharray="1 5"
+                      strokeLinecap="round"
+                      opacity={0.6}
+                    />
+                    {edge.label && <EdgeLabel point={midPoint} text={edge.label} />}
+                  </g>
                 )
               }
 
               return (
-                <line
-                  key={index}
-                  x1={from.x}
-                  y1={from.y}
-                  x2={to.x}
-                  y2={to.y}
-                  stroke="var(--cyan)"
-                  strokeWidth={1.25}
-                  strokeDasharray="4 4"
-                  strokeLinecap="round"
-                  opacity={0.75}
-                  className="schematic-edge-flow"
-                />
+                <g key={index}>
+                  <line
+                    x1={from.x}
+                    y1={from.y}
+                    x2={to.x}
+                    y2={to.y}
+                    stroke="var(--cyan)"
+                    strokeWidth={1.25}
+                    strokeDasharray="4 4"
+                    strokeLinecap="round"
+                    opacity={0.75}
+                    className="schematic-edge-flow"
+                  />
+                  {edge.label && <EdgeLabel point={midPoint} text={edge.label} />}
+                </g>
               )
             })}
           </svg>
