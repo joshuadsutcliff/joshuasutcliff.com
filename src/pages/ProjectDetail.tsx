@@ -65,6 +65,7 @@ export default function ProjectDetail() {
           )}
         </div>
       )}
+      {card.note && <p className="mt-3 text-xs leading-relaxed text-dim">{card.note}</p>}
 
       <div className="glass mt-10 rounded-3xl p-8 sm:p-12">
         {detail.overview.map((paragraph, i) => (
