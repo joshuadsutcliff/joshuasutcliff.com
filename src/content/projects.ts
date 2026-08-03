@@ -4,6 +4,8 @@ export type ProjectCard = {
   status?: string
   href?: string
   note?: string
+  secondaryLabel?: string
+  secondaryHref?: string
 }
 
 export type ProjectGroup = {
@@ -48,6 +50,8 @@ export const PROJECT_GROUPS: ProjectGroup[] = [
         status: 'Active',
         href: 'https://github.com/joshuadsutcliff/claude-config-public',
         note: 'Built on the Compound AI Operating Standards by Cameron Sutcliff, CC BY 4.0.',
+        secondaryLabel: 'Setup guide: Obsidian + Claude Code',
+        secondaryHref: '/guides/obsidian-claude-setup',
       },
       {
         title: 'Mechanical Enforcement Layer',

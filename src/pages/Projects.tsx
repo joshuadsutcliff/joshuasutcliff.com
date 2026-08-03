@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { GithubIcon } from '../components/icons'
 import { PROJECT_GROUPS } from '../content/projects'
 import { CHANGELOG_ENTRIES, CHANGELOG_HEADING, CHANGELOG_INTRO } from '../content/changelog'
@@ -35,19 +36,31 @@ export default function Projects() {
                   )}
                 </>
               )
-              return card.href ? (
-                <a
+              return (
+                <div
                   key={card.title}
-                  href={card.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="glass group flex flex-col rounded-2xl p-7 transition-all duration-300 hover:-translate-y-1"
+                  className={`glass flex flex-col rounded-2xl p-7${card.href ? ' group transition-all duration-300 hover:-translate-y-1' : ''}`}
                 >
-                  {inner}
-                </a>
-              ) : (
-                <div key={card.title} className="glass flex flex-col rounded-2xl p-7">
-                  {inner}
+                  {card.href ? (
+                    <a
+                      href={card.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex flex-1 flex-col"
+                    >
+                      {inner}
+                    </a>
+                  ) : (
+                    inner
+                  )}
+                  {card.secondaryHref && card.secondaryLabel && (
+                    <Link
+                      to={card.secondaryHref}
+                      className="mt-3 inline-flex items-center gap-2 font-mono text-xs text-cyan hover:text-purple"
+                    >
+                      {card.secondaryLabel} →
+                    </Link>
+                  )}
                 </div>
               )
             })}
