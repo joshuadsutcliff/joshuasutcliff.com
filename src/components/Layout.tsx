@@ -65,7 +65,7 @@ export default function Layout() {
         </div>
       </nav>
       <hr className="hud-divider mx-auto max-w-5xl print:hidden" />
-      <main className="page-enter" key={location.pathname}>
+      <main className="relative page-enter" key={location.pathname}>
         <Outlet />
       </main>
       <Footer />

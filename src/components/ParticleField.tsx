@@ -92,7 +92,7 @@ export default function ParticleField({ mode }: ParticleFieldProps) {
 
     function seedSpiral() {
       const armCount = 3
-      const total = 100 // within the brief's 80-140 range, kept toward the lower end
+      const total = 70 // spec cap: particle count <= current Home count (70)
       const perArm = Math.ceil(total / armCount)
       const thetaMax = Math.PI * 4
       const b = 0.21 // within the 0.18-0.25 range
