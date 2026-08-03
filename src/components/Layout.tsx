@@ -17,7 +17,7 @@ export default function Layout() {
   const flourish = useSecretAdmin()
   const location = useLocation()
   return (
-    <div className="min-h-screen bg-bg text-fg">
+    <div className="min-h-screen text-fg">
       <div aria-hidden className="ambient-wash" />
       <div aria-hidden className="ambient-grid" />
       {flourish && <AccessFlourish />}
@@ -53,7 +53,7 @@ export default function Layout() {
           </a>
         </div>
       </nav>
-      <hr className="hud-divider mx-auto max-w-5xl" />
+      <hr className="hud-divider mx-auto max-w-5xl print:hidden" />
       <main className="page-enter" key={location.pathname}>
         <Outlet />
       </main>

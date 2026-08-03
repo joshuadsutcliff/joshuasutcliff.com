@@ -170,14 +170,17 @@ export default function ProjectDetail() {
 
       {detail.showChangelog && (
         <div className="mt-10">
-          <details className="hud-panel rounded-2xl p-6 sm:p-8">
+          <details className="group hud-panel rounded-2xl p-6 sm:p-8">
             <summary className="hud-eyebrow cursor-pointer">
+              <span aria-hidden className="inline-block transition-transform group-open:rotate-90">
+                &rsaquo;
+              </span>
               {CHANGELOG_HEADING}
             </summary>
             <p className="mt-3 text-sm leading-relaxed text-muted">{CHANGELOG_INTRO}</p>
             <div className="mt-5 grid gap-5">
               {CHANGELOG_ENTRIES.map((entry) => (
-                <div key={entry.title} className="hud-panel flex flex-col rounded-2xl p-7">
+                <div key={entry.title} className="flex flex-col rounded-2xl border border-border bg-bg2/40 p-7">
                   <div className="flex items-start justify-between gap-3">
                     <p className="font-display text-xl font-semibold text-fg">{entry.title}</p>
                     <span className="shrink-0 rounded-full border border-border px-2.5 py-0.5 font-mono text-[11px] text-muted">

@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 export default function Lightbox({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) {
   useEffect(() => {
@@ -9,7 +10,15 @@ export default function Lightbox({ src, alt, onClose }: { src: string; alt: stri
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
 
-  return (
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [])
+
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
@@ -23,6 +32,7 @@ export default function Lightbox({ src, alt, onClose }: { src: string; alt: stri
         onClick={(event) => event.stopPropagation()}
         className="max-h-[90%] max-w-[90%] rounded-xl border border-border object-contain"
       />
-    </div>
+    </div>,
+    document.body,
   )
 }

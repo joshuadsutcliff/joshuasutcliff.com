@@ -67,7 +67,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  transition: background 0.4s ease, color 0.4s ease;
 }
 
 ::selection {
@@ -165,6 +164,10 @@ body {
     background: currentColor;
     opacity: 0.3;
   }
+  .ambient-wash,
+  .ambient-grid {
+    display: none;
+  }
 }
 
 .page-enter { animation: page-enter 0.2s ease both; }
@@ -214,6 +217,7 @@ body {
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
