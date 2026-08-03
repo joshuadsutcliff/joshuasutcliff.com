@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { GithubIcon } from '../components/icons'
 import Lightbox from '../components/Lightbox'
+import Schematic from '../components/Schematic'
 import { PROJECT_GROUPS, type ProjectCard } from '../content/projects'
 import { PROJECT_DETAILS } from '../content/projects-detail'
 import { CHANGELOG_ENTRIES, CHANGELOG_HEADING, CHANGELOG_INTRO } from '../content/changelog'
 import { DIAGRAMS_ENTRIES, DIAGRAMS_HEADING, DIAGRAMS_INTRO } from '../content/diagrams'
+import { SCHEMATICS } from '../content/schematics'
 
 export default function ProjectDetail() {
   const { slug } = useParams<{ slug: string }>()
@@ -132,20 +134,34 @@ export default function ProjectDetail() {
           <div className="mt-6 space-y-8">
             {DIAGRAMS_ENTRIES.map((entry, index) => {
               const isOddRow = index % 2 === 0
+              const schematic = SCHEMATICS[entry.id]
               return (
                 <div key={entry.id} className="grid gap-5 md:grid-cols-[2fr_3fr]">
-                  <button
-                    type="button"
-                    onClick={() => setLightboxImage({ src: entry.image, alt: entry.alt })}
-                    className={`text-left ${isOddRow ? 'md:order-2' : ''}`}
-                  >
-                    <img
-                      src={entry.image}
-                      alt={entry.alt}
-                      loading="lazy"
-                      className="w-full rounded-xl border border-border"
-                    />
-                  </button>
+                  <div className={isOddRow ? 'md:order-2' : ''}>
+                    {schematic ? (
+                      <Schematic spec={schematic} />
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setLightboxImage({ src: entry.image, alt: entry.alt })}
+                        className="block w-full text-left"
+                      >
+                        <img
+                          src={entry.image}
+                          alt={entry.alt}
+                          loading="lazy"
+                          className="w-full rounded-xl border border-border"
+                        />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setLightboxImage({ src: entry.image, alt: entry.alt })}
+                      className="mt-2 font-mono text-[11px] text-dim hover:text-cyan"
+                    >
+                      view original
+                    </button>
+                  </div>
                   <div>
                     <p className="font-display text-lg font-semibold text-fg">{entry.title}</p>
                     <div className="mt-3 space-y-3">
