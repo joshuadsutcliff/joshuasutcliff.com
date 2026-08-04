@@ -123,4 +123,36 @@ export const PROJECT_DETAILS: Record<string, ProjectDetailEntry> = {
     showDiagrams: true,
     showChangelog: true,
   },
+  'monitoring-stack': {
+    slug: 'monitoring-stack',
+    group: 'AI Operations',
+    overview: [
+      'Install scripts die the first time reality disagrees with their assumptions: a different subnet, a different SSD bridge chip, a router that will not hand off DNS. This project ships a phase-by-phase setup charter written for an AI coding agent instead. The agent probes the actual hardware, adapts addressing and storage to what it finds, and verifies every phase before starting the next. The charter encodes the design and the hard-won gotchas; the agent supplies the adaptation.',
+    ],
+    stack: ['Raspberry Pi 5', 'Pi-hole', 'InfluxDB', 'Telegraf', 'Grafana', 'ntfy', 'Uptime Kuma', 'NUT', 'MeshCentral', 'Tailscale'],
+    highlights: [
+      'Pi-hole: LAN-wide DNS and ad-blocking, with local hostnames for every device on the network',
+      'InfluxDB 2.x + Telegraf + Grafana: a metrics pipeline that extends to every machine in the house with native agents',
+      'ntfy: self-hosted push alerts straight to your phone',
+      'Uptime Kuma: up/down monitoring with alert routing, tuned to avoid false pages',
+      'NUT: UPS monitoring with phone alerts on power loss and ordered fleet shutdown when the battery runs low',
+      'MeshCentral: self-hosted remote desktop and management for the rest of your machines',
+      'Homepage + Homarr: two dashboard front-ends integrating all of the above',
+      'Tailscale: secure remote access; nothing in the stack is ever exposed to the public internet',
+    ],
+    extraSections: [
+      {
+        heading: 'How the install works',
+        paragraphs: [
+          'Nine phases, each ending in explicit verification commands the agent must pass before advancing. It starts with an interview (static IP, router access, which machines to manage, which machines are off-limits because an employer owns them), and the riskiest step, taking over the house DNS, ships with a written rollback plan. Storage, including the Docker data-root, lives on an external SSD from the first phase. It ends with per-OS fleet agents (macOS, Windows, Linux, NVIDIA AI boxes) extending metrics to every machine in the house, with a guard against GPU polling that stutters games.',
+        ],
+      },
+      {
+        heading: 'Battle-tested, not hypothetical',
+        paragraphs: [
+          'The design is distilled from three production deployments refined over months. The embedded warnings are real failure modes those deployments hit: the MeshCentral silent agent-enrollment trap, the dashboard dual-URL rule, USB UAS quirks on Pi hardware, restart policies that silently do not apply.',
+        ],
+      },
+    ],
+  },
 }

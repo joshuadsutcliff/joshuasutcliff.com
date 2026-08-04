@@ -78,6 +78,14 @@ export const PROJECT_GROUPS: ProjectGroup[] = [
         secondaryLabel: 'Setup guide: Obsidian + Claude Code',
         secondaryHref: '/guides/obsidian-claude-setup',
       },
+      {
+        slug: 'monitoring-stack',
+        title: 'Pi 5 Monitoring Stack',
+        tldr: 'A complete home-network monitoring stack in one charter file. Your AI agent reads it, interviews you for your network details, then builds Pi-hole DNS, Grafana metrics, phone alerts, UPS awareness, remote management, and dual dashboards on a Raspberry Pi 5. There is no installer script: the agent is the installer.',
+        status: 'Active',
+        statusTone: 'green',
+        href: 'https://github.com/joshuadsutcliff/pi5-monitoring-stack',
+      },
     ],
   },
 ]
