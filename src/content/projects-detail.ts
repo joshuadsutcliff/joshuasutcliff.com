@@ -127,9 +127,9 @@ export const PROJECT_DETAILS: Record<string, ProjectDetailEntry> = {
     slug: 'monitoring-stack',
     group: 'AI Operations',
     overview: [
-      'Install scripts die the first time reality disagrees with their assumptions: a different subnet, a different SSD bridge chip, a router that will not hand off DNS. This project ships a phase-by-phase setup charter written for an AI coding agent instead. The agent probes the actual hardware, adapts addressing and storage to what it finds, and verifies every phase before starting the next. The charter encodes the design and the hard-won gotchas; the agent supplies the adaptation.',
+      'Install scripts die the first time reality disagrees with their assumptions: a different subnet, a different SSD bridge chip, a router that will not hand off DNS. This project ships a phase-by-phase setup charter written for an AI coding agent instead. The agent probes the actual hardware, adapts addressing and storage to what it finds, and verifies every phase before starting the next. The charter encodes the design and the hard-won gotchas; the agent supplies the adaptation. The reference build is a Raspberry Pi 5 with an SSD, but the charter runs anywhere Debian-family Linux does: a VM, bare metal, or an old laptop in a closet.',
     ],
-    stack: ['Raspberry Pi 5', 'Pi-hole', 'InfluxDB', 'Telegraf', 'Grafana', 'ntfy', 'Uptime Kuma', 'NUT', 'MeshCentral', 'Tailscale'],
+    stack: ['Debian-family Linux (Pi 5, VM, or bare metal)', 'Pi-hole', 'InfluxDB', 'Telegraf', 'Grafana', 'ntfy', 'Uptime Kuma', 'NUT', 'MeshCentral', 'Tailscale'],
     highlights: [
       'Pi-hole: LAN-wide DNS and ad-blocking, with local hostnames for every device on the network',
       'InfluxDB 2.x + Telegraf + Grafana: a metrics pipeline that extends to every machine in the house with native agents',
@@ -150,7 +150,7 @@ export const PROJECT_DETAILS: Record<string, ProjectDetailEntry> = {
       {
         heading: 'Battle-tested, not hypothetical',
         paragraphs: [
-          'The design is distilled from three production deployments refined over months. The embedded warnings are real failure modes those deployments hit: the MeshCentral silent agent-enrollment trap, the dashboard dual-URL rule, USB UAS quirks on Pi hardware, restart policies that silently do not apply.',
+          'The design is distilled from three production deployments refined over months. The embedded warnings are real failure modes those deployments hit: the MeshCentral silent agent-enrollment trap, the dashboard dual-URL rule, USB UAS quirks on SBC hardware, restart policies that silently do not apply.',
         ],
       },
     ],
