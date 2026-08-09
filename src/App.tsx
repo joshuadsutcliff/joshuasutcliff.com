@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
 import ScrollToTop from './components/ScrollToTop'
@@ -9,6 +10,8 @@ import About from './pages/About'
 import Resume from './pages/Resume'
 import Admin from './pages/Admin'
 import GuideObsidianClaude from './pages/GuideObsidianClaude'
+
+const Baton = lazy(() => import('./pages/Baton'))
 
 function App() {
   return (
@@ -26,6 +29,14 @@ function App() {
           <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
+        <Route
+          path="/baton"
+          element={
+            <Suspense fallback={null}>
+              <Baton />
+            </Suspense>
+          }
+        />
       </Routes>
     </>
   )

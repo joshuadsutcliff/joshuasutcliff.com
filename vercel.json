@@ -6,7 +6,8 @@
     { "source": "/(.*)", "destination": "/" }
   ],
   "functions": {
-    "api/track.ts": { "includeFiles": "api/_lib/GeoLite2-ASN.mmdb" }
+    "api/track.ts": { "includeFiles": "api/_lib/GeoLite2-ASN.mmdb" },
+    "api/baton/deck.ts": { "includeFiles": "api/_lib/baton-deck.html" }
   },
   "headers": [
     {
@@ -17,6 +18,12 @@
     },
     {
       "source": "/admin",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/baton",
       "headers": [
         { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
       ]
