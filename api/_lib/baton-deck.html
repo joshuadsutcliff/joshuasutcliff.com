@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baton — Enterprise Briefing</title>
+<style>
+:root{
+  --act1:#E8A33D; --act1-soft:rgba(232,163,61,.14);
+  --act2:#3FC5D8; --act2-soft:rgba(63,197,216,.14);
+  --act3:#4FBF7B; --act3-soft:rgba(79,191,123,.14);
+  --radius:14px;
+  --script-width:0px;
+  --t-fast:.12s; --t-base:.28s;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;
+}
+html[data-theme="dark"]{
+  --bg:#0B0E13; --bg-2:#11151C; --surface:#161B24; --surface-2:#1D2431;
+  --border:#262E3C; --border-strong:#39445A;
+  --text:#EEF2F8; --text-2:#A9B4C6; --text-3:#6F7C91;
+  --accent:var(--act2);
+  --shadow:0 18px 48px rgba(0,0,0,.5);
+}
+html[data-theme="light"]{
+  --bg:#FBFBFC; --bg-2:#F2F4F7; --surface:#FFFFFF; --surface-2:#F4F6FA;
+  --border:#DDE2EA; --border-strong:#B7C0CE;
+  --text:#10151C; --text-2:#4A5566; --text-3:#7B8798;
+  --act1:#B9791B; --act1-soft:rgba(185,121,27,.10);
+  --act2:#0E7C90; --act2-soft:rgba(14,124,144,.10);
+  --act3:#1E8A4C; --act3-soft:rgba(30,138,76,.10);
+  --accent:var(--act2);
+  --shadow:0 14px 40px rgba(16,26,40,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:var(--font); font-size:17px; line-height:1.62;
+  -webkit-font-smoothing:antialiased; overflow:hidden;
+  transition:background var(--t-base),color var(--t-base);
+}
+.deck{position:relative;height:100vh;width:100vw}
+.slide{
+  position:absolute; inset:0; left:var(--script-width);
+  width:calc(100vw - var(--script-width));
+  padding:4.2vh 5.2vw 7vh;
+  display:none; flex-direction:column; justify-content:center; overflow:hidden;
+  animation:fade var(--t-base) ease both;
+}
+.slide.active{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.slide[data-act="1"]{--accent:var(--act1);--accent-soft:var(--act1-soft)}
+.slide[data-act="2"]{--accent:var(--act2);--accent-soft:var(--act2-soft)}
+.slide[data-act="3"]{--accent:var(--act3);--accent-soft:var(--act3-soft)}
+.slide[data-act="0"]{--accent:var(--act2);--accent-soft:var(--act2-soft)}
+
+.eyebrow{
+  font-size:.82rem; letter-spacing:.18em; text-transform:uppercase;
+  font-weight:650; color:var(--accent); margin-bottom:1.1rem;
+}
+h1{font-size:6.4rem;line-height:1.02;letter-spacing:-.035em;font-weight:760}
+h2{font-size:2.9rem;line-height:1.12;letter-spacing:-.022em;font-weight:700;margin-bottom:.5rem}
+h3{font-size:1.22rem;font-weight:680;letter-spacing:-.005em}
+.sub{font-size:1.3rem;color:var(--text-2);max-width:60ch;margin-bottom:1.9rem;line-height:1.55}
+p{color:var(--text-2)}
+strong{color:var(--text);font-weight:640}
+.rule{height:4px;width:96px;background:var(--accent);border-radius:3px;margin:1.4rem 0 1.9rem}
+
+/* ---- cards / grids ---- */
+.grid{display:grid;gap:1.15rem}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.card{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:1.35rem 1.5rem;
+}
+.card.accented{border-left:4px solid var(--accent)}
+.card h3{margin-bottom:.4rem}
+.card p{font-size:1.02rem;line-height:1.6}
+
+.stat{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:1.5rem 1.4rem; text-align:left;
+}
+.stat .v{
+  font-size:4rem;line-height:1;font-weight:780;letter-spacing:-.04em;
+  color:var(--accent); display:block; margin-bottom:.55rem;
+  font-variant-numeric:tabular-nums;
+}
+.stat .l{font-size:.95rem;color:var(--text-2);line-height:1.45}
+.stat.big .v{font-size:5.2rem}
+
+/* compare */
+.compare{display:grid;grid-template-columns:1fr auto 1fr;gap:1.2rem;align-items:stretch;margin-bottom:1.3rem}
+.cbox{border-radius:var(--radius);padding:1.5rem 1.6rem;border:1px solid var(--border);background:var(--surface)}
+.cbox.bad{border-color:rgba(226,92,78,.55);background:linear-gradient(180deg,rgba(226,92,78,.10),transparent)}
+.cbox.good{border-color:var(--act3);background:linear-gradient(180deg,var(--act3-soft),transparent)}
+.cbox .lab{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);font-weight:640}
+.cbox .val{font-size:4.6rem;line-height:1.04;font-weight:790;letter-spacing:-.04em;margin:.25rem 0 .5rem}
+.cbox.bad .val{color:#E25C4E}
+html[data-theme="light"] .cbox.bad .val{color:#C0392B}
+.cbox.good .val{color:var(--act3)}
+.cbox p{font-size:1rem;line-height:1.55}
+.cvs{display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;
+  font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3);font-weight:650}
+
+.glass{background:var(--accent-soft);border:1px solid var(--border);border-left:4px solid var(--accent);
+  border-radius:var(--radius);padding:1.15rem 1.4rem;font-size:1.05rem;line-height:1.6}
+.keyline{font-size:1.55rem;line-height:1.4;color:var(--text);font-weight:600;
+  border-left:4px solid var(--accent);padding-left:1.1rem;margin-top:1.4rem;max-width:78ch}
+.keyline em{font-style:normal;color:var(--accent)}
+
+/* hook clusters */
+.cluster{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:1.05rem 1.15rem}
+.cluster > .ch{font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;font-weight:700;color:var(--accent);margin-bottom:.7rem}
+.hk{display:flex;gap:.6rem;padding:.34rem 0;font-size:.93rem;line-height:1.4;border-top:1px solid var(--border)}
+.hk:first-of-type{border-top:0}
+.hk code{font-family:var(--mono);font-size:.85rem;color:var(--text);white-space:nowrap;font-weight:600}
+.hk span{color:var(--text-2)}
+
+/* contents */
+.toc{display:grid;grid-template-columns:repeat(4,1fr);gap:1.15rem;margin-top:.6rem}
+.toc button{
+  text-align:left;cursor:pointer;font:inherit;color:var(--text);
+  background:var(--surface);border:1px solid var(--border);border-top:4px solid var(--tc,var(--act2));
+  border-radius:var(--radius);padding:1.5rem 1.4rem;transition:transform var(--t-fast),border-color var(--t-fast);
+}
+.toc button:hover{transform:translateY(-3px);border-color:var(--tc,var(--act2))}
+.toc .n{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tc);font-weight:700}
+.toc .t{font-size:1.5rem;font-weight:700;letter-spacing:-.02em;margin:.35rem 0 .45rem;line-height:1.2}
+.toc .d{font-size:.95rem;color:var(--text-2);line-height:1.5}
+
+/* divider slides */
+.divider{justify-content:center;align-items:flex-start}
+.divider h2{font-size:4.6rem;max-width:20ch;letter-spacing:-.035em;line-height:1.05}
+.divider .big-num{font-size:1rem;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:1.2rem}
+
+/* questions */
+.q{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+   padding:1.7rem 1.7rem;display:flex;flex-direction:column;gap:.7rem}
+.q .qn{font-size:.8rem;letter-spacing:.18em;color:var(--accent);font-weight:750}
+.q .qt{font-size:1.6rem;line-height:1.32;font-weight:620;color:var(--text);letter-spacing:-.015em}
+
+/* pilot */
+.ask{background:linear-gradient(135deg,var(--accent-soft),transparent);
+  border:1px solid var(--accent);border-radius:18px;padding:2.2rem 2.4rem;margin-bottom:1.3rem}
+.ask .askline{font-size:3.5rem;line-height:1.12;font-weight:770;letter-spacing:-.03em;color:var(--text)}
+.ask .asksub{font-size:1.25rem;color:var(--text-2);margin-top:.9rem;max-width:70ch}
+
+ul.ticks{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+ul.ticks li{font-size:1.05rem;color:var(--text-2);padding-left:1.6rem;position:relative;line-height:1.55}
+ul.ticks li::before{content:"";position:absolute;left:0;top:.62em;width:9px;height:9px;border-radius:2px;background:var(--accent)}
+ul.ticks li b{color:var(--text);font-weight:650}
+
+.flow{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+.flow svg{width:100%;height:100%;max-height:52vh}
+.svg-node{fill:var(--surface);stroke:var(--border-strong);stroke-width:1.5}
+.svg-node-a{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2}
+.svg-t{fill:var(--text);font-family:var(--font);font-weight:650}
+.svg-t2{fill:var(--text-2);font-family:var(--font)}
+.svg-ta{fill:var(--accent);font-family:var(--font);font-weight:700}
+.svg-line{stroke:var(--border-strong);stroke-width:1.8;fill:none}
+.svg-line-a{stroke:var(--accent);stroke-width:2.2;fill:none}
+.svg-hook{fill:var(--accent);stroke:var(--bg);stroke-width:2}
+
+/* chrome */
+.slide-footer{
+  position:absolute;left:5.2vw;right:5.2vw;bottom:2.3vh;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:.78rem;letter-spacing:.1em;color:var(--text-3);text-transform:uppercase;
+  border-top:1px solid var(--border);padding-top:.7rem;
+}
+.progress-bar{position:fixed;left:var(--script-width);right:0;top:0;height:3px;background:var(--border);z-index:60}
+.progress-fill{height:100%;width:0;background:var(--accent,#3FC5D8);transition:width var(--t-base)}
+.theme-toggle{
+  position:fixed;top:1.3rem;right:1.4rem;z-index:80;width:42px;height:42px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--border);color:var(--text-2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all var(--t-fast);
+}
+.theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+.key-help{position:fixed;bottom:.35rem;left:5.2vw;z-index:70;font-size:.72rem;color:var(--text-3);
+  font-family:var(--mono);letter-spacing:.04em}
+.nav-zone{position:fixed;top:0;bottom:0;width:64px;z-index:50;cursor:pointer}
+.script-panel{
+  position:fixed;left:0;top:0;bottom:0;width:var(--script-width);overflow-y:auto;z-index:65;
+  background:var(--bg-2);border-right:1px solid var(--border);padding:1.6rem 1.4rem;
+}
+.script-panel.hidden{display:none}
+.script-panel h4{font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:.8rem}
+.script-panel .body{font-size:.95rem;line-height:1.65;color:var(--text-2);white-space:pre-wrap}
+body.notes-on{--script-width:360px}
+
+@media print{
+  body{overflow:visible}
+  .script-panel,.progress-bar,.nav-zone,.key-help,.theme-toggle{display:none!important}
+  .slide{display:flex!important;position:relative;page-break-after:always;height:100vh;left:0;width:100%}
+}
+@media (max-width:1100px){
+  h1{font-size:4.2rem} h2{font-size:2.4rem}
+  .g4{grid-template-columns:repeat(2,1fr)} .toc{grid-template-columns:repeat(2,1fr)}
+  .stat .v{font-size:3rem} .ask .askline{font-size:2.4rem}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<button class="theme-toggle" id="themeBtn" aria-label="Toggle theme" title="Toggle theme (T)">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+       stroke-linecap="round" id="themeIcon"></svg>
+</button>
+<aside class="script-panel hidden" id="script-panel"><h4>Speaker Notes</h4><div class="body" id="script-body"></div></aside>
+<div class="key-help" id="key-help">← → nav · S notes · F full · T theme</div>
+
+<div class="deck" id="deck">
+
+<!-- 1 -->
+<section class="slide" data-act="0" data-script="Open here. Baton is not a tool and not a prompt library — it is an operating methodology for how engineers interact with AI coding tools, plus the mechanical enforcement that makes the methodology stick. Four numbers frame the whole briefing: six times the throughput on the same budget, thirteen enforcement hooks doing the governing, two hundred plus logged sessions across five months informing the design, and one command to install it. Everything after this slide explains those four numbers.">
+  <div class="eyebrow">Enterprise Briefing</div>
+  <h1>Baton</h1>
+  <p class="sub" style="font-size:1.7rem;color:var(--text);margin:1.1rem 0 .3rem;max-width:34ch;font-weight:600">Mechanical discipline for AI development tools</p>
+  <p class="sub">An operating methodology that governs how engineers interact with AI coding tools.</p>
+  <div class="grid g4" style="margin-top:auto;margin-bottom:3vh">
+    <div class="stat"><span class="v">6×</span><span class="l">Throughput on the same budget</span></div>
+    <div class="stat"><span class="v">13</span><span class="l">Enforcement hooks</span></div>
+    <div class="stat"><span class="v">200+</span><span class="l">Sessions informed</span></div>
+    <div class="stat"><span class="v">1</span><span class="l">Install command</span></div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-act="0" data-script="Three acts and a close. Act one: the problem, and why it is an engineering-behavior problem rather than a finance problem. Act two: the methodology — the conductor/orchestra operating model, the enforcement layer that makes it mechanical, and the observed production data. Act three: the ask — one team, one week. Then closing validation and the questions I want to leave in the room. If you want the answer in three minutes, jump to the observed results and the pilot.">
+  <div class="eyebrow">Contents</div>
+  <h2>What this briefing covers</h2>
+  <div class="rule"></div>
+  <div class="toc">
+    <button data-go="3" style="--tc:var(--act1)"><div class="n">Act I</div><div class="t">The Problem</div><div class="d">Token cost is this year's top operational AI challenge — and it is behavioral, not financial.</div></button>
+    <button data-go="6" style="--tc:var(--act2)"><div class="n">Act II</div><div class="t">The Methodology</div><div class="d">Conductor and orchestra, mechanical enforcement, and five months of observed results.</div></button>
+    <button data-go="11" style="--tc:var(--act3)"><div class="n">Act III</div><div class="t">The Proposal</div><div class="d">One team. One week. Measured before-and-after on your own engineers.</div></button>
+    <button data-go="15" style="--tc:var(--act2)"><div class="n">Close</div><div class="t">Validation &amp; Questions</div><div class="d">Open source, MIT, production-proven — and four questions worth asking.</div></button>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="slide" data-act="1" data-script="Credibility anchors, in case anyone asks whether this is a real category: BCG published 'Managing AI Token Costs' in July 2026. McKinsey published 'The Cost of Intelligence' in July 2026. Forbes ran 'The Token Trap' in June 2026. Three separate consultancy and business-press outlets on the same problem in two months. The important framing move on this slide is the last line: finance sees a runaway line item and reaches for procurement levers, but nothing in a contract renegotiation changes how an engineer's tool behaves at 2pm on a Tuesday. It is an engineering-behavior problem wearing a finance costume.">
+  <div class="eyebrow">Act I — The Problem</div>
+  <h2>The industry reality</h2>
+  <div class="rule"></div>
+  <div class="grid g3" style="margin-bottom:1.4rem">
+    <div class="card accented"><h3>The #1 operational AI challenge</h3><p>Enterprise AI token cost is this year's leading operational concern. Major consultancies and the business press are publishing on it in parallel.</p></div>
+    <div class="card accented"><h3>Budgets exhausted in months</h3><p>Companies are burning annual AI allocations in a fraction of the year, then rationing access to the tools they just standardised on.</p></div>
+    <div class="card accented"><h3>$500–$2,000 per engineer / month</h3><p>Cost per engineer at undisciplined usage. Multiply by seat count — the number is a fleet number, not a pilot number.</p></div>
+  </div>
+  <div class="keyline">This is an <em>engineering-behavior problem</em> wearing a finance costume. Procurement cannot fix how a tool behaves inside a session.</div>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-act="1" data-script="Violations are documented in the methodology repo's enforcement-philosophy doc — this is not a rhetorical claim, it is a written record. The key nuance to land: this is not malicious and it is not a model defect. 'Get it done' is simply a stronger optimization signal than 'stay within budget' when nothing mechanical enforces the budget. A written rule is an input to reasoning, and reasoning under task pressure will route around an inconvenient input. That is the whole argument for hooks over guidelines.">
+  <div class="eyebrow">Act I — The Problem</div>
+  <h2>Why it happens</h2>
+  <div class="rule"></div>
+  <div class="grid g3" style="margin-bottom:1.5rem">
+    <div class="card accented"><h3>Optimized for done, not efficient</h3><p>The tool's objective is completing the task. Nothing in that objective weighs what the completion cost.</p></div>
+    <div class="card accented"><h3>No budget signal</h3><p>The model cannot see spend. There is no institutional memory of what went wrong in last week's session.</p></div>
+    <div class="card accented"><h3>No mechanical constraint</h3><p>Written guidance is an input to reasoning — and reasoning under pressure routes around inconvenient inputs.</p></div>
+  </div>
+  <div class="keyline">We demonstrated this empirically — the model was given explicit written instructions and <em>violated them three times</em> under task pressure, rationalizing around its own rules mid-session.</div>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-act="1" data-script="If this audience already has platform-level agent governance, position Baton as complementary, not competitive — it sits one layer below and does not overlap. Platform governance answers 'what may this deployed agent do in production.' It has nothing to say about an engineer with a coding assistant open on their laptop, which is where the per-seat spend actually accumulates. The waste is not one big event, it is one session at a time across every engineering seat, every day.">
+  <div class="eyebrow">Act I — The Problem</div>
+  <h2>The gap in current solutions</h2>
+  <div class="rule"></div>
+  <div class="grid g2" style="gap:1.4rem;margin-bottom:1.4rem">
+    <div class="card"><h3 style="color:var(--text-3)">What platform governance covers</h3><p style="font-size:1.08rem">Agents deployed to production: what they may call, what data they may touch, how they are audited. Necessary, mature, and well-served by existing vendors.</p></div>
+    <div class="card accented"><h3>What nothing covers</h3><p style="font-size:1.08rem">The developer's daily interaction with their own AI coding tool. That is where waste occurs — one session at a time, across every engineering seat.</p></div>
+  </div>
+  <div class="glass"><strong>Baton fills this gap.</strong> It governs the developer seat, the layer beneath deployed-agent governance — not a replacement for it.</div>
+</section>
+
+<!-- 6 -->
+<section class="slide divider" data-act="2" data-script="Transition. Act one was the problem; act two is the answer, and the answer is not 'use fewer tokens.' It is a change in who does what work. Everything from here is mechanism: the operating model, the enforcement that makes it non-optional, what specifically gets enforced, and then the production numbers.">
+  <div class="big-num">Act II — The Methodology</div>
+  <h2>A discipline that produces multiples</h2>
+  <div class="rule"></div>
+  <p class="sub" style="font-size:1.35rem">Not a smaller budget. A different division of labour — enforced mechanically, not requested politely.</p>
+</section>
+
+<!-- 7 -->
+<section class="slide" data-act="2" data-script="Not prompt engineering — an operating model. The conductor never writes boilerplate, never reads files it doesn't need, never retries failed approaches. Workers do that, at one tenth the cost. The expensive model's time goes entirely into decisions: what to do, who does it, and whether the result is good. Note the state store on the diagram — that is the institutional memory the tool otherwise lacks; decisions and outcomes persist across sessions rather than being relearned every morning.">
+  <div class="eyebrow">Act II — The Methodology</div>
+  <h2>The operating model</h2>
+  <div class="rule" style="margin-bottom:.8rem"></div>
+  <div class="flow">
+    <svg viewBox="0 0 1180 470" role="img" aria-label="Conductor routes briefs to worker agents through enforcement hooks, with a persistent file-based state store">
+      <!-- conductor -->
+      <rect class="svg-node-a" x="430" y="18" width="320" height="86" rx="14"/>
+      <text class="svg-ta" x="590" y="52" text-anchor="middle" font-size="24">CONDUCTOR</text>
+      <text class="svg-t2" x="590" y="80" text-anchor="middle" font-size="16">Decides · plans · reviews · never executes</text>
+
+      <!-- hook bar -->
+      <rect class="svg-node" x="230" y="152" width="720" height="56" rx="12" stroke-dasharray="6 5"/>
+      <text class="svg-ta" x="590" y="187" text-anchor="middle" font-size="16">ENFORCEMENT HOOKS — every brief passes through policy before it becomes work</text>
+      <path class="svg-line-a" d="M590 104 L590 152"/>
+      <circle class="svg-hook" cx="590" cy="152" r="7"/>
+
+      <!-- workers -->
+      <g>
+        <rect class="svg-node" x="120" y="270" width="230" height="94" rx="12"/>
+        <text class="svg-t" x="235" y="303" text-anchor="middle" font-size="19">Worker</text>
+        <text class="svg-t2" x="235" y="329" text-anchor="middle" font-size="15">Research &amp; file scans</text>
+        <text class="svg-t2" x="235" y="350" text-anchor="middle" font-size="15">cheap tier</text>
+
+        <rect class="svg-node" x="475" y="270" width="230" height="94" rx="12"/>
+        <text class="svg-t" x="590" y="303" text-anchor="middle" font-size="19">Worker</text>
+        <text class="svg-t2" x="590" y="329" text-anchor="middle" font-size="15">Bounded code edits</text>
+        <text class="svg-t2" x="590" y="350" text-anchor="middle" font-size="15">cheap tier</text>
+
+        <rect class="svg-node" x="830" y="270" width="230" height="94" rx="12"/>
+        <text class="svg-t" x="945" y="303" text-anchor="middle" font-size="19">Worker</text>
+        <text class="svg-t2" x="945" y="329" text-anchor="middle" font-size="15">Tests &amp; log reduction</text>
+        <text class="svg-t2" x="945" y="350" text-anchor="middle" font-size="15">cheap tier</text>
+      </g>
+      <path class="svg-line" d="M400 208 L400 240 L235 240 L235 270"/>
+      <path class="svg-line" d="M590 208 L590 270"/>
+      <path class="svg-line" d="M780 208 L780 240 L945 240 L945 270"/>
+      <circle class="svg-hook" cx="235" cy="270" r="6"/>
+      <circle class="svg-hook" cx="590" cy="270" r="6"/>
+      <circle class="svg-hook" cx="945" cy="270" r="6"/>
+
+      <!-- return -->
+      <path class="svg-line-a" d="M1060 317 L1120 317 L1120 61 L750 61" stroke-dasharray="5 5"/>
+      <text class="svg-t2" x="1090" y="196" font-size="14" text-anchor="middle" transform="rotate(90 1090 196)">results return</text>
+
+      <!-- state store -->
+      <rect class="svg-node" x="380" y="404" width="420" height="52" rx="12"/>
+      <text class="svg-t" x="590" y="436" text-anchor="middle" font-size="17">State store — decisions persist across sessions</text>
+      <path class="svg-line" d="M590 364 L590 404" stroke-dasharray="4 4"/>
+    </svg>
+  </div>
+  <div class="keyline" style="margin-top:.6rem">The same budget produces <em>6× the output</em> because expensive model time is spent on decisions, not grunt work.</div>
+</section>
+
+<!-- 8 -->
+<section class="slide" data-act="2" data-script="This is the load-bearing slide of the methodology. Rules written into instruction files get rationalized around under task pressure — we documented exactly that on slide four. Hooks execute outside the model's reasoning entirely: they are shell scripts on lifecycle events, and they return an allow, a redirect, a warning, or a block before the work runs. The model's context has no vote on whether the rule applies, because the rule is not in the context. Everything fails open — if a hook errors, work proceeds and the failure is logged.">
+  <div class="eyebrow">Act II — The Methodology</div>
+  <h2>Mechanical enforcement</h2>
+  <div class="rule" style="margin-bottom:.8rem"></div>
+  <div class="flow">
+    <svg viewBox="0 0 1180 430" role="img" aria-label="Pipeline: prompt enters, lifecycle intercept points apply policy, policy allows redirects warns or blocks, then work executes">
+      <rect class="svg-node" x="20" y="168" width="150" height="72" rx="12"/>
+      <text class="svg-t" x="95" y="211" text-anchor="middle" font-size="19">Prompt</text>
+      <path class="svg-line-a" d="M170 204 L228 204" marker-end="url(#ar)"/>
+
+      <rect class="svg-node-a" x="232" y="72" width="392" height="264" rx="14" stroke-dasharray="6 5"/>
+      <text class="svg-ta" x="428" y="104" text-anchor="middle" font-size="16">LIFECYCLE INTERCEPT POINTS</text>
+      <g>
+        <rect class="svg-node" x="256" y="122" width="344" height="44" rx="9"/>
+        <text class="svg-t" x="428" y="150" text-anchor="middle" font-size="17">Session start</text>
+        <rect class="svg-node" x="256" y="174" width="344" height="44" rx="9"/>
+        <text class="svg-t" x="428" y="202" text-anchor="middle" font-size="17">Prompt submission</text>
+        <rect class="svg-node" x="256" y="226" width="344" height="44" rx="9"/>
+        <text class="svg-t" x="428" y="254" text-anchor="middle" font-size="17">Pre-tool</text>
+        <rect class="svg-node" x="256" y="278" width="344" height="44" rx="9"/>
+        <text class="svg-t" x="428" y="306" text-anchor="middle" font-size="17">Post-tool</text>
+      </g>
+      <path class="svg-line-a" d="M624 204 L682 204" marker-end="url(#ar)"/>
+
+      <rect class="svg-node-a" x="686" y="96" width="268" height="216" rx="14"/>
+      <text class="svg-ta" x="820" y="128" text-anchor="middle" font-size="16">POLICY APPLIED</text>
+      <text class="svg-t" x="820" y="166" text-anchor="middle" font-size="18">Allow</text>
+      <text class="svg-t" x="820" y="200" text-anchor="middle" font-size="18">Redirect</text>
+      <text class="svg-t" x="820" y="234" text-anchor="middle" font-size="18">Warn</text>
+      <text class="svg-t" x="820" y="268" text-anchor="middle" font-size="18">Block</text>
+      <path class="svg-line-a" d="M954 204 L1012 204" marker-end="url(#ar)"/>
+
+      <rect class="svg-node" x="1016" y="168" width="148" height="72" rx="12"/>
+      <text class="svg-t" x="1090" y="203" text-anchor="middle" font-size="18">Work</text>
+      <text class="svg-t" x="1090" y="225" text-anchor="middle" font-size="18">executes</text>
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+        <path d="M0 0 L10 5 L0 10 z" fill="currentColor" style="fill:var(--accent)"/></marker></defs>
+    </svg>
+  </div>
+  <div class="keyline" style="margin-top:.6rem">The model's context has no vote on whether the rule applies. <em>A firewall doesn't ask the packet.</em></div>
+</section>
+
+<!-- 9 -->
+<section class="slide" data-act="2" data-script="Per-profile disablement: the conservative profile runs all thirteen; the developer and research profiles relax specific thresholds rather than removing controls. Every script is plain shell, roughly eighty lines each, fully inspectable — no compiled binaries, no black boxes, nothing phoning home. An engineering evaluator can read the entire enforcement layer in an afternoon. Emphasise that if the room includes anyone who owns security review.">
+  <div class="eyebrow">Act II — The Methodology</div>
+  <h2>What it enforces</h2>
+  <div class="rule" style="margin-bottom:1rem"></div>
+  <div class="grid g3">
+    <div class="cluster">
+      <div class="ch">Cost discipline</div>
+      <div class="hk"><code>budget-guard</code><span>Denies new spawns once a session crosses its token hard stop.</span></div>
+      <div class="hk"><code>delegation-limiter</code><span>Forces every spawn to pin an allowlisted cheap model; caps concurrency.</span></div>
+      <div class="hk"><code>session-timer</code><span>Nudges wrap-up once elapsed session time crosses a threshold.</span></div>
+      <div class="hk"><code>worker-output-size</code><span>Warns when a worker returns more text than the main context should carry.</span></div>
+      <div class="hk"><code>session-router</code><span>Classifies each prompt's weight and injects a routing directive.</span></div>
+    </div>
+    <div class="cluster">
+      <div class="ch">Security</div>
+      <div class="hk"><code>credential-scanner</code><span>Blocks credential-shaped strings in tool input and output; logs pattern, never value.</span></div>
+      <div class="hk"><code>push-safety</code><span>Blocks force-push variants and rewritten-refspec pushes.</span></div>
+      <div class="hk"><code>destructive-command-guard</code><span>Blocks a fixed set of destructive shell patterns before they run.</span></div>
+    </div>
+    <div class="cluster">
+      <div class="ch">Quality</div>
+      <div class="hk"><code>context-manager</code><span>Warns once per band as estimated context fill crosses a threshold.</span></div>
+      <div class="hk"><code>task-drift-guard</code><span>Flags a session that has drifted from the task it started on.</span></div>
+      <div class="hk"><code>conductor-tripwire</code><span>Flags the primary model doing hands-on work it should have delegated.</span></div>
+      <div class="hk"><code>model-governance</code><span>Records the baseline model, warns on a mid-session swap, checks an allowlist.</span></div>
+      <div class="hk"><code>hook-health-check</code><span>Syntax-checks every installed hook at session start; warns, never blocks.</span></div>
+    </div>
+  </div>
+  <div class="glass" style="margin-top:1.1rem">Thirteen hooks, three categories. Plain shell, roughly eighty lines each — <strong>fully inspectable, no black boxes</strong>.</div>
+</section>
+
+<!-- 10 -->
+<section class="slide" data-act="2" data-script="The story here is not 'one bad day, one fix' — it's 'we got hit, patched it, got hit again harder, then built it right.' June 12: a single audit task spawned fifty-seven uncontrolled workers, each silently inheriting the premium model tier, and burned the full five-hour quota in about thirty minutes. The response was a single usage-guard hook — budget enforcement only. July 25: two back-to-back sessions exhausted quota anyway. Single-hook enforcement was proven insufficient — the model found paths the lone guard didn't cover. That was the never-again event. What followed was not a second patch, it was the full thirteen-hook enforcement suite: delegation, context, credentials, session routing, drift detection, conductor behavior monitoring — a complete governance layer, not one hook chasing one failure mode. Since deployment: zero uncontrolled cost events, delegation now governed in 58 percent of sessions, forty-seven guardrail interventions recorded — the system working as designed — and roughly six times the throughput under unchanged caps. The full enforcement layer exists because partial fixes were provably insufficient. This is iteration, not clairvoyance.">
+  <div class="eyebrow">Act II — Observed Data</div>
+  <h2>The observed results</h2>
+  <p class="sub" style="margin-bottom:1.2rem">From <strong>201 sessions</strong> across <strong>23 weeks</strong> of active engineering use — 45 before enforcement, 156 after. Real session logs.</p>
+  <div class="grid g4" style="margin-bottom:1rem">
+    <div class="stat" style="border-left:3px solid var(--bad,#e5484d);padding-left:.7rem;text-align:left">
+      <span class="l" style="display:block;opacity:.7">Jun 12, 2026 — first blowout</span>
+      <span class="v" style="font-size:1.15rem">57 workers, quota gone in 30 min</span>
+      <span class="l" style="display:block">Response: 1 usage-guard hook</span>
+    </div>
+    <div class="stat" style="border-left:3px solid var(--bad,#e5484d);padding-left:.7rem;text-align:left">
+      <span class="l" style="display:block;opacity:.7">Jul 25, 2026 — double blowout</span>
+      <span class="v" style="font-size:1.15rem">2 sessions exhausted back-to-back</span>
+      <span class="l" style="display:block">Single-hook enforcement: insufficient</span>
+    </div>
+    <div class="stat" style="border-left:3px solid var(--accent,#3b82f6);padding-left:.7rem;text-align:left">
+      <span class="l" style="display:block;opacity:.7">Post-Jul 25 — full system</span>
+      <span class="v" style="font-size:1.15rem">13-hook enforcement suite</span>
+      <span class="l" style="display:block">Complete governance layer</span>
+    </div>
+    <div class="stat" style="border-left:3px solid var(--good,#30a46c);padding-left:.7rem;text-align:left">
+      <span class="l" style="display:block;opacity:.7">Since deployment</span>
+      <span class="v" style="font-size:1.15rem">0 uncontrolled cost events</span>
+      <span class="l" style="display:block">58% governed · 47 interventions · ~6× throughput</span>
+    </div>
+  </div>
+  <div class="compare">
+    <div class="cbox bad">
+      <div class="lab">Before enforcement — one audit task</div>
+      <div class="val">57 workers</div>
+      <p>Uncontrolled fan-out, each silently inheriting the premium tier. Full five-hour quota exhausted in ~30 minutes.</p>
+    </div>
+    <div class="cvs">Same task class</div>
+    <div class="cbox good">
+      <div class="lab">After enforcement — hard-capped</div>
+      <div class="val">≤25 workers</div>
+      <p>Every spawn pinned to an efficient tier by hooks. No quota exhaustion since.</p>
+    </div>
+  </div>
+  <div class="grid g4" style="margin-bottom:1.1rem">
+    <div class="stat"><span class="v">1 → 0</span><span class="l">Uncontrolled fan-outs, before → after</span></div>
+    <div class="stat"><span class="v" style="font-size:3.2rem">13% → 58%</span><span class="l">Sessions using delegation, now governed</span></div>
+    <div class="stat"><span class="v">47 / 156</span><span class="l">Governed sessions with a recorded guardrail intervention</span></div>
+    <div class="stat"><span class="v">~6×</span><span class="l">Session throughput growth under unchanged caps</span></div>
+  </div>
+  <div class="glass">Waste didn't vanish — it stopped being unbounded. <strong>Every post-enforcement incident was caught by instrumentation, measured, and converted into a new permanent control.</strong> No token estimates, no survey: counts from real session logs.</div>
+</section>
+
+<!-- 11 -->
+<section class="slide divider" data-act="3" data-script="Transition to the ask. Everything before this was evidence; what follows is a small, reversible proposal. Keep this short — the room's attention should land on the next two slides.">
+  <div class="big-num">Act III — The Proposal</div>
+  <h2>One team. One week. Real numbers.</h2>
+  <div class="rule"></div>
+  <p class="sub" style="font-size:1.35rem">A reversible experiment on your own engineers, doing their own work, measured before and after.</p>
+</section>
+
+<!-- 12 -->
+<section class="slide" data-act="3" data-script="An evaluator's first question is always 'does this break our setup?' The answer is no: the installer merges with existing configuration and never overwrites it, and a single uninstall restores the original configuration byte-for-byte. If it doesn't work for you, one command and it's gone — that's the entire risk profile. Claude Code is the reference implementation because that's what was validated; the methodology and policy layer are tool-agnostic and the repo structure explicitly invites additional runtimes. Do not oversell the multi-vendor story: other runtimes are future work, not shipped.">
+  <div class="eyebrow">Act III — The Proposal</div>
+  <h2>How it deploys</h2>
+  <div class="rule"></div>
+  <div class="grid g3" style="margin-bottom:1.3rem">
+    <div class="card accented"><h3>One install command</h3><p>A single script installs hooks, renders policy, and registers everything. Preview mode writes nothing.</p></div>
+    <div class="card accented"><h3>Three profiles</h3><p>Conservative, developer, research. Policy-driven configuration — thresholds and allowlists in YAML your org owns.</p></div>
+    <div class="card accented"><h3>Merges, never overwrites</h3><p>Existing configuration is preserved and backed up. Your other tooling keeps working untouched.</p></div>
+  </div>
+  <div class="grid g2" style="gap:1.2rem">
+    <div class="glass"><strong>Fully reversible.</strong> One uninstall restores the original configuration byte-for-byte.</div>
+    <div class="glass"><strong>Reference implementation: Claude Code.</strong> The methodology and policy layer are tool-agnostic; the structure invites future runtimes.</div>
+  </div>
+</section>
+
+<!-- 13 -->
+<section class="slide" data-act="3" data-script="This is the decision slide — say the ask once, clearly, and then stop talking. It is a small reversible commitment with real data coming out the other end. If it succeeds the conversation becomes 'how do we roll this out'; if it fails, one command reverts everything and you've spent a week of ordinary engineering work you were doing anyway. Zero software cost, zero infrastructure — the only input is time.">
+  <div class="eyebrow">Act III — The Ask</div>
+  <h2>The pilot</h2>
+  <div class="rule" style="margin-bottom:1.2rem"></div>
+  <div class="ask">
+    <div class="askline">One team, one week.</div>
+    <div class="asksub">We handle setup. You get measured before-and-after data on your own engineers doing their own work.</div>
+  </div>
+  <div class="grid g2" style="gap:1.3rem">
+    <div class="card">
+      <h3 style="margin-bottom:.7rem">What gets measured</h3>
+      <ul class="ticks">
+        <li><b>Tokens consumed</b> — per seat, before and after</li>
+        <li><b>Tasks completed</b> — the throughput side of the ratio</li>
+        <li><b>Waste events</b> — fan-outs, retries, blocked actions</li>
+        <li><b>Throughput delta</b> — output per unit of budget</li>
+      </ul>
+    </div>
+    <div class="card accented">
+      <h3 style="margin-bottom:.7rem">What it costs</h3>
+      <ul class="ticks">
+        <li><b>Zero software cost</b> — open source, MIT</li>
+        <li><b>Zero infrastructure</b> — runs on the engineer's machine</li>
+        <li><b>Time only</b> — a week of work they were doing anyway</li>
+        <li><b>Reversible</b> — one command restores everything</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 14 -->
+<section class="slide" data-act="3" data-script="Don't lead with this unless the room is receptive — it can read as getting ahead of ourselves before the pilot has produced anything. But if the CEO is thinking commercially, it is the most interesting slide in the deck. The pattern is the same one Agile followed in the 2010s: an internal engineering practice becomes a teachable client practice, and the teachable practice becomes a revenue stream. The third step is the durable one — the developer-seat layer is a genuine gap in every governance stack currently being sold.">
+  <div class="eyebrow">Act III — The Proposal</div>
+  <h2>The long view</h2>
+  <div class="rule"></div>
+  <div class="grid g3" style="margin-bottom:1.4rem">
+    <div class="card accented"><div class="eyebrow" style="margin-bottom:.5rem">Step one</div><h3>Internal engineering standard</h3><p>Every engineering seat operates under the same measurable discipline. Cost per seat becomes a governed number.</p></div>
+    <div class="card accented"><div class="eyebrow" style="margin-bottom:.5rem">Step two</div><h3>Teachable client practice</h3><p>A methodology you can teach — methodology consulting on a problem every client already has and few can name.</p></div>
+    <div class="card accented"><div class="eyebrow" style="margin-bottom:.5rem">Step three</div><h3>The developer-seat layer</h3><p>The missing tier that completes an existing governance stack, rather than competing with it.</p></div>
+  </div>
+  <div class="keyline">Internal practice → client offering → <em>revenue stream</em>.</div>
+</section>
+
+<!-- 15 -->
+<section class="slide" data-act="0" data-script="The repo is the technical proof. It is readable shell and markdown — no compiled artefacts, no black boxes, nothing an evaluator has to take on trust. Hand this slide to engineering and let them tear into it; the honest limits are documented in the repo too, including where the token figures are proxies rather than billed truth. That honesty is a feature in a technical review. Anticipated question — 'is five months of validation real?' Yes, with a distinction: the methodology was developed iteratively over five months of active use — that's the 200-plus session history behind the design. The enforcement layer is the final piece of that iteration, and it's recent — late July — because it was built in direct response to the last failure, not deployed on day one. Zero incidents since it went live.">
+  <div class="eyebrow">Closing</div>
+  <h2>Validation</h2>
+  <div class="rule"></div>
+  <div class="grid g4" style="margin-bottom:1.4rem">
+    <div class="stat"><span class="v">MIT</span><span class="l">Open source licence — inspect, fork, audit</span></div>
+    <div class="stat"><span class="v">200+</span><span class="l">Production sessions behind the numbers</span></div>
+    <div class="stat"><span class="v">5</span><span class="l">Months of continuous real-workflow use</span></div>
+    <div class="stat"><span class="v">13</span><span class="l">Hooks, plain shell, fully inspectable</span></div>
+  </div>
+  <div class="grid g2" style="gap:1.2rem;margin-bottom:1.2rem">
+    <div class="card accented"><h3>Architecturally proven on real workflows</h3><p>Not a benchmark and not a demo — 200+ engineering sessions spanning five months informed the design. The full enforcement layer has been in production since late July 2026, with zero uncontrolled events since deployment.</p></div>
+    <div class="card accented"><h3>Universal methodology, one reference runtime</h3><p>The operating model and policy layer are tool-agnostic. Claude Code is the reference implementation; other runtimes are future work.</p></div>
+  </div>
+  <div class="glass"><span style="font-family:var(--mono);font-size:1.05rem">github.com/&lt;org&gt;/baton</span> — <strong>Full technical briefing and methodology documentation available for engineering evaluation.</strong></div>
+</section>
+
+<!-- 16 -->
+<section class="slide" data-act="0" data-script="Leave this on screen during discussion — every one of these four questions is answerable by the pilot, which is the point. Then close by re-stating the ask exactly once and stopping: one team, one week, we handle setup. Do not add anything after that sentence.">
+  <div class="eyebrow">Closing</div>
+  <h2>Questions worth asking</h2>
+  <div class="rule" style="margin-bottom:1.1rem"></div>
+  <div class="grid g2" style="gap:1.2rem">
+    <div class="q" style="--accent:var(--act1)"><div class="qn">01</div><div class="qt">What do your engineers' AI tools cost per month — and does anyone measure it?</div></div>
+    <div class="q" style="--accent:var(--act2)"><div class="qn">02</div><div class="qt">If you mandated 3× efficiency, what would mechanically enforce it?</div></div>
+    <div class="q" style="--accent:var(--act3)"><div class="qn">03</div><div class="qt">What if the same methodology that cuts waste also multiplies output?</div></div>
+    <div class="q" style="--accent:var(--act1)"><div class="qn">04</div><div class="qt">Who writes the governance standard for your developers' AI tools — you, or the vendor's defaults?</div></div>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var CLIENT_MODE = window.location.search.indexOf('client') !== -1;
+
+  /* ---- theme ---- */
+  var SUN='<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+  var MOON='<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>';
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    document.getElementById('themeIcon').innerHTML = (t==='dark') ? SUN : MOON;
+  }
+  var stored = null;
+  try { stored = localStorage.getItem('baton-theme'); } catch(e){}
+  var theme = params.get('theme') || stored || 'dark';
+  if (theme !== 'light' && theme !== 'dark') theme = 'dark';
+  applyTheme(theme);
+  document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+  function toggleTheme(){
+    theme = (document.documentElement.getAttribute('data-theme') === 'dark') ? 'light' : 'dark';
+    applyTheme(theme);
+    try { localStorage.setItem('baton-theme', theme); } catch(e){}
+  }
+
+  /* ---- slides ---- */
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var TOTAL = slides.length;
+  var fill = document.querySelector('.progress-fill');
+  var panel = document.getElementById('script-panel');
+  var body  = document.getElementById('script-body');
+
+  slides.forEach(function(s,i){
+    var f = document.createElement('footer');
+    f.className = 'slide-footer';
+    f.innerHTML = '<span>Baton</span><span>Confidential Briefing</span><span>'+(i+1)+' / '+TOTAL+'</span>';
+    s.appendChild(f);
+  });
+
+  if (CLIENT_MODE){
+    panel.parentNode.removeChild(panel);
+    var kh = document.getElementById('key-help'); if(kh) kh.parentNode.removeChild(kh);
+    document.body.classList.remove('notes-on');
+  }
+
+  var current = 0;
+  var q = parseInt(params.get('slide'), 10);
+  if (!isNaN(q) && q >= 1 && q <= TOTAL) current = q - 1;
+
+  function goTo(i){
+    if (i < 0) i = 0; if (i > TOTAL-1) i = TOTAL-1;
+    slides.forEach(function(s){ s.classList.remove('active'); });
+    current = i;
+    slides[current].classList.add('active');
+    fill.style.width = (((current+1)/TOTAL)*100)+'%';
+    if (!CLIENT_MODE) body.textContent = slides[current].getAttribute('data-script') || '';
+    if (history.replaceState) {
+      var p = new URLSearchParams(window.location.search);
+      p.set('slide', current+1);
+      history.replaceState(null,'','?'+p.toString());
+    }
+  }
+  function next(){ goTo(current+1); }
+  function prev(){ goTo(current-1); }
+
+  function setNotesVisible(v){
+    panel.classList.toggle('hidden', !v);
+    document.body.classList.toggle('notes-on', v);
+    try { localStorage.setItem('baton-notes', v ? 'on' : 'off'); } catch(e){}
+  }
+  function toggleScript(){
+    if (CLIENT_MODE) return;
+    setNotesVisible(panel.classList.contains('hidden'));
+  }
+  if (!CLIENT_MODE){
+    var notesStored = null;
+    try { notesStored = localStorage.getItem('baton-notes'); } catch(e){}
+    if (notesStored === 'on') setNotesVisible(true);
+    else { panel.classList.add('hidden'); document.body.classList.remove('notes-on'); }
+  }
+  function toggleFullscreen(){
+    if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); }
+    else { document.exitFullscreen(); }
+  }
+
+  document.addEventListener('keydown', function(e){
+    var k = e.key;
+    if (k==='ArrowRight'||k==='ArrowDown'||k===' '||k==='PageDown'){ e.preventDefault(); next(); }
+    else if (k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'){ e.preventDefault(); prev(); }
+    else if (k==='Home'){ e.preventDefault(); goTo(0); }
+    else if (k==='End'){ e.preventDefault(); goTo(TOTAL-1); }
+    else if (k==='s'||k==='S'){ toggleScript(); }
+    else if (k==='f'||k==='F'){ toggleFullscreen(); }
+    else if (k==='t'||k==='T'){ toggleTheme(); }
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.toc button'), function(b){
+    b.addEventListener('click', function(){ goTo(parseInt(b.getAttribute('data-go'),10)-1); });
+  });
+
+  ['prev','next'].forEach(function(dir){
+    var z = document.createElement('div');
+    z.className = 'nav-zone nav-zone-'+dir;
+    if (dir==='prev'){ z.style.left = 'var(--script-width)'; } else { z.style.right = '0'; }
+    z.addEventListener('click', dir==='prev' ? prev : next);
+    document.body.appendChild(z);
+  });
+
+  var tsx=0, tsy=0;
+  document.addEventListener('touchstart', function(e){ tsx=e.changedTouches[0].clientX; tsy=e.changedTouches[0].clientY; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    var dx=e.changedTouches[0].clientX-tsx, dy=e.changedTouches[0].clientY-tsy;
+    if (Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)) { dx<0 ? next() : prev(); }
+  }, {passive:true});
+
+  goTo(current);
+})();
+</script>
+</body>
+</html>
