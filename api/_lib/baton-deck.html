@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Baton — Enterprise Briefing</title>
+<title>Baton: Enterprise Briefing</title>
 <style>
 :root{
   --act1:#E8A33D; --act1-soft:rgba(232,163,61,.14);
@@ -248,7 +248,7 @@ body.notes-on{--script-width:360px}
 <div class="deck" id="deck">
 
 <!-- 1 -->
-<section class="slide" data-act="0" data-script="Open here. Baton is not a tool and not a prompt library — it is an operating methodology for how engineers interact with AI coding tools, plus the mechanical enforcement that makes the methodology stick. Four numbers frame the whole briefing: six times the throughput on the same budget, thirteen enforcement hooks doing the governing, two hundred plus logged sessions across five months informing the design, and one command to install it. Everything after this slide explains those four numbers.">
+<section class="slide" data-act="0" data-script="Open here. Baton is an operating methodology for how engineers interact with AI coding tools, plus the mechanical enforcement that makes the methodology stick. Four numbers frame the whole briefing: six times the throughput on the same budget, thirteen enforcement hooks doing the governing, two hundred plus logged sessions across five months informing the design, and one command to install it. Everything after this slide explains those four numbers.">
   <div class="eyebrow">Enterprise Briefing</div>
   <h1>Baton</h1>
   <p class="sub" style="font-size:1.7rem;color:var(--text);margin:1.1rem 0 .3rem;max-width:34ch;font-weight:600">Mechanical discipline for AI development tools</p>
@@ -262,67 +262,67 @@ body.notes-on{--script-width:360px}
 </section>
 
 <!-- 2 -->
-<section class="slide" data-act="0" data-script="Three acts and a close. Act one: the problem, and why it is an engineering-behavior problem rather than a finance problem. Act two: the methodology — the conductor/orchestra operating model, the enforcement layer that makes it mechanical, and the observed production data. Act three: the ask — one team, one week. Then closing validation and the questions I want to leave in the room. If you want the answer in three minutes, jump to the observed results and the pilot.">
+<section class="slide" data-act="0" data-script="Three acts and a close. Act one: the problem, and why it is an engineering-behavior problem rather than a finance problem. Act two: the methodology: the conductor/orchestra operating model, the enforcement layer that makes it mechanical, and the observed production data. Act three: the ask, one team, one week. Then closing validation and the questions I want to leave in the room. If you want the answer in three minutes, jump to the observed results and the pilot.">
   <div class="eyebrow">Contents</div>
   <h2>What this briefing covers</h2>
   <div class="rule"></div>
   <div class="toc">
-    <button data-go="3" style="--tc:var(--act1)"><div class="n">Act I</div><div class="t">The Problem</div><div class="d">Token cost is this year's top operational AI challenge — and it is behavioral, not financial.</div></button>
+    <button data-go="3" style="--tc:var(--act1)"><div class="n">Act I</div><div class="t">The Problem</div><div class="d">Token cost is this year's top operational AI challenge, and it is behavioral, not financial.</div></button>
     <button data-go="6" style="--tc:var(--act2)"><div class="n">Act II</div><div class="t">The Methodology</div><div class="d">Conductor and orchestra, mechanical enforcement, and five months of observed results.</div></button>
     <button data-go="11" style="--tc:var(--act3)"><div class="n">Act III</div><div class="t">The Proposal</div><div class="d">One team. One week. Measured before-and-after on your own engineers.</div></button>
-    <button data-go="15" style="--tc:var(--act2)"><div class="n">Close</div><div class="t">Validation &amp; Questions</div><div class="d">Open source, MIT, production-proven — and four questions worth asking.</div></button>
+    <button data-go="15" style="--tc:var(--act2)"><div class="n">Close</div><div class="t">Validation &amp; Questions</div><div class="d">Open source, MIT, production-proven, and four questions worth asking.</div></button>
   </div>
 </section>
 
 <!-- 3 -->
 <section class="slide" data-act="1" data-script="Credibility anchors, in case anyone asks whether this is a real category: BCG published 'Managing AI Token Costs' in July 2026. McKinsey published 'The Cost of Intelligence' in July 2026. Forbes ran 'The Token Trap' in June 2026. Three separate consultancy and business-press outlets on the same problem in two months. The important framing move on this slide is the last line: finance sees a runaway line item and reaches for procurement levers, but nothing in a contract renegotiation changes how an engineer's tool behaves at 2pm on a Tuesday. It is an engineering-behavior problem wearing a finance costume.">
-  <div class="eyebrow">Act I — The Problem</div>
+  <div class="eyebrow">Act I: The Problem</div>
   <h2>The industry reality</h2>
   <div class="rule"></div>
   <div class="grid g3" style="margin-bottom:1.4rem">
     <div class="card accented"><h3>The #1 operational AI challenge</h3><p>Enterprise AI token cost is this year's leading operational concern. Major consultancies and the business press are publishing on it in parallel.</p></div>
     <div class="card accented"><h3>Budgets exhausted in months</h3><p>Companies are burning annual AI allocations in a fraction of the year, then rationing access to the tools they just standardised on.</p></div>
-    <div class="card accented"><h3>$500–$2,000 per engineer / month</h3><p>Cost per engineer at undisciplined usage. Multiply by seat count — the number is a fleet number, not a pilot number.</p></div>
+    <div class="card accented"><h3>$500–$2,000 per engineer / month</h3><p>Cost per engineer at undisciplined usage. Multiply by seat count: the number is a fleet number, not a pilot number.</p></div>
   </div>
   <div class="keyline">This is an <em>engineering-behavior problem</em> wearing a finance costume. Procurement cannot fix how a tool behaves inside a session.</div>
 </section>
 
 <!-- 4 -->
-<section class="slide" data-act="1" data-script="Violations are documented in the methodology repo's enforcement-philosophy doc — this is not a rhetorical claim, it is a written record. The key nuance to land: this is not malicious and it is not a model defect. 'Get it done' is simply a stronger optimization signal than 'stay within budget' when nothing mechanical enforces the budget. A written rule is an input to reasoning, and reasoning under task pressure will route around an inconvenient input. That is the whole argument for hooks over guidelines.">
-  <div class="eyebrow">Act I — The Problem</div>
+<section class="slide" data-act="1" data-script="Violations are documented in the methodology repo's enforcement-philosophy doc: this is a written record, not a rhetorical claim. The key nuance to land: this is not malicious and it is not a model defect. 'Get it done' is simply a stronger optimization signal than 'stay within budget' when nothing mechanical enforces the budget. A written rule is an input to reasoning, and reasoning under task pressure will route around an inconvenient input. That is the whole argument for hooks over guidelines.">
+  <div class="eyebrow">Act I: The Problem</div>
   <h2>Why it happens</h2>
   <div class="rule"></div>
   <div class="grid g3" style="margin-bottom:1.5rem">
     <div class="card accented"><h3>Optimized for done, not efficient</h3><p>The tool's objective is completing the task. Nothing in that objective weighs what the completion cost.</p></div>
     <div class="card accented"><h3>No budget signal</h3><p>The model cannot see spend. There is no institutional memory of what went wrong in last week's session.</p></div>
-    <div class="card accented"><h3>No mechanical constraint</h3><p>Written guidance is an input to reasoning — and reasoning under pressure routes around inconvenient inputs.</p></div>
+    <div class="card accented"><h3>No mechanical constraint</h3><p>Written guidance is an input to reasoning, and reasoning under pressure routes around inconvenient inputs.</p></div>
   </div>
-  <div class="keyline">We demonstrated this empirically — the model was given explicit written instructions and <em>violated them three times</em> under task pressure, rationalizing around its own rules mid-session.</div>
+  <div class="keyline">We demonstrated this empirically: the model was given explicit written instructions and <em>violated them three times</em> under task pressure, rationalizing around its own rules mid-session.</div>
 </section>
 
 <!-- 5 -->
-<section class="slide" data-act="1" data-script="If this audience already has platform-level agent governance, position Baton as complementary, not competitive — it sits one layer below and does not overlap. Platform governance answers 'what may this deployed agent do in production.' It has nothing to say about an engineer with a coding assistant open on their laptop, which is where the per-seat spend actually accumulates. The waste is not one big event, it is one session at a time across every engineering seat, every day.">
-  <div class="eyebrow">Act I — The Problem</div>
+<section class="slide" data-act="1" data-script="If this audience already has platform-level agent governance, position Baton as complementary, not competitive: it sits one layer below and does not overlap. Platform governance answers 'what may this deployed agent do in production.' It has nothing to say about an engineer with a coding assistant open on their laptop, which is where the per-seat spend accumulates. The waste is not one big event, it is one session at a time across every engineering seat, every day.">
+  <div class="eyebrow">Act I: The Problem</div>
   <h2>The gap in current solutions</h2>
   <div class="rule"></div>
   <div class="grid g2" style="gap:1.4rem;margin-bottom:1.4rem">
     <div class="card"><h3 style="color:var(--text-3)">What platform governance covers</h3><p style="font-size:1.08rem">Agents deployed to production: what they may call, what data they may touch, how they are audited. Necessary, mature, and well-served by existing vendors.</p></div>
-    <div class="card accented"><h3>What nothing covers</h3><p style="font-size:1.08rem">The developer's daily interaction with their own AI coding tool. That is where waste occurs — one session at a time, across every engineering seat.</p></div>
+    <div class="card accented"><h3>What nothing covers</h3><p style="font-size:1.08rem">The developer's daily interaction with their own AI coding tool. That is where waste occurs: one session at a time, across every engineering seat.</p></div>
   </div>
-  <div class="glass"><strong>Baton fills this gap.</strong> It governs the developer seat, the layer beneath deployed-agent governance — not a replacement for it.</div>
+  <div class="glass"><strong>Baton fills this gap.</strong> It governs the developer seat, the layer beneath deployed-agent governance, not a replacement for it.</div>
 </section>
 
 <!-- 6 -->
 <section class="slide divider" data-act="2" data-script="Transition. Act one was the problem; act two is the answer, and the answer is not 'use fewer tokens.' It is a change in who does what work. Everything from here is mechanism: the operating model, the enforcement that makes it non-optional, what specifically gets enforced, and then the production numbers.">
-  <div class="big-num">Act II — The Methodology</div>
+  <div class="big-num">Act II: The Methodology</div>
   <h2>A discipline that produces multiples</h2>
   <div class="rule"></div>
-  <p class="sub" style="font-size:1.35rem">Not a smaller budget. A different division of labour — enforced mechanically, not requested politely.</p>
+  <p class="sub" style="font-size:1.35rem">Not a smaller budget. A different division of labour, enforced mechanically, not requested politely.</p>
 </section>
 
 <!-- 7 -->
-<section class="slide" data-act="2" data-script="Not prompt engineering — an operating model. The conductor never writes boilerplate, never reads files it doesn't need, never retries failed approaches. Workers do that, at one tenth the cost. The expensive model's time goes entirely into decisions: what to do, who does it, and whether the result is good. Note the state store on the diagram — that is the institutional memory the tool otherwise lacks; decisions and outcomes persist across sessions rather than being relearned every morning.">
-  <div class="eyebrow">Act II — The Methodology</div>
+<section class="slide" data-act="2" data-script="An operating model. The conductor never writes boilerplate, never reads files it doesn't need, never retries failed approaches. Workers do that, at one tenth the cost. The expensive model's time goes entirely into decisions: what to do, who does it, and whether the result is good. Note the state store on the diagram: that is the institutional memory the tool otherwise lacks; decisions and outcomes persist across sessions rather than being relearned every morning.">
+  <div class="eyebrow">Act II: The Methodology</div>
   <h2>The operating model</h2>
   <div class="rule" style="margin-bottom:.8rem"></div>
   <div class="flow">
@@ -334,7 +334,7 @@ body.notes-on{--script-width:360px}
 
       <!-- hook bar -->
       <rect class="svg-node" x="230" y="152" width="720" height="56" rx="12" stroke-dasharray="6 5"/>
-      <text class="svg-ta" x="590" y="187" text-anchor="middle" font-size="16">ENFORCEMENT HOOKS — every brief passes through policy before it becomes work</text>
+      <text class="svg-ta" x="590" y="187" text-anchor="middle" font-size="16">ENFORCEMENT HOOKS: every brief passes through policy before it becomes work</text>
       <path class="svg-line-a" d="M590 104 L590 152"/>
       <circle class="svg-hook" cx="590" cy="152" r="7"/>
 
@@ -368,7 +368,7 @@ body.notes-on{--script-width:360px}
 
       <!-- state store -->
       <rect class="svg-node" x="380" y="404" width="420" height="52" rx="12"/>
-      <text class="svg-t" x="590" y="436" text-anchor="middle" font-size="17">State store — decisions persist across sessions</text>
+      <text class="svg-t" x="590" y="436" text-anchor="middle" font-size="17">State store: decisions persist across sessions</text>
       <path class="svg-line" d="M590 364 L590 404" stroke-dasharray="4 4"/>
     </svg>
   </div>
@@ -376,8 +376,8 @@ body.notes-on{--script-width:360px}
 </section>
 
 <!-- 8 -->
-<section class="slide" data-act="2" data-script="This is the load-bearing slide of the methodology. Rules written into instruction files get rationalized around under task pressure — we documented exactly that on slide four. Hooks execute outside the model's reasoning entirely: they are shell scripts on lifecycle events, and they return an allow, a redirect, a warning, or a block before the work runs. The model's context has no vote on whether the rule applies, because the rule is not in the context. Everything fails open — if a hook errors, work proceeds and the failure is logged.">
-  <div class="eyebrow">Act II — The Methodology</div>
+<section class="slide" data-act="2" data-script="This is the load-bearing slide of the methodology. Rules written into instruction files get rationalized around under task pressure: we documented exactly that on slide four. Hooks execute outside the model's reasoning entirely: they are shell scripts on lifecycle events, and they return an allow, a redirect, a warning, or a block before the work runs. The model's context has no vote on whether the rule applies, because the rule is not in the context. Everything fails open: if a hook errors, work proceeds and the failure is logged.">
+  <div class="eyebrow">Act II: The Methodology</div>
   <h2>Mechanical enforcement</h2>
   <div class="rule" style="margin-bottom:.8rem"></div>
   <div class="flow">
@@ -419,8 +419,8 @@ body.notes-on{--script-width:360px}
 </section>
 
 <!-- 9 -->
-<section class="slide" data-act="2" data-script="Per-profile disablement: the conservative profile runs all thirteen; the developer and research profiles relax specific thresholds rather than removing controls. Every script is plain shell, roughly eighty lines each, fully inspectable — no compiled binaries, no black boxes, nothing phoning home. An engineering evaluator can read the entire enforcement layer in an afternoon. Emphasise that if the room includes anyone who owns security review.">
-  <div class="eyebrow">Act II — The Methodology</div>
+<section class="slide" data-act="2" data-script="Per-profile disablement: the conservative profile runs all thirteen; the developer and research profiles relax specific thresholds rather than removing controls. Every script is plain shell, roughly eighty lines each, fully inspectable: no compiled binaries, no black boxes, nothing phoning home. An engineering evaluator can read the entire enforcement layer in an afternoon. Emphasise that if the room includes anyone who owns security review.">
+  <div class="eyebrow">Act II: The Methodology</div>
   <h2>What it enforces</h2>
   <div class="rule" style="margin-bottom:1rem"></div>
   <div class="grid g3">
@@ -447,27 +447,27 @@ body.notes-on{--script-width:360px}
       <div class="hk"><code>hook-health-check</code><span>Syntax-checks every installed hook at session start; warns, never blocks.</span></div>
     </div>
   </div>
-  <div class="glass" style="margin-top:1.1rem">Thirteen hooks, three categories. Plain shell, roughly eighty lines each — <strong>fully inspectable, no black boxes</strong>.</div>
+  <div class="glass" style="margin-top:1.1rem">Thirteen hooks, three categories. Plain shell, roughly eighty lines each: <strong>fully inspectable, no black boxes</strong>.</div>
 </section>
 
 <!-- 10 -->
-<section class="slide" data-act="2" data-script="The story here is not 'one bad day, one fix' — it's 'we got hit, patched it, got hit again harder, then built it right.' June 12: a single audit task spawned fifty-seven uncontrolled workers, each silently inheriting the premium model tier, and burned the full five-hour quota in about thirty minutes. The response was a single usage-guard hook — budget enforcement only. July 25: two back-to-back sessions exhausted quota anyway. Single-hook enforcement was proven insufficient — the model found paths the lone guard didn't cover. That was the never-again event. What followed was not a second patch, it was the full thirteen-hook enforcement suite: delegation, context, credentials, session routing, drift detection, conductor behavior monitoring — a complete governance layer, not one hook chasing one failure mode. Since deployment: zero uncontrolled cost events, delegation now governed in 58 percent of sessions, forty-seven guardrail interventions recorded — the system working as designed — and roughly six times the throughput under unchanged caps. The full enforcement layer exists because partial fixes were provably insufficient. This is iteration, not clairvoyance.">
-  <div class="eyebrow">Act II — Observed Data</div>
+<section class="slide" data-act="2" data-script="The story here is 'we got hit, patched it, got hit again harder, then built it right,' not 'one bad day, one fix.' June 12: a single audit task spawned fifty-seven uncontrolled workers, each silently inheriting the premium model tier, and burned the full five-hour quota in about thirty minutes. The response was a single usage-guard hook: budget enforcement only. July 25: two back-to-back sessions exhausted quota anyway. Single-hook enforcement was proven insufficient: the model found paths the lone guard didn't cover. That was the never-again event. What followed was the full thirteen-hook enforcement suite, not a second patch: delegation, context, credentials, session routing, drift detection, conductor behavior monitoring, a complete governance layer, not one hook chasing one failure mode. Since deployment: zero uncontrolled cost events, delegation now governed in 58 percent of sessions, forty-seven guardrail interventions recorded, the system working as designed, and roughly six times the throughput under unchanged caps. The full enforcement layer exists because partial fixes were provably insufficient. This is iteration, not clairvoyance.">
+  <div class="eyebrow">Act II: Observed Data</div>
   <h2>The observed results</h2>
-  <p class="sub" style="margin-bottom:1.2rem">From <strong>201 sessions</strong> across <strong>23 weeks</strong> of active engineering use — 45 before enforcement, 156 after. Real session logs.</p>
+  <p class="sub" style="margin-bottom:1.2rem">From <strong>201 sessions</strong> across <strong>23 weeks</strong> of active engineering use: 45 before enforcement, 156 after. Real session logs.</p>
   <div class="grid g4" style="margin-bottom:1rem">
     <div class="stat" style="border-left:3px solid var(--bad,#e5484d);padding-left:.7rem;text-align:left">
-      <span class="l" style="display:block;opacity:.7">Jun 12, 2026 — first blowout</span>
+      <span class="l" style="display:block;opacity:.7">Jun 12, 2026: first blowout</span>
       <span class="v" style="font-size:1.15rem">57 workers, quota gone in 30 min</span>
       <span class="l" style="display:block">Response: 1 usage-guard hook</span>
     </div>
     <div class="stat" style="border-left:3px solid var(--bad,#e5484d);padding-left:.7rem;text-align:left">
-      <span class="l" style="display:block;opacity:.7">Jul 25, 2026 — double blowout</span>
+      <span class="l" style="display:block;opacity:.7">Jul 25, 2026: double blowout</span>
       <span class="v" style="font-size:1.15rem">2 sessions exhausted back-to-back</span>
       <span class="l" style="display:block">Single-hook enforcement: insufficient</span>
     </div>
     <div class="stat" style="border-left:3px solid var(--accent,#3b82f6);padding-left:.7rem;text-align:left">
-      <span class="l" style="display:block;opacity:.7">Post-Jul 25 — full system</span>
+      <span class="l" style="display:block;opacity:.7">Post-Jul 25: full system</span>
       <span class="v" style="font-size:1.15rem">13-hook enforcement suite</span>
       <span class="l" style="display:block">Complete governance layer</span>
     </div>
@@ -479,13 +479,13 @@ body.notes-on{--script-width:360px}
   </div>
   <div class="compare">
     <div class="cbox bad">
-      <div class="lab">Before enforcement — one audit task</div>
+      <div class="lab">Before enforcement: one audit task</div>
       <div class="val">57 workers</div>
       <p>Uncontrolled fan-out, each silently inheriting the premium tier. Full five-hour quota exhausted in ~30 minutes.</p>
     </div>
     <div class="cvs">Same task class</div>
     <div class="cbox good">
-      <div class="lab">After enforcement — hard-capped</div>
+      <div class="lab">After enforcement: hard-capped</div>
       <div class="val">≤25 workers</div>
       <p>Every spawn pinned to an efficient tier by hooks. No quota exhaustion since.</p>
     </div>
@@ -496,25 +496,25 @@ body.notes-on{--script-width:360px}
     <div class="stat"><span class="v">47 / 156</span><span class="l">Governed sessions with a recorded guardrail intervention</span></div>
     <div class="stat"><span class="v">~6×</span><span class="l">Session throughput growth under unchanged caps</span></div>
   </div>
-  <div class="glass">Waste didn't vanish — it stopped being unbounded. <strong>Every post-enforcement incident was caught by instrumentation, measured, and converted into a new permanent control.</strong> No token estimates, no survey: counts from real session logs.</div>
+  <div class="glass">Waste became bounded rather than eliminated. <strong>Every post-enforcement incident was caught by instrumentation, measured, and converted into a new permanent control.</strong> No token estimates, no survey: counts from real session logs.</div>
 </section>
 
 <!-- 11 -->
-<section class="slide divider" data-act="3" data-script="Transition to the ask. Everything before this was evidence; what follows is a small, reversible proposal. Keep this short — the room's attention should land on the next two slides.">
-  <div class="big-num">Act III — The Proposal</div>
+<section class="slide divider" data-act="3" data-script="Transition to the ask. Everything before this was evidence; what follows is a small, reversible proposal. Keep this short: the room's attention should land on the next two slides.">
+  <div class="big-num">Act III: The Proposal</div>
   <h2>One team. One week. Real numbers.</h2>
   <div class="rule"></div>
   <p class="sub" style="font-size:1.35rem">A reversible experiment on your own engineers, doing their own work, measured before and after.</p>
 </section>
 
 <!-- 12 -->
-<section class="slide" data-act="3" data-script="An evaluator's first question is always 'does this break our setup?' The answer is no: the installer merges with existing configuration and never overwrites it, and a single uninstall restores the original configuration byte-for-byte. If it doesn't work for you, one command and it's gone — that's the entire risk profile. Claude Code is the reference implementation because that's what was validated; the methodology and policy layer are tool-agnostic and the repo structure explicitly invites additional runtimes. Do not oversell the multi-vendor story: other runtimes are future work, not shipped.">
-  <div class="eyebrow">Act III — The Proposal</div>
+<section class="slide" data-act="3" data-script="An evaluator's first question is always 'does this break our setup?' The answer is no: the installer merges with existing configuration and never overwrites it, and a single uninstall restores the original configuration byte-for-byte. If it doesn't work for you, one command and it's gone: that's the entire risk profile. Claude Code is the reference implementation because that's what was validated; the methodology and policy layer are tool-agnostic and the repo structure explicitly invites additional runtimes. Do not oversell the multi-vendor story: other runtimes are future work, not shipped.">
+  <div class="eyebrow">Act III: The Proposal</div>
   <h2>How it deploys</h2>
   <div class="rule"></div>
   <div class="grid g3" style="margin-bottom:1.3rem">
     <div class="card accented"><h3>One install command</h3><p>A single script installs hooks, renders policy, and registers everything. Preview mode writes nothing.</p></div>
-    <div class="card accented"><h3>Three profiles</h3><p>Conservative, developer, research. Policy-driven configuration — thresholds and allowlists in YAML your org owns.</p></div>
+    <div class="card accented"><h3>Three profiles</h3><p>Conservative, developer, research. Policy-driven configuration: thresholds and allowlists in YAML your org owns.</p></div>
     <div class="card accented"><h3>Merges, never overwrites</h3><p>Existing configuration is preserved and backed up. Your other tooling keeps working untouched.</p></div>
   </div>
   <div class="grid g2" style="gap:1.2rem">
@@ -524,8 +524,8 @@ body.notes-on{--script-width:360px}
 </section>
 
 <!-- 13 -->
-<section class="slide" data-act="3" data-script="This is the decision slide — say the ask once, clearly, and then stop talking. It is a small reversible commitment with real data coming out the other end. If it succeeds the conversation becomes 'how do we roll this out'; if it fails, one command reverts everything and you've spent a week of ordinary engineering work you were doing anyway. Zero software cost, zero infrastructure — the only input is time.">
-  <div class="eyebrow">Act III — The Ask</div>
+<section class="slide" data-act="3" data-script="This is the decision slide: say the ask once, clearly, and then stop talking. It is a small reversible commitment with real data coming out the other end. If it succeeds the conversation becomes 'how do we roll this out'; if it fails, one command reverts everything and you've spent a week of ordinary engineering work you were doing anyway. Zero software cost, zero infrastructure: the only input is time.">
+  <div class="eyebrow">Act III: The Ask</div>
   <h2>The pilot</h2>
   <div class="rule" style="margin-bottom:1.2rem"></div>
   <div class="ask">
@@ -536,65 +536,65 @@ body.notes-on{--script-width:360px}
     <div class="card">
       <h3 style="margin-bottom:.7rem">What gets measured</h3>
       <ul class="ticks">
-        <li><b>Tokens consumed</b> — per seat, before and after</li>
-        <li><b>Tasks completed</b> — the throughput side of the ratio</li>
-        <li><b>Waste events</b> — fan-outs, retries, blocked actions</li>
-        <li><b>Throughput delta</b> — output per unit of budget</li>
+        <li><b>Tokens consumed</b>: per seat, before and after</li>
+        <li><b>Tasks completed</b>: the throughput side of the ratio</li>
+        <li><b>Waste events</b>: fan-outs, retries, blocked actions</li>
+        <li><b>Throughput delta</b>: output per unit of budget</li>
       </ul>
     </div>
     <div class="card accented">
       <h3 style="margin-bottom:.7rem">What it costs</h3>
       <ul class="ticks">
-        <li><b>Zero software cost</b> — open source, MIT</li>
-        <li><b>Zero infrastructure</b> — runs on the engineer's machine</li>
-        <li><b>Time only</b> — a week of work they were doing anyway</li>
-        <li><b>Reversible</b> — one command restores everything</li>
+        <li><b>Zero software cost</b>: open source, MIT</li>
+        <li><b>Zero infrastructure</b>: runs on the engineer's machine</li>
+        <li><b>Time only</b>: a week of work they were doing anyway</li>
+        <li><b>Reversible</b>: one command restores everything</li>
       </ul>
     </div>
   </div>
 </section>
 
 <!-- 14 -->
-<section class="slide" data-act="3" data-script="Don't lead with this unless the room is receptive — it can read as getting ahead of ourselves before the pilot has produced anything. But if the CEO is thinking commercially, it is the most interesting slide in the deck. The pattern is the same one Agile followed in the 2010s: an internal engineering practice becomes a teachable client practice, and the teachable practice becomes a revenue stream. The third step is the durable one — the developer-seat layer is a genuine gap in every governance stack currently being sold.">
-  <div class="eyebrow">Act III — The Proposal</div>
+<section class="slide" data-act="3" data-script="Don't lead with this unless the room is receptive: it can read as getting ahead of ourselves before the pilot has produced anything. But if the CEO is thinking commercially, it is the most interesting slide in the deck. The pattern is the same one Agile followed in the 2010s: an internal engineering practice becomes a teachable client practice, and the teachable practice becomes a revenue stream. The third step is the durable one: the developer-seat layer is a genuine gap in every governance stack currently being sold.">
+  <div class="eyebrow">Act III: The Proposal</div>
   <h2>The long view</h2>
   <div class="rule"></div>
   <div class="grid g3" style="margin-bottom:1.4rem">
     <div class="card accented"><div class="eyebrow" style="margin-bottom:.5rem">Step one</div><h3>Internal engineering standard</h3><p>Every engineering seat operates under the same measurable discipline. Cost per seat becomes a governed number.</p></div>
-    <div class="card accented"><div class="eyebrow" style="margin-bottom:.5rem">Step two</div><h3>Teachable client practice</h3><p>A methodology you can teach — methodology consulting on a problem every client already has and few can name.</p></div>
+    <div class="card accented"><div class="eyebrow" style="margin-bottom:.5rem">Step two</div><h3>Teachable client practice</h3><p>A methodology you can teach: methodology consulting on a problem every client already has and few can name.</p></div>
     <div class="card accented"><div class="eyebrow" style="margin-bottom:.5rem">Step three</div><h3>The developer-seat layer</h3><p>The missing tier that completes an existing governance stack, rather than competing with it.</p></div>
   </div>
   <div class="keyline">Internal practice → client offering → <em>revenue stream</em>.</div>
 </section>
 
 <!-- 15 -->
-<section class="slide" data-act="0" data-script="The repo is the technical proof. It is readable shell and markdown — no compiled artefacts, no black boxes, nothing an evaluator has to take on trust. Hand this slide to engineering and let them tear into it; the honest limits are documented in the repo too, including where the token figures are proxies rather than billed truth. That honesty is a feature in a technical review. Anticipated question — 'is five months of validation real?' Yes, with a distinction: the methodology was developed iteratively over five months of active use — that's the 200-plus session history behind the design. The enforcement layer is the final piece of that iteration, and it's recent — late July — because it was built in direct response to the last failure, not deployed on day one. Zero incidents since it went live.">
+<section class="slide" data-act="0" data-script="The repo is the technical proof. It is readable shell and markdown: no compiled artefacts, no black boxes, nothing an evaluator has to take on trust. Hand this slide to engineering and let them tear into it; the honest limits are documented in the repo too, including where the token figures are proxies rather than billed truth. That honesty is a feature in a technical review. Anticipated question: 'is five months of validation real?' Yes, with a distinction: the methodology was developed iteratively over five months of active use, and that's the 200-plus session history behind the design. The enforcement layer is the final piece of that iteration, and it's recent, from late July, because it was built in direct response to the last failure, not deployed on day one. Zero incidents since it went live.">
   <div class="eyebrow">Closing</div>
   <h2>Validation</h2>
   <div class="rule"></div>
   <div class="grid g4" style="margin-bottom:1.4rem">
-    <div class="stat"><span class="v">MIT</span><span class="l">Open source licence — inspect, fork, audit</span></div>
+    <div class="stat"><span class="v">MIT</span><span class="l">Open source licence: inspect, fork, audit</span></div>
     <div class="stat"><span class="v">200+</span><span class="l">Production sessions behind the numbers</span></div>
     <div class="stat"><span class="v">5</span><span class="l">Months of continuous real-workflow use</span></div>
     <div class="stat"><span class="v">13</span><span class="l">Hooks, plain shell, fully inspectable</span></div>
   </div>
   <div class="grid g2" style="gap:1.2rem;margin-bottom:1.2rem">
-    <div class="card accented"><h3>Architecturally proven on real workflows</h3><p>Not a benchmark and not a demo — 200+ engineering sessions spanning five months informed the design. The full enforcement layer has been in production since late July 2026, with zero uncontrolled events since deployment.</p></div>
+    <div class="card accented"><h3>Architecturally proven on real workflows</h3><p>200+ engineering sessions spanning five months informed the design, not a benchmark or a demo. The full enforcement layer has been in production since late July 2026, with zero uncontrolled events since deployment.</p></div>
     <div class="card accented"><h3>Universal methodology, one reference runtime</h3><p>The operating model and policy layer are tool-agnostic. Claude Code is the reference implementation; other runtimes are future work.</p></div>
   </div>
-  <div class="glass"><span style="font-family:var(--mono);font-size:1.05rem">github.com/&lt;org&gt;/baton</span> — <strong>Full technical briefing and methodology documentation available for engineering evaluation.</strong></div>
+  <div class="glass"><span style="font-family:var(--mono);font-size:1.05rem">github.com/&lt;org&gt;/baton</span>: <strong>Full technical briefing and methodology documentation available for engineering evaluation.</strong></div>
 </section>
 
 <!-- 16 -->
-<section class="slide" data-act="0" data-script="Leave this on screen during discussion — every one of these four questions is answerable by the pilot, which is the point. Then close by re-stating the ask exactly once and stopping: one team, one week, we handle setup. Do not add anything after that sentence.">
+<section class="slide" data-act="0" data-script="Leave this on screen during discussion: every one of these four questions is answerable by the pilot, which is the point. Then close by re-stating the ask exactly once and stopping: one team, one week, we handle setup. Do not add anything after that sentence.">
   <div class="eyebrow">Closing</div>
   <h2>Questions worth asking</h2>
   <div class="rule" style="margin-bottom:1.1rem"></div>
   <div class="grid g2" style="gap:1.2rem">
-    <div class="q" style="--accent:var(--act1)"><div class="qn">01</div><div class="qt">What do your engineers' AI tools cost per month — and does anyone measure it?</div></div>
+    <div class="q" style="--accent:var(--act1)"><div class="qn">01</div><div class="qt">What do your engineers' AI tools cost per month, and does anyone measure it?</div></div>
     <div class="q" style="--accent:var(--act2)"><div class="qn">02</div><div class="qt">If you mandated 3× efficiency, what would mechanically enforce it?</div></div>
     <div class="q" style="--accent:var(--act3)"><div class="qn">03</div><div class="qt">What if the same methodology that cuts waste also multiplies output?</div></div>
-    <div class="q" style="--accent:var(--act1)"><div class="qn">04</div><div class="qt">Who writes the governance standard for your developers' AI tools — you, or the vendor's defaults?</div></div>
+    <div class="q" style="--accent:var(--act1)"><div class="qn">04</div><div class="qt">Who writes the governance standard for your developers' AI tools, you or the vendor's defaults?</div></div>
   </div>
 </section>
 
