@@ -42,7 +42,7 @@ export const OBSIDIAN_CLAUDE_GUIDE = {
       kind: 'paragraph',
       inline: [
         t(
-          "Don't want to walk through every step by hand? Run a single command and it installs Obsidian and Claude Code, creates a vault, and drops in a starter ",
+          "Run a single command and it installs Obsidian and Claude Code, creates a vault, and drops in a starter ",
         ),
         c('CLAUDE.md'),
         t(' rulebook for you, all in one go.'),
