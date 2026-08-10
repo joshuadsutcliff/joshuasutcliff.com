@@ -299,7 +299,7 @@ You (Claude) run from the vault root and may read, create, and edit notes.
       kind: 'paragraph',
       inline: [
         t(
-          'That\'s genuinely enough. The file grows with you: every time you find yourself repeating an instruction, move it into ',
+          'That\'s enough. The file grows with you: every time you find yourself repeating an instruction, move it into ',
         ),
         c('CLAUDE.md'),
         t(' and it becomes permanent.'),

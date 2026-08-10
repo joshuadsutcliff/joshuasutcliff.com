@@ -55,7 +55,7 @@ export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
     date: 'Jul 30',
     title: 'Credentials, look before asking',
-    what: 'Any task needing a credential checks the private secrets store first; the operator is asked only when the credential genuinely is not stored.',
+    what: 'Any task needing a credential checks the private secrets store first; the operator is asked only when the credential is not stored.',
     why: 'The orchestrator kept asking for keys and passwords that were already on file.',
     improvement: 'Fewer round-trips, with a mechanical reminder injected on credential-shaped prompts as a backstop.',
   },
