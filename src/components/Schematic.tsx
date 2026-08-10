@@ -256,7 +256,7 @@ function NodeBox({ node }: { node: SchematicNode }) {
   const isStar = node.accent === 'star'
   const toneRgb = node.tone === 'bad' ? '239, 68, 68' : node.tone === 'good' ? '34, 197, 94' : null
   const style = isStar
-    ? { boxShadow: '0 0 26px 8px rgba(139, 92, 246, 0.18), inset 0 0 0 1px rgba(6, 182, 212, 0.3)' }
+    ? { boxShadow: `0 0 26px 8px rgba(var(--purple-rgb), 0.18), inset 0 0 0 1px rgba(var(--cyan-rgb), 0.3)` }
     : toneRgb
       ? { boxShadow: `inset 0 0 0 1px rgba(${toneRgb}, 0.35)` }
       : undefined

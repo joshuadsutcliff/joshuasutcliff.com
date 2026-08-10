@@ -16,7 +16,7 @@ export default function Resume() {
         </div>
         <a
           href={`mailto:${SITE.email}`}
-          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan to-purple px-5 py-2.5 text-sm font-medium text-white transition-transform hover:scale-[1.03] print:hidden"
+          className="inline-flex items-center gap-2 rounded-full bg-cyan px-5 py-2.5 text-sm font-medium text-[#07090f] transition-transform hover:scale-[1.03] print:hidden"
         >
           <MailIcon /> Get in touch
         </a>

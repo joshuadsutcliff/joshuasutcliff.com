@@ -18,7 +18,7 @@ export default function Work() {
       <div className="mt-10">
         <Link
           to={WORK.cta.to}
-          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan to-purple px-6 py-3 text-sm font-medium text-white shadow-[var(--shadow-neon)] transition-transform hover:scale-[1.03]"
+          className="inline-flex items-center gap-2 rounded-full bg-cyan px-6 py-3 text-sm font-medium text-[#07090f] shadow-[var(--shadow-neon)] transition-transform hover:scale-[1.03]"
         >
           {WORK.cta.label} →
         </Link>

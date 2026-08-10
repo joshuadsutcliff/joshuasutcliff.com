@@ -138,7 +138,7 @@ export default function Admin() {
           {error && <p className="text-sm text-purple">{error}</p>}
           <button
             type="submit"
-            className="w-full rounded-full bg-gradient-to-r from-cyan to-purple px-6 py-3 text-sm font-medium text-white transition-transform hover:scale-[1.02]"
+            className="w-full rounded-full bg-cyan px-6 py-3 text-sm font-medium text-[#07090f] transition-transform hover:scale-[1.02]"
           >
             Sign in
           </button>

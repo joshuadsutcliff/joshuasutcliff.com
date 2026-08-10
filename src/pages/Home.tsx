@@ -27,7 +27,7 @@ export default function Home() {
         <div className="mt-10 flex flex-wrap items-center gap-4">
           <a
             href={`mailto:${SITE.email}`}
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan to-purple px-6 py-3 text-sm font-medium text-white shadow-[var(--shadow-neon)] transition-transform hover:scale-[1.03]"
+            className="inline-flex items-center gap-2 rounded-full bg-cyan px-6 py-3 text-sm font-medium text-[#07090f] shadow-[var(--shadow-neon)] transition-transform hover:scale-[1.03]"
           >
             <MailIcon /> Get in touch
           </a>
