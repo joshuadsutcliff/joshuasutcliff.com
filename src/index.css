@@ -11,7 +11,7 @@
   --fg: #e2e8f0;
   --text: #e2e8f0;
   --muted: #a1afc4;
-  --dim: #6b7a92;
+  --dim: #748299;
   --border: #1e2536;
   --border-bright: #2d3548;
   --card: #0d111b;
@@ -71,6 +71,18 @@ body {
 
 ::selection {
   background: rgba(var(--cyan-rgb), 0.3);
+}
+
+/* Keyboard focus ring - visible on near-black backgrounds, mouse clicks stay ring-free */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(var(--cyan-rgb), 0.25);
 }
 
 /* Glass card utility */
