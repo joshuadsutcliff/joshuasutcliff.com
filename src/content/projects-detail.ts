@@ -5,7 +5,7 @@ export type ProjectDetailEntry = {
   stack: string[]
   highlights: string[]
   images?: { src: string; alt: string; caption?: string }[]
-  extraSections?: { heading: string; paragraphs: string[] }[]
+  extraSections?: { heading: string; paragraphs: string[]; schematicId?: string }[]
   showDiagrams?: boolean
   showChangelog?: boolean
 }
@@ -142,10 +142,18 @@ export const PROJECT_DETAILS: Record<string, ProjectDetailEntry> = {
     ],
     extraSections: [
       {
+        heading: 'How it works',
+        paragraphs: [
+          'Native agents on every machine in the house collect metrics into InfluxDB, and Grafana turns that history into dashboards and alert rules. Uptime Kuma watches up/down status independently of the metrics pipeline, so a dead metrics agent cannot hide an outage. Every alert, from either side, routes through ntfy to a phone, while MeshCentral covers remote desktop and control, and Homepage plus Homarr tie the whole stack into one set of wallboards.',
+        ],
+        schematicId: 'monitoring-architecture',
+      },
+      {
         heading: 'How the install works',
         paragraphs: [
           'Nine phases, each ending in explicit verification commands the agent must pass before advancing. It starts with an interview (static IP, router access, which machines to manage, which machines are off-limits because an employer owns them), and the riskiest step, taking over the house DNS, ships with a written rollback plan. Storage, including the Docker data-root, lives on an external SSD from the first phase. It ends with per-OS fleet agents (macOS, Windows, Linux, NVIDIA AI boxes) extending metrics to every machine in the house, with a guard against GPU polling that stutters games.',
         ],
+        schematicId: 'monitoring-install',
       },
       {
         heading: 'Battle-tested, not hypothetical',

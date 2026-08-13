@@ -121,6 +121,11 @@ export default function ProjectDetail() {
               </p>
             ))}
           </div>
+          {section.schematicId && SCHEMATICS[section.schematicId] && (
+            <div className="mt-6">
+              <Schematic spec={SCHEMATICS[section.schematicId]!} />
+            </div>
+          )}
         </div>
       ))}
 
