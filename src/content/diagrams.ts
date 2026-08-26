@@ -1,25 +1,24 @@
 export type DiagramEntry = {
   id: string
   title: string
-  image: string
+  image?: string
   alt: string
   what: string
   why: string
 }
 
-export const DIAGRAMS_HEADING = 'The system in seven diagrams'
+export const DIAGRAMS_HEADING = 'The system in eight diagrams'
 
 export const DIAGRAMS_INTRO =
-  'Seven diagrams cover the whole design: what runs where, what is mechanically enforced versus behaviorally expected, and what the enforcement layer measurably changed. They are drawn for both audiences: if you are new to agent orchestration, read each "What it shows" first; if you run agent fleets yourself, the "Why it\'s built this way" notes carry the design rationale and the incidents behind it.'
+  'Eight diagrams cover the whole design: what runs where, what is mechanically enforced versus behaviorally expected, and what the enforcement layer measurably changed. They are drawn for both audiences: if you are new to agent orchestration, read each "What it shows" first; if you run agent fleets yourself, the "Why it\'s built this way" notes carry the design rationale and the incidents behind it.'
 
 export const DIAGRAMS_ENTRIES: DiagramEntry[] = [
   {
     id: 'architecture',
     title: 'Master architecture: one prompt, end to end',
-    image: '/diagrams/diagram-1-architecture.png',
-    alt: 'Diagram of a prompt flowing through four enforcement hooks into a conductor model, which delegates to a tiered pool of worker models and persists memory to an Obsidian vault.',
-    what: 'The full life of a request. A user prompt first passes through four enforcement hooks that inject policy into context before the model acts: the session router (classifies the prompt\'s weight), the usage guard (budget and spawn-rate limits), the session timer (long-session nudges), and the conductor tripwire (flags execution-shaped output). It then reaches the conductor, the frontier model whose only job is judgment: plan, decompose, delegate, verify, synthesize, report. All bounded execution goes to a tiered pool of cheaper workers (Haiku for mechanical work, Sonnet as the default executor, Opus for reasoning-heavy bounded tasks, and a free-tier model for second opinions), whose results flow back (dotted lines) for the conductor to re-verify. An Obsidian vault serves as persistent memory across sessions.',
-    why: 'Frontier-model tokens are the most expensive resource in the loop. Spending them exclusively on judgment while cheaper models handle volume work is what makes the system 3–5× more cost-efficient, but that split only holds if something enforces it, which is what the hook layer is for. The model asked nicely does not stay disciplined; the model blocked by a shell script does.',
+    alt: 'Diagram of a prompt flowing through four enforcement hooks into an executor model, which consults a frontier-model advisor at decision points, delegates to a tiered pool of worker models, and persists memory to an Obsidian vault.',
+    what: 'The full life of a request. A user prompt first passes through four enforcement hooks that inject policy into context before the model acts: the session router (classifies the prompt\'s weight), the usage guard (budget and spawn-rate limits), the session timer (long-session nudges), and the tripwire (flags execution-shaped output). It then reaches the executor, the model that runs the session loop and whose only job is judgment: plan, decompose, delegate, verify, synthesize, report. At fixed decision points the executor consults a separate frontier-model advisor, which reads the whole session and reviews the approach before it is committed and again before the work is called done. All bounded execution goes to a tiered pool of cheaper workers (Haiku for mechanical work, Sonnet as the default, Opus for reasoning-heavy bounded tasks and capped at one per dispatch round, and a free-tier model for second opinions), whose results flow back (dotted lines) for the executor to re-verify. An Obsidian vault serves as persistent memory across sessions.',
+    why: 'Frontier-model tokens are the most expensive resource in the loop. Spending them on judgment and review while cheaper models handle volume work is what makes the system 3–5× more cost-efficient, but that split only holds if something enforces it, which is what the hook layer is for. Separating the reviewer from the executor matters for the same reason: a model that reviews its own plan is not a second opinion, so the review runs on a different model at fixed points rather than whenever the executor happens to feel uncertain. The model asked nicely does not stay disciplined; the model blocked by a shell script does.',
   },
   {
     id: 'hook-flow',
@@ -68,5 +67,12 @@ export const DIAGRAMS_ENTRIES: DiagramEntry[] = [
     alt: 'Flowchart: a user prompt fans out to seven parallel pattern-matchers, each emitting a constraint injection that combines with the session tier policy into context delivered before the model generates.',
     what: 'The router doesn\'t just classify: it pattern-matches seven risky prompt shapes (blanket authorization, minimizing language, inline-override requests, batched asks, remote-host work, sycophancy bait, irreversible actions) and injects each one\'s counter-constraint into context before the model generates. The model reads the constraint before forming its response.',
     why: 'Correcting a bad response after the fact costs a retry and still leaves the wrong action in the transcript. Injecting the counter-constraint before generation means the model never drafts the risky response in the first place, because the rule that would have overridden it is already load-bearing context.',
+  },
+  {
+    id: 'knowledge-flywheel',
+    title: 'From correction to guard rail',
+    alt: 'Flow diagram showing a correction becoming a rule, the rule accumulating incident counts, and a recurring rule compiling into a mechanical check, remaining a written convention, or retiring.',
+    what: 'The path a correction takes after it is caught. It becomes a rule, the rule counts its own recurrences, and a rule that keeps recurring is compiled into a check that runs before the action it governs.',
+    why: 'Prose rules depend on recall at the worst possible moment, when context is longest. Compiling the recurring ones removes that dependency, and giving every rule a lifecycle means the set can shrink as well as grow.',
   },
 ]

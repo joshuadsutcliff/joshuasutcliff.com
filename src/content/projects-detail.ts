@@ -98,6 +98,7 @@ export const PROJECT_DETAILS: Record<string, ProjectDetailEntry> = {
     group: 'AI Operations',
     overview: [
       'This is the shareable core of my AI operating practice: usage guards, a session router, worker agents, goal contracts, and provenance scripts, now extended with a usage-adaptive delegation ladder.',
+      'The model that runs the session is not the model that reviews it. A frontier-model advisor is consulted when an approach is being committed to, when the same error keeps recurring, and before any work is declared done.',
       'A free-model tier, Forge running OpenRouter free models plus a direct Gemini free-tier lane as a congestion-proof reserve, absorbs second opinions, adjudications, and copy review at zero token cost.',
       'Routing shifts down-ladder as the paid usage window fills, and a capability floor keeps repo-dependent and precision work on capable models: regulation, not degradation.',
       'A spec-driven planning IDE, Kiro, feeds source-verified product interviews into the same loop. Point a fresh agent at the repo and it installs the system end-to-end.',
@@ -105,6 +106,8 @@ export const PROJECT_DETAILS: Record<string, ProjectDetailEntry> = {
     stack: ['Claude Code', 'bash hooks', 'Obsidian'],
     highlights: [
       'Usage guards, session router, worker agents, goal contracts, and provenance scripts',
+      'Executor and advisor split: the session loop and the review of it run on different models',
+      'Recurring corrections compile into mechanical checks, and every rule carries a lifecycle so the set can shrink',
       'Usage-adaptive delegation ladder with a free-model tier (Forge + Gemini) for zero-cost second opinions',
       'Capability floor keeps repo-dependent and precision work on capable models',
       'Kiro spec-driven planning IDE feeds source-verified interviews into the loop',
@@ -117,6 +120,7 @@ export const PROJECT_DETAILS: Record<string, ProjectDetailEntry> = {
           'The honest sequel to the conductor/orchestra architecture: written rules failed three times. The conductor drifted into doing worker jobs inline; it inline-integrated a 250-line worker draft while designing the compliance tests for that exact rule; and after launching three concurrent test sessions that burned 36% of a weekly usage cap in 32 minutes, it was told emphatically to stop; it serialized, and kept the next 24 sessions running at full throughput.',
           'The root cause is behavioral, not ignorance: task-completion drive overrides compliance drive once the model has momentum, and it will always construct a technically-compliant reading that permits continuing.',
           'The fix is a circuit breaker, not another rule: a machine-global spawn-rate limiter that hard-denies runaway fan-outs, a plan-then-stop gate that holds multi-step work until the plan is approved, a tripwire that logs execution-shaped conductor output, and a hard two-agent parallel ceiling. Voluntary compliance is a bonus; the hooks are the safety mechanism.',
+          'The layer keeps growing on the same principle. A cap of one high-cost reasoning worker per dispatch round closed the case where several expensive workers each looked justified on their own. A guard written to police review consultations was then found to be unable to fire at all, because the tool it targeted runs server side and exposes no name a local check can match, so it was replaced with an after-the-fact audit. Both outcomes are in the log above, because the ones that failed are the ones worth reading.',
         ],
       },
     ],

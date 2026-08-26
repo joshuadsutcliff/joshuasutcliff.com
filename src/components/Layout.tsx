@@ -5,6 +5,7 @@ import { SITE } from '../content/site'
 import useSecretAdmin from '../hooks/useSecretAdmin'
 import AccessFlourish from './AccessFlourish'
 import ParticleField, { type ParticleMode } from './ParticleField'
+import { prefersReducedMotion } from '../lib/motion'
 
 const TABS = [
   { to: '/', label: 'Home' },
@@ -26,6 +27,7 @@ export default function Layout() {
   const flourish = useSecretAdmin()
   const location = useLocation()
   const mode = modeForPath(location.pathname)
+  const useViewTransition = !prefersReducedMotion()
   return (
     <div className="min-h-screen text-fg">
       <div aria-hidden className="ambient-wash" />
@@ -33,7 +35,11 @@ export default function Layout() {
       <ParticleField mode={mode} key={mode} />
       {flourish && <AccessFlourish />}
       <nav className="relative z-10 mx-auto flex max-w-5xl flex-nowrap items-center justify-between gap-x-0.5 px-2 py-6 sm:gap-x-1 sm:gap-y-3 sm:px-6 print:hidden">
-        <NavLink to="/" className="inline-flex min-h-11 shrink-0 items-center font-mono text-sm tracking-tight text-muted">
+        <NavLink
+          to="/"
+          viewTransition={useViewTransition}
+          className="inline-flex min-h-11 shrink-0 items-center font-mono text-sm tracking-tight text-muted"
+        >
           js<span className="text-cyan">.</span>
         </NavLink>
         <div className="flex min-w-0 flex-nowrap items-center gap-0 sm:flex-wrap sm:gap-2">
@@ -42,6 +48,7 @@ export default function Layout() {
               key={t.to}
               to={t.to}
               end={t.to === '/'}
+              viewTransition={useViewTransition}
               className={({ isActive }) =>
                 `inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-1 py-3 text-[11px] transition-colors sm:px-3.5 sm:text-sm ${
                   isActive ? 'glass text-fg' : 'text-muted hover:text-fg'

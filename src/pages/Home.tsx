@@ -2,8 +2,12 @@ import { Link } from 'react-router-dom'
 import { GithubIcon, MailIcon } from '../components/icons'
 import { SITE } from '../content/site'
 import { HOME } from '../content/home'
+import useReveal from '../hooks/useReveal'
+import { prefersReducedMotion } from '../lib/motion'
 
 export default function Home() {
+  const teaserRef = useReveal<HTMLDivElement>()
+  const useViewTransition = !prefersReducedMotion()
   return (
     <div className="relative overflow-hidden">
       <div
@@ -43,11 +47,13 @@ export default function Home() {
       </section>
 
       <section className="relative mx-auto max-w-5xl px-6 pb-24">
-        <div className="grid gap-5 sm:grid-cols-3">
+        <div ref={teaserRef} className="grid gap-5 sm:grid-cols-3">
           {HOME.teasers.map((t) => (
             <Link
               key={t.to}
               to={t.to}
+              viewTransition={useViewTransition}
+              data-reveal
               className="hud-panel group rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1"
             >
               <p className="font-display text-lg font-semibold text-fg">

@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom'
 import { GithubIcon } from '../components/icons'
 import { PROJECT_GROUPS } from '../content/projects'
+import useReveal from '../hooks/useReveal'
+import { prefersReducedMotion } from '../lib/motion'
 
 export default function Projects() {
+  const gridRef = useReveal<HTMLDivElement>()
+  const useViewTransition = !prefersReducedMotion()
   return (
     <section className="mx-auto max-w-5xl px-6 py-20">
       <p className="hud-eyebrow">Projects</p>
@@ -16,15 +20,16 @@ export default function Projects() {
             <h2 className="hud-eyebrow">{group.heading}</h2>
             <div className="hud-divider flex-1" />
           </div>
-          <div className="mt-5 grid gap-5 sm:grid-cols-2">
+          <div ref={gridRef} className="mt-5 grid gap-5 sm:grid-cols-2">
             {group.cards.map((card) => {
               const className = `hud-panel relative flex flex-col rounded-2xl p-7${card.slug ? ' group transition-all duration-300 hover:-translate-y-1' : ''}`
               return (
-                <div key={card.title} className={className}>
+                <div key={card.title} data-reveal className={className}>
                   {card.slug && (
                     <Link
                       to={`/projects/${card.slug}`}
                       aria-label={card.title}
+                      viewTransition={useViewTransition}
                       className="absolute inset-0 rounded-2xl"
                     />
                   )}
@@ -53,6 +58,7 @@ export default function Projects() {
                       {card.secondaryHref && card.secondaryLabel && (
                         <Link
                           to={card.secondaryHref}
+                          viewTransition={useViewTransition}
                           className="inline-flex items-center gap-2 font-mono text-xs text-cyan hover:text-purple"
                         >
                           {card.secondaryLabel} →

@@ -32,7 +32,12 @@ export const SCHEMATICS: Partial<Record<string, SchematicSpec>> = {
     groups: [
       {
         id: 'conductor-group',
-        nodes: [{ id: 'conductor', label: 'conductor', sub: 'judgment only', accent: 'star' }],
+        nodes: [{ id: 'conductor', label: 'executor', sub: 'judgment only', accent: 'star' }],
+        direction: 'column',
+      },
+      {
+        id: 'advisor-group',
+        nodes: [{ id: 'advisor', label: 'advisor', sub: 'frontier model' }],
         direction: 'column',
       },
       {
@@ -41,7 +46,7 @@ export const SCHEMATICS: Partial<Record<string, SchematicSpec>> = {
         nodes: [
           { id: 'haiku', label: 'haiku', sub: 'mechanical' },
           { id: 'sonnet', label: 'sonnet', sub: 'default' },
-          { id: 'opus', label: 'opus', sub: 'reasoning' },
+          { id: 'opus', label: 'opus', sub: 'one per round' },
           { id: 'free-tier', label: 'free tier', sub: 'second opinion' },
         ],
         direction: 'column',
@@ -57,6 +62,8 @@ export const SCHEMATICS: Partial<Record<string, SchematicSpec>> = {
       { from: 'usage-guard', to: 'conductor', style: 'flow' },
       { from: 'session-timer', to: 'conductor', style: 'flow' },
       { from: 'tripwire', to: 'conductor', style: 'flow' },
+      { from: 'conductor', to: 'advisor', style: 'flow' },
+      { from: 'advisor', to: 'conductor', style: 'return' },
       { from: 'conductor', to: 'haiku', style: 'flow' },
       { from: 'conductor', to: 'sonnet', style: 'flow' },
       { from: 'conductor', to: 'opus', style: 'flow' },
@@ -67,7 +74,7 @@ export const SCHEMATICS: Partial<Record<string, SchematicSpec>> = {
       { from: 'free-tier', to: 'conductor', style: 'return' },
       { from: 'conductor', to: 'vault', style: 'orbit', label: 'memory' },
     ],
-    footnote: 'Hooks enforce the split; the conductor never executes directly.',
+    footnote: 'The executor never runs bounded work itself. The advisor reviews before an approach is committed, and again before it is called done.',
   },
   'hook-flow': {
     id: 'hook-flow',
@@ -329,6 +336,46 @@ export const SCHEMATICS: Partial<Record<string, SchematicSpec>> = {
       { from: 'wallboards', to: 'grafana', style: 'return', label: 'embeds' },
     ],
     footnote: 'Everything is self-hosted on one box; nothing is ever exposed to the public internet, and remote access rides Tailscale.',
+  },
+  'knowledge-flywheel': {
+    id: 'knowledge-flywheel',
+    title: 'How a correction becomes a guard rail',
+    gates: [{ id: 'threshold', label: 'recurs enough', kind: 'limit' }],
+    groups: [
+      {
+        id: 'in',
+        nodes: [{ id: 'correction', label: 'correction', sub: 'caught in session' }],
+        direction: 'column',
+      },
+      {
+        id: 'store',
+        title: 'knowledge base',
+        nodes: [
+          { id: 'rule', label: 'rule', sub: 'written once' },
+          { id: 'incidents', label: 'incidents', sub: 'counted per rule' },
+        ],
+        direction: 'column',
+      },
+      {
+        id: 'out',
+        title: 'disposition',
+        nodes: [
+          { id: 'compiled', label: 'compiled', sub: 'runs before the action', accent: 'star' },
+          { id: 'convention', label: 'convention', sub: 'prose, not enforced' },
+          { id: 'retired', label: 'retired', sub: 'superseded' },
+        ],
+        direction: 'column',
+      },
+    ],
+    edges: [
+      { from: 'correction', to: 'rule', style: 'flow' },
+      { from: 'rule', to: 'incidents', style: 'flow' },
+      { from: 'incidents', to: 'threshold', style: 'flow' },
+      { from: 'threshold', to: 'compiled', style: 'flow' },
+      { from: 'threshold', to: 'convention', style: 'return', label: 'not yet' },
+      { from: 'rule', to: 'retired', style: 'orbit', label: 'audit' },
+    ],
+    footnote: 'A rule that recurs earns a mechanical check. A rule that stops recurring is retired instead of left to rot.',
   },
   'monitoring-install': {
     id: 'monitoring-install',

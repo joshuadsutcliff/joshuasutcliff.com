@@ -150,27 +150,31 @@ export default function ProjectDetail() {
                          DIAGRAMS_ENTRIES id has a matching SCHEMATICS spec
                          today, but this keeps a raw-PNG fallback in place for
                          any future entry that doesn't. */
+                      entry.image ? (
+                        <button
+                          type="button"
+                          onClick={() => setLightboxImage({ src: entry.image!, alt: entry.alt })}
+                          className="block w-full text-left"
+                        >
+                          <img
+                            src={entry.image}
+                            alt={entry.alt}
+                            loading="lazy"
+                            className="w-full rounded-xl border border-border"
+                          />
+                        </button>
+                      ) : null
+                    )}
+                    {entry.image && (
                       <button
                         type="button"
-                        onClick={() => setLightboxImage({ src: entry.image, alt: entry.alt })}
-                        className="block w-full text-left"
+                        onClick={() => setLightboxImage({ src: entry.image!, alt: entry.alt })}
+                        aria-label={'View original diagram: ' + entry.title}
+                        className="mt-2 font-mono text-[11px] text-dim hover:text-cyan"
                       >
-                        <img
-                          src={entry.image}
-                          alt={entry.alt}
-                          loading="lazy"
-                          className="w-full rounded-xl border border-border"
-                        />
+                        view original
                       </button>
                     )}
-                    <button
-                      type="button"
-                      onClick={() => setLightboxImage({ src: entry.image, alt: entry.alt })}
-                      aria-label={'View original diagram: ' + entry.title}
-                      className="mt-2 font-mono text-[11px] text-dim hover:text-cyan"
-                    >
-                      view original
-                    </button>
                   </div>
                   <div>
                     <p className="font-display text-lg font-semibold text-fg">{entry.title}</p>
