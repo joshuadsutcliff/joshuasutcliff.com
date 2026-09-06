@@ -12,6 +12,14 @@ import { hasWebGL2 } from '../lib/webgl'
 
 const DepthStage = lazy(() => import('../scenes/DepthStage'))
 
+type DepthScene = 'blackhole' | 'galaxy'
+
+function sceneForPath(pathname: string): DepthScene | null {
+  if (pathname === '/about') return 'blackhole'
+  if (pathname === '/projects') return 'galaxy'
+  return null
+}
+
 const TABS = [
   { to: '/', label: 'Home' },
   { to: '/work', label: 'Work' },
@@ -33,15 +41,15 @@ export default function Layout() {
   const location = useLocation()
   const mode = modeForPath(location.pathname)
   const useViewTransition = !prefersReducedMotion()
-  const depthActive =
-    isDepthEnabled() && location.pathname === '/about' && hasWebGL2()
+  const depthScene = isDepthEnabled() ? sceneForPath(location.pathname) : null
+  const depthActive = depthScene !== null && hasWebGL2()
   return (
     <div className="min-h-screen text-fg">
       <div aria-hidden className="ambient-wash" />
       <div aria-hidden className="ambient-grid" />
       {depthActive ? (
         <Suspense fallback={<ParticleField mode={mode} key={mode} />}>
-          <DepthStage scene="blackhole" />
+          <DepthStage scene={depthScene} />
         </Suspense>
       ) : (
         <ParticleField mode={mode} key={mode} />

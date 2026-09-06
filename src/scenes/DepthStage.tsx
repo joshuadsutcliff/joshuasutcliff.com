@@ -1,13 +1,17 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer, Noise, Vignette } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
 import { prefersReducedMotion } from '../lib/motion';
-import BlackHoleScene from './BlackHoleScene';
 
 export interface DepthStageProps {
-  scene: 'blackhole';
+  scene: 'blackhole' | 'galaxy';
 }
+
+// Each scene is its own lazy chunk so a visitor to one depth route never
+// downloads another scene's shader. Do not hoist these to static imports.
+const BlackHoleScene = lazy(() => import('./BlackHoleScene'));
+const GalaxyScene = lazy(() => import('./GalaxyScene'));
 
 /**
  * Releases the WebGL context on unmount. Browsers cap live contexts at
@@ -85,7 +89,6 @@ function computeDpr(): number {
 }
 
 export default function DepthStage({ scene }: DepthStageProps) {
-  void scene;
   // Evaluated once at mount: the whole reduced motion branch, including
   // whether Lenis exists at all, hangs off this single value.
   const reduced = useMemo(() => prefersReducedMotion(), []);
@@ -103,7 +106,13 @@ export default function DepthStage({ scene }: DepthStageProps) {
       >
         <ContextDisposer />
         {!reduced && <LenisDriver scrollRef={scrollRef} />}
-        <BlackHoleScene reduced={reduced} scrollRef={scrollRef} />
+        <Suspense fallback={null}>
+          {scene === 'blackhole' ? (
+            <BlackHoleScene reduced={reduced} scrollRef={scrollRef} />
+          ) : (
+            <GalaxyScene reduced={reduced} scrollRef={scrollRef} />
+          )}
+        </Suspense>
         <EffectComposer>
           <Bloom
             intensity={0.45}
