@@ -59,6 +59,12 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Lenis drives smooth scroll itself while active; native smooth scroll
+   fighting it causes jank, so disable it when Lenis adds this class. */
+html.lenis {
+  scroll-behavior: auto;
+}
+
 body {
   margin: 0;
   background: var(--bg);

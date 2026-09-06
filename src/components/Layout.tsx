@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import Footer from './Footer'
 import { GithubIcon } from './icons'
@@ -6,6 +7,10 @@ import useSecretAdmin from '../hooks/useSecretAdmin'
 import AccessFlourish from './AccessFlourish'
 import ParticleField, { type ParticleMode } from './ParticleField'
 import { prefersReducedMotion } from '../lib/motion'
+import { isDepthEnabled } from '../lib/depthFlag'
+import { hasWebGL2 } from '../lib/webgl'
+
+const DepthStage = lazy(() => import('../scenes/DepthStage'))
 
 const TABS = [
   { to: '/', label: 'Home' },
@@ -28,11 +33,19 @@ export default function Layout() {
   const location = useLocation()
   const mode = modeForPath(location.pathname)
   const useViewTransition = !prefersReducedMotion()
+  const depthActive =
+    isDepthEnabled() && location.pathname === '/about' && hasWebGL2()
   return (
     <div className="min-h-screen text-fg">
       <div aria-hidden className="ambient-wash" />
       <div aria-hidden className="ambient-grid" />
-      <ParticleField mode={mode} key={mode} />
+      {depthActive ? (
+        <Suspense fallback={<ParticleField mode={mode} key={mode} />}>
+          <DepthStage scene="blackhole" />
+        </Suspense>
+      ) : (
+        <ParticleField mode={mode} key={mode} />
+      )}
       {flourish && <AccessFlourish />}
       <nav className="relative z-10 mx-auto flex max-w-5xl flex-nowrap items-center justify-between gap-x-0.5 px-2 py-6 sm:gap-x-1 sm:gap-y-3 sm:px-6 print:hidden">
         <NavLink
