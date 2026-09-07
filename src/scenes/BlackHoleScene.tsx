@@ -1,4 +1,4 @@
-import { useRef, type MutableRefObject } from 'react';
+import { useEffect, useRef, type MutableRefObject } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Vector2, Vector3, type ShaderMaterial } from 'three';
 import { blackHoleFragmentShader, blackHoleVertexShader } from './blackHoleShader';
@@ -41,6 +41,8 @@ const initialUniforms = {
   uSpin: { value: 0 },
   // Step budget for the ray march, tunable without touching the shader.
   uSteps: { value: 150 },
+  // Eased cursor position, -1..1 per axis, centered when idle or reduced.
+  uPointer: { value: new Vector2(0, 0) },
 };
 
 /**
@@ -51,6 +53,30 @@ const initialUniforms = {
  */
 export default function BlackHoleScene({ reduced, scrollRef }: BlackHoleSceneProps) {
   const materialRef = useRef<ShaderMaterial>(null);
+
+  // Pointer target written by a window listener; pointerRef is the eased
+  // value the shader actually sees. Plain numbers in refs, so nothing is
+  // allocated per frame and nothing re-renders React.
+  const targetRef = useRef({ x: 0, y: 0 });
+  const pointerRef = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    // Under reduced motion the listener is never attached at all, so there
+    // is no path by which pointer movement can change the frozen frame.
+    if (reduced) return;
+    const onMove = (event: PointerEvent) => {
+      const w = window.innerWidth || 1;
+      const h = window.innerHeight || 1;
+      // Normalised to -1..1 and clamped; y is flipped so up is positive,
+      // matching the shader's ray space.
+      const nx = Math.min(Math.max((event.clientX / w) * 2 - 1, -1), 1);
+      const ny = Math.min(Math.max((event.clientY / h) * 2 - 1, -1), 1);
+      targetRef.current.x = nx;
+      targetRef.current.y = -ny;
+    };
+    window.addEventListener('pointermove', onMove, { passive: true });
+    return () => window.removeEventListener('pointermove', onMove);
+  }, [reduced]);
 
   useFrame((state) => {
     const material = materialRef.current;
@@ -88,6 +114,15 @@ export default function BlackHoleScene({ reduced, scrollRef }: BlackHoleScenePro
       height3d,
       Math.cos(azimuth) * distance,
     );
+
+    // Eased pointer follow. The lerp is slow enough that a flick of the
+    // mouse arrives as a glide, never as a jump. Written through
+    // material.uniforms; the module scope initialUniforms object is never
+    // touched after mount.
+    const ptr = pointerRef.current;
+    ptr.x += (targetRef.current.x - ptr.x) * 0.05;
+    ptr.y += (targetRef.current.y - ptr.y) * 0.05;
+    u.uPointer.value.set(ptr.x, ptr.y);
   });
 
   return (

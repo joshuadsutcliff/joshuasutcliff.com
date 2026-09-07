@@ -32,6 +32,7 @@ uniform float uFov;
 uniform float uScroll;
 uniform float uSpin;
 uniform float uSteps;
+uniform vec2  uPointer;
 
 // Palette. These are the only colours in the scene.
 //
@@ -151,6 +152,15 @@ void main() {
   float frameY = mix(FRAME_Y_N, FRAME_Y, wide);
   vec2 center = vec2((frameX - 0.5) * aspect, 0.5 - frameY);
   vec2 p = uv - center;
+
+  // Cursor driven lensing perturbation: a small extra deflection of the
+  // rays nearest the shadow, tracking the eased pointer. The weight is a
+  // Gaussian about the singularity roughly two photon ring radii wide, so
+  // the warp is local to the focal point and the wider composition never
+  // moves. Both the ray march and the photon ring overlay read p, so the
+  // shadow, disk and ring bend together. Kept deliberately small.
+  float ptrWeight = exp(-dot(p, p) / 0.045);
+  p += uPointer * 0.008 * ptrWeight;
 
   // Camera basis, always looking at the singularity.
   vec3 forward = normalize(-uCamPos);
