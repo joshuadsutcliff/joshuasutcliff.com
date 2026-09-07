@@ -10,6 +10,7 @@ import About from './pages/About'
 import Resume from './pages/Resume'
 import Admin from './pages/Admin'
 import GuideObsidianClaude from './pages/GuideObsidianClaude'
+import StyleGuide from './pages/StyleGuide'
 
 const Baton = lazy(() => import('./pages/Baton'))
 
@@ -27,6 +28,7 @@ function App() {
           <Route path="/resume" element={<Resume />} />
           <Route path="/guides/obsidian-claude-setup" element={<GuideObsidianClaude />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/styleguide" element={<StyleGuide />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
         <Route

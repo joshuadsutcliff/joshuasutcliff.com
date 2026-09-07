@@ -37,6 +37,18 @@
   --shadow-neon-purple: 0 4px 24px rgba(91, 79, 214, 0.12);
   --shadow-elevated: 0 8px 30px rgba(0, 0, 0, 0.45);
   color-scheme: dark;
+
+  /* CLI design language (stage 1). Baseline values measured from
+     mechabunny.com/about. Namespaced so they can coexist with the outgoing
+     tokens until the site-wide shell lands. */
+  --cli-bg: #121319;
+  --cli-text: #aac1cb;
+  --cli-cyan: #00ced1;
+  --cli-cyan-rgb: 0, 206, 209;
+  --cli-sakura: #e75480;
+  --cli-green: #4ade80;
+  --cli-emphasis: #ffffff;
+  --cli-warn: #f59e0b;
 }
 
 /* Map our tokens into Tailwind's theme so utilities like text-fg, bg-card work */
@@ -59,6 +71,16 @@
   --color-accent-sakura: var(--accent-sakura);
   --color-accent-cli: var(--accent-cli);
   --color-purple: var(--purple);
+
+  --font-cli: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-body: 'Geologica', system-ui, sans-serif;
+
+  --color-cli-bg: var(--cli-bg);
+  --color-cli-text: var(--cli-text);
+  --color-cli-cyan: var(--cli-cyan);
+  --color-cli-sakura: var(--cli-sakura);
+  --color-cli-green: var(--cli-green);
+  --color-cli-emphasis: var(--cli-emphasis);
 }
 
 * {
@@ -334,4 +356,23 @@ select:focus-visible,
 }
 .secret-caption {
   animation: secret-caption 0.7s ease-out forwards;
+}
+
+/* CLI design language (stage 1) prose + focus rules. */
+.cli-prose {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--cli-text);
+}
+
+.cli-scope a:focus-visible,
+.cli-scope button:focus-visible,
+.cli-scope input:focus-visible,
+.cli-scope textarea:focus-visible,
+.cli-scope select:focus-visible,
+.cli-scope [tabindex]:focus-visible {
+  outline: 2px solid var(--cli-cyan);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(var(--cli-cyan-rgb), 0.25);
 }
