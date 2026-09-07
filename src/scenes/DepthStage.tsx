@@ -1,11 +1,11 @@
 import { lazy, Suspense, useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Bloom, EffectComposer, Noise, Vignette } from '@react-three/postprocessing';
+import { Bloom, DepthOfField, EffectComposer, Noise, Vignette } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
 import { prefersReducedMotion } from '../lib/motion';
 
 export interface DepthStageProps {
-  scene: 'blackhole' | 'galaxy' | 'starfield';
+  scene: 'blackhole' | 'galaxy' | 'starfield' | 'orbital';
 }
 
 // Each scene is its own lazy chunk so a visitor to one depth route never
@@ -13,6 +13,7 @@ export interface DepthStageProps {
 const BlackHoleScene = lazy(() => import('./BlackHoleScene'));
 const GalaxyScene = lazy(() => import('./GalaxyScene'));
 const StarfieldScene = lazy(() => import('./StarfieldScene'));
+const OrbitalScene = lazy(() => import('./OrbitalScene'));
 
 /**
  * Releases the WebGL context on unmount. Browsers cap live contexts at
@@ -82,6 +83,26 @@ function LenisDriver({ scrollRef }: { scrollRef: React.MutableRefObject<number> 
   return null;
 }
 
+// Depth-of-field focus for the orbital scene, as a world distance from the
+// camera. The orbital system's centre of mass sits 9 world units from the
+// camera; focus is parked slightly in front of it so the core and the near
+// half of every orbit stay crisp while the far half of each inclined orbit
+// falls out of focus. Duplicated as literals rather than imported from
+// OrbitalScene, which would drag that scene out of its own lazy chunk.
+const ORBITAL_FOCUS_DISTANCE = 7.90;
+const ORBITAL_FOCUS_RANGE = 1.10;
+
+// Bokeh radius for the orbital scene's depth-of-field pass. 2.8 is tuned for a
+// desktop-sized render; at 320 CSS pixels wide the whole system spans only a
+// couple of hundred device pixels, and a blur of that radius is a large
+// fraction of it, which turns the orbits into an indistinct smudge. Narrow
+// frames therefore get a much smaller radius. Orbital scene only: the three
+// shipped scenes have no DepthOfField pass at all.
+function computeOrbitalBokeh(): number {
+  if (typeof window === 'undefined') return 2.8;
+  return window.innerWidth < 640 ? 0.75 : 2.8;
+}
+
 function computeDpr(): number {
   if (typeof window === 'undefined') return 1;
   const ratio = window.devicePixelRatio || 1;
@@ -94,6 +115,7 @@ export default function DepthStage({ scene }: DepthStageProps) {
   // whether Lenis exists at all, hangs off this single value.
   const reduced = useMemo(() => prefersReducedMotion(), []);
   const dpr = useMemo(() => computeDpr(), []);
+  const orbitalBokeh = useMemo(() => computeOrbitalBokeh(), []);
   const scrollRef = useRef(0);
 
   return (
@@ -112,20 +134,48 @@ export default function DepthStage({ scene }: DepthStageProps) {
             <BlackHoleScene reduced={reduced} scrollRef={scrollRef} />
           ) : scene === 'galaxy' ? (
             <GalaxyScene reduced={reduced} scrollRef={scrollRef} />
+          ) : scene === 'orbital' ? (
+            <OrbitalScene reduced={reduced} scrollRef={scrollRef} />
           ) : (
             <StarfieldScene reduced={reduced} scrollRef={scrollRef} />
           )}
         </Suspense>
-        <EffectComposer>
-          <Bloom
-            intensity={0.45}
-            luminanceThreshold={0.65}
-            luminanceSmoothing={0.22}
-            mipmapBlur
-          />
-          <Noise premultiply blendFunction={BlendFunction.OVERLAY} opacity={0.16} />
-          <Vignette eskil={false} offset={0.28} darkness={0.72} />
-        </EffectComposer>
+        {scene === 'orbital' ? (
+          // The orbital scene is the ONLY one with a real, varying depth
+          // buffer: its bodies are opaque meshes with depthTest and depthWrite
+          // genuinely on. The other three are a fullscreen ray-marched quad
+          // and two additive point clouds with depthWrite off, which give
+          // DepthOfField a uniform depth buffer and make it blur the whole
+          // frame evenly. So this is a SEPARATE, explicit composer tree rather
+          // than a conditional child inside the shared one: the shipped
+          // scenes' pipeline below stays byte for byte what it already was.
+          <EffectComposer>
+            <DepthOfField
+              worldFocusDistance={ORBITAL_FOCUS_DISTANCE}
+              worldFocusRange={ORBITAL_FOCUS_RANGE}
+              bokehScale={orbitalBokeh}
+            />
+            <Bloom
+              intensity={0.45}
+              luminanceThreshold={0.65}
+              luminanceSmoothing={0.22}
+              mipmapBlur
+            />
+            <Noise premultiply blendFunction={BlendFunction.OVERLAY} opacity={0.16} />
+            <Vignette eskil={false} offset={0.28} darkness={0.72} />
+          </EffectComposer>
+        ) : (
+          <EffectComposer>
+            <Bloom
+              intensity={0.45}
+              luminanceThreshold={0.65}
+              luminanceSmoothing={0.22}
+              mipmapBlur
+            />
+            <Noise premultiply blendFunction={BlendFunction.OVERLAY} opacity={0.16} />
+            <Vignette eskil={false} offset={0.28} darkness={0.72} />
+          </EffectComposer>
+        )}
       </Canvas>
     </div>
   );
