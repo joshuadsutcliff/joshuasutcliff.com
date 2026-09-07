@@ -5,13 +5,14 @@ import { BlendFunction } from 'postprocessing';
 import { prefersReducedMotion } from '../lib/motion';
 
 export interface DepthStageProps {
-  scene: 'blackhole' | 'galaxy';
+  scene: 'blackhole' | 'galaxy' | 'starfield';
 }
 
 // Each scene is its own lazy chunk so a visitor to one depth route never
 // downloads another scene's shader. Do not hoist these to static imports.
 const BlackHoleScene = lazy(() => import('./BlackHoleScene'));
 const GalaxyScene = lazy(() => import('./GalaxyScene'));
+const StarfieldScene = lazy(() => import('./StarfieldScene'));
 
 /**
  * Releases the WebGL context on unmount. Browsers cap live contexts at
@@ -109,8 +110,10 @@ export default function DepthStage({ scene }: DepthStageProps) {
         <Suspense fallback={null}>
           {scene === 'blackhole' ? (
             <BlackHoleScene reduced={reduced} scrollRef={scrollRef} />
-          ) : (
+          ) : scene === 'galaxy' ? (
             <GalaxyScene reduced={reduced} scrollRef={scrollRef} />
+          ) : (
+            <StarfieldScene reduced={reduced} scrollRef={scrollRef} />
           )}
         </Suspense>
         <EffectComposer>
