@@ -1,30 +1,12 @@
-import { lazy, Suspense } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import Footer from './Footer'
 import { GithubIcon } from './icons'
 import { SITE } from '../content/site'
 import useSecretAdmin from '../hooks/useSecretAdmin'
 import AccessFlourish from './AccessFlourish'
-import ParticleField, { type ParticleMode } from './ParticleField'
 import { prefersReducedMotion } from '../lib/motion'
-import { isDepthEnabled, isDepthForced } from '../lib/depthFlag'
 import { isCliFrameEnabled } from '../lib/cliFlag'
 import CliStatusStrip from './CliStatusStrip'
-import { hasWebGL2 } from '../lib/webgl'
-import { canRunDepthScenes } from '../lib/deviceTier'
-
-const DepthStage = lazy(() => import('../scenes/DepthStage'))
-
-type DepthScene = 'blackhole' | 'galaxy' | 'starfield' | 'orbital' | 'nebula'
-
-function sceneForPath(pathname: string): DepthScene | null {
-  if (pathname === '/') return 'starfield'
-  if (pathname === '/about') return 'blackhole'
-  if (pathname === '/projects') return 'galaxy'
-  if (pathname === '/work') return 'orbital'
-  if (pathname === '/resume') return 'nebula'
-  return null
-}
 
 const TABS = [
   { to: '/', label: 'Home' },
@@ -34,37 +16,15 @@ const TABS = [
   { to: '/resume', label: 'Resume' },
 ]
 
-function modeForPath(pathname: string): ParticleMode {
-  if (pathname === '/') return 'constellation'
-  if (pathname === '/work') return 'orbital'
-  if (pathname === '/about') return 'singularity'
-  if (pathname === '/resume') return 'nebula'
-  return 'spiral'
-}
-
 export default function Layout() {
   const flourish = useSecretAdmin()
   const location = useLocation()
-  const mode = modeForPath(location.pathname)
   const useViewTransition = !prefersReducedMotion()
   const cliFrame = isCliFrameEnabled()
-  const depthScene = isDepthEnabled() ? sceneForPath(location.pathname) : null
-  // Gate: flag AND route match AND WebGL2 AND device capable. An
-  // explicit `?depth=1` bypasses the device gate so the scenes can be
-  // forced on for testing on real low-end hardware.
-  const depthActive =
-    depthScene !== null && hasWebGL2() && (isDepthForced() || canRunDepthScenes())
   return (
     <div className="min-h-screen text-fg">
       <div aria-hidden className="ambient-wash" />
       <div aria-hidden className="ambient-grid" />
-      {depthActive ? (
-        <Suspense fallback={<ParticleField mode={mode} key={mode} />}>
-          <DepthStage scene={depthScene} />
-        </Suspense>
-      ) : (
-        <ParticleField mode={mode} key={mode} />
-      )}
       {flourish && <AccessFlourish />}
       {cliFrame && <CliStatusStrip pathname={location.pathname} />}
       <nav className="relative z-10 mx-auto flex max-w-5xl flex-nowrap items-center justify-between gap-x-0.5 px-2 py-6 sm:gap-x-1 sm:gap-y-3 sm:px-6 print:hidden">
