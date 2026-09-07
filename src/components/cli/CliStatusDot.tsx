@@ -9,7 +9,7 @@ export interface CliStatusDotProps {
 const STATUS_COLOR: Record<CliStatusDotStatus, string> = {
   ok: 'bg-cli-green',
   active: 'bg-cli-cyan',
-  warn: 'bg-[var(--cli-warn)]',
+  warn: 'bg-cli-warn',
 }
 
 // "[●]" status indicator. The bracket glyphs and the dot are decorative and

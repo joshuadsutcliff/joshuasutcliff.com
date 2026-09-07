@@ -49,6 +49,10 @@
   --cli-green: #4ade80;
   --cli-emphasis: #ffffff;
   --cli-warn: #f59e0b;
+  /* Pre-composited equivalent of --cli-text at 70 percent opacity over
+     --cli-bg. Made a real token (instead of an opacity modifier on
+     --cli-text) so the contrast check covers what actually renders. */
+  --cli-dim: #7c8d96;
 }
 
 /* Map our tokens into Tailwind's theme so utilities like text-fg, bg-card work */
@@ -81,6 +85,8 @@
   --color-cli-sakura: var(--cli-sakura);
   --color-cli-green: var(--cli-green);
   --color-cli-emphasis: var(--cli-emphasis);
+  --color-cli-warn: var(--cli-warn);
+  --color-cli-dim: var(--cli-dim);
 }
 
 * {
@@ -366,6 +372,10 @@ select:focus-visible,
   color: var(--cli-text);
 }
 
+/* These rules only apply inside an ancestor carrying the cli-scope class.
+   Today only StyleGuide.tsx sets that class. A later stage's site-wide
+   shell must add cli-scope to its root element so every page inherits the
+   CLI focus ring; the primitives here deliberately do not self-apply it. */
 .cli-scope a:focus-visible,
 .cli-scope button:focus-visible,
 .cli-scope input:focus-visible,

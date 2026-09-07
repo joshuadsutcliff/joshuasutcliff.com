@@ -59,7 +59,7 @@ export default function StyleGuide() {
                   style={{ background: swatch.hex }}
                 />
                 <p className="font-cli text-cli-text text-xs">{swatch.name}</p>
-                <p className="font-cli text-cli-text/70 text-xs">{swatch.hex}</p>
+                <p className="font-cli text-cli-dim text-xs">{swatch.hex}</p>
               </div>
             ))}
           </div>

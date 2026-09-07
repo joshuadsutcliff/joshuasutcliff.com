@@ -23,10 +23,10 @@ export default function CliHeaderStrip({ className = '' }: CliHeaderStripProps) 
         <span aria-hidden>&#9654;</span>
         LIVE
       </span>
-      <span className="text-cli-text/70">
+      <span className="text-cli-dim">
         session <span className="text-cli-cyan">{sessionId}</span>
       </span>
-      <span className="text-cli-text/70">ssh visitor@joshuasutcliff.com</span>
+      <span className="text-cli-dim">ssh visitor@joshuasutcliff.com</span>
     </div>
   )
 }

@@ -14,7 +14,7 @@ const cssPath = path.join(__dirname, '..', 'src', 'index.css')
 const css = readFileSync(cssPath, 'utf8')
 
 const BG_TOKEN = '--cli-bg'
-const FG_TOKENS = ['--cli-text', '--cli-cyan', '--cli-sakura', '--cli-green', '--cli-emphasis', '--cli-warn']
+const FG_TOKENS = ['--cli-text', '--cli-cyan', '--cli-sakura', '--cli-green', '--cli-emphasis', '--cli-warn', '--cli-dim']
 const MIN_RATIO = 4.5
 
 function readToken(name) {
@@ -70,9 +70,55 @@ for (const token of FG_TOKENS) {
   console.log(`${token.padEnd(16)} ${hex.padEnd(9)} vs ${bgHex}  ratio=${ratio.toFixed(2)}:1  ${marker}`)
 }
 
+// Generic rgb-companion check: any token named "--<name>-rgb" is a
+// hand-written "r, g, b" triple meant to mirror the hex value of its
+// "--<name>" counterpart (used for rgba() alpha compositing in CSS, which
+// cannot consume a hex token directly). Nothing in CSS enforces that the two
+// stay in sync, so verify it here for every such pair found in the file.
+console.log()
+
+function findRgbCompanions(source) {
+  const names = new Set()
+  const re = /--([a-z0-9-]+)-rgb\s*:/g
+  let match
+  while ((match = re.exec(source))) {
+    names.add(match[1])
+  }
+  return [...names]
+}
+
+function readRgbToken(name) {
+  const match = css.match(new RegExp(`--${name}-rgb\\s*:\\s*([0-9]{1,3})\\s*,\\s*([0-9]{1,3})\\s*,\\s*([0-9]{1,3})\\s*;`))
+  if (!match) {
+    throw new Error(`Token --${name}-rgb not found in src/index.css`)
+  }
+  return { r: Number(match[1]), g: Number(match[2]), b: Number(match[3]) }
+}
+
+const rgbCompanionNames = findRgbCompanions(css)
+
+for (const name of rgbCompanionNames) {
+  const hexTokenName = `--${name}`
+  let hex
+  try {
+    hex = readToken(hexTokenName)
+  } catch {
+    // No hex counterpart to compare against; not this check's concern.
+    continue
+  }
+  const expected = hexToRgb(hex)
+  const actual = readRgbToken(name)
+  const pass = expected.r === actual.r && expected.g === actual.g && expected.b === actual.b
+  if (!pass) anyFail = true
+  const marker = pass ? 'PASS' : 'FAIL'
+  console.log(
+    `${(`--${name}-rgb`).padEnd(16)} ${`${actual.r}, ${actual.g}, ${actual.b}`.padEnd(14)} vs ${hexTokenName}=${hex} (${expected.r}, ${expected.g}, ${expected.b})  ${marker}`,
+  )
+}
+
 if (anyFail) {
-  console.error('\nOne or more CLI tokens fail the 4.5:1 minimum contrast ratio against --cli-bg.')
+  console.error('\nOne or more CLI tokens fail the 4.5:1 minimum contrast ratio against --cli-bg, or an -rgb token has drifted from its hex counterpart.')
   process.exit(1)
 } else {
-  console.log('\nAll CLI tokens meet the 4.5:1 minimum contrast ratio against --cli-bg.')
+  console.log('\nAll CLI tokens meet the 4.5:1 minimum contrast ratio against --cli-bg, and all -rgb tokens match their hex counterparts.')
 }
