@@ -24,6 +24,14 @@
   --purple-rgb: 91, 79, 214;
   --accent-cyan: #17a7c4;
   --accent-purple: #5b4fd6;
+  /* UI accents for terminal chrome (status dots, prompt glyphs, syntax
+     highlighting, wordmark accent). Cyan remains the primary hue site-wide;
+     sakura and cli are accents only and must never compete with cyan as
+     the primary hue. Both verified >=4.5:1 against --bg. */
+  --accent-sakura: #e75480;
+  --accent-sakura-rgb: 231, 84, 128;
+  --accent-cli: #4ade80;
+  --accent-cli-rgb: 74, 222, 128;
   --particle-alpha: 0.55;
   --shadow-neon: 0 4px 24px rgba(23, 167, 196, 0.12);
   --shadow-neon-purple: 0 4px 24px rgba(91, 79, 214, 0.12);
@@ -48,6 +56,8 @@
   --color-card: var(--card);
   --color-card-hover: var(--card-hover);
   --color-cyan: var(--cyan);
+  --color-accent-sakura: var(--accent-sakura);
+  --color-accent-cli: var(--accent-cli);
   --color-purple: var(--purple);
 }
 
