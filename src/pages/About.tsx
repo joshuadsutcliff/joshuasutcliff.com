@@ -1,8 +1,12 @@
 import { MailIcon } from '../components/icons'
 import { SITE } from '../content/site'
 import { ABOUT } from '../content/about'
+import AboutTerminal from '../components/AboutTerminal'
+import { isAboutTerminalEnabled } from '../lib/terminalFlag'
 
 export default function About() {
+  if (isAboutTerminalEnabled()) return <AboutTerminal />
+
   return (
     <section className="mx-auto max-w-5xl px-6 py-20">
       <div className="hud-panel hud-panel-solid rounded-3xl p-8 sm:p-12">
