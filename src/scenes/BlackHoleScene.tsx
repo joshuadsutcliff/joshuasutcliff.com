@@ -27,10 +27,12 @@ function easeInOutCubic(t: number): number {
   return c < 0.5 ? 4 * c * c * c : 1 - Math.pow(-2 * c + 2, 3) / 2;
 }
 
-// Module scope singleton: only one BlackHoleScene is ever mounted (it is
-// gated to a single route in Layout), and keeping the uniform holder out
-// of the component keeps the per frame writes off React's render path.
-const uniforms = {
+// Initial uniform values only. This object is NEVER written to after mount.
+// react-three-fiber does not adopt this object as the material's uniform
+// holder: applyProps copies it entry by entry into the material's own
+// `uniforms` map (`uniforms[name] = { ...uniform }`), so every per frame
+// write has to go through `material.uniforms`, not through this object.
+const initialUniforms = {
   uTime: { value: 0 },
   uResolution: { value: new Vector2(1, 1) },
   uCamPos: { value: new Vector3(0, BASE_HEIGHT, BASE_DISTANCE) },
@@ -54,9 +56,11 @@ export default function BlackHoleScene({ reduced, scrollRef }: BlackHoleScenePro
     const material = materialRef.current;
     if (!material) return;
 
+    const u = material.uniforms;
+
     const { width, height } = state.size;
     const dpr = state.viewport.dpr;
-    uniforms.uResolution.value.set(width * dpr, height * dpr);
+    u.uResolution.value.set(width * dpr, height * dpr);
 
     if (reduced) {
       // Static path: resolution only, then nothing else ever changes.
@@ -68,10 +72,10 @@ export default function BlackHoleScene({ reduced, scrollRef }: BlackHoleScenePro
     const t = state.clock.elapsedTime;
     const scroll = easeInOutCubic(scrollRef.current);
 
-    uniforms.uTime.value = t;
-    uniforms.uScroll.value = scroll;
+    u.uTime.value = t;
+    u.uScroll.value = scroll;
     // Slow disk rotation. Everything here is deliberately unhurried.
-    uniforms.uSpin.value = t * 0.16;
+    u.uSpin.value = t * 0.16;
 
     // Very slow camera drift on a sine, plus a scroll driven push in and
     // a small tilt. Sine and eased scroll keep the motion off linear.
@@ -79,7 +83,7 @@ export default function BlackHoleScene({ reduced, scrollRef }: BlackHoleScenePro
     const distance = BASE_DISTANCE - PUSH_IN * scroll;
     const height3d = BASE_HEIGHT + Math.sin(t * 0.027) * 0.34 + scroll * 0.85;
 
-    uniforms.uCamPos.value.set(
+    u.uCamPos.value.set(
       Math.sin(azimuth) * distance,
       height3d,
       Math.cos(azimuth) * distance,
@@ -93,7 +97,7 @@ export default function BlackHoleScene({ reduced, scrollRef }: BlackHoleScenePro
         ref={materialRef}
         vertexShader={blackHoleVertexShader}
         fragmentShader={blackHoleFragmentShader}
-        uniforms={uniforms}
+        uniforms={initialUniforms}
         depthTest={false}
         depthWrite={false}
         toneMapped={false}

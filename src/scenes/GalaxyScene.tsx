@@ -1,6 +1,6 @@
 import { useMemo, useRef, type MutableRefObject } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { AdditiveBlending, BufferAttribute, BufferGeometry, type Points } from 'three';
+import { AdditiveBlending, BufferAttribute, BufferGeometry, type Points, type ShaderMaterial } from 'three';
 import { galaxyFragmentShader, galaxyVertexShader } from './galaxyShader';
 
 export interface GalaxySceneProps {
@@ -195,10 +195,12 @@ function buildGalaxy(count: number, seed: number): GalaxyBuffers {
   return { positions, props, count };
 }
 
-// Module scope singleton, matching BlackHoleScene: only one GalaxyScene is
-// ever mounted, and keeping the uniform holder out of the component keeps
-// the per frame writes off React's render path.
-const uniforms = {
+// Initial uniform values only. This object is NEVER written to after mount.
+// react-three-fiber does not adopt this object as the material's uniform
+// holder: applyProps copies it entry by entry into the material's own
+// `uniforms` map (`uniforms[name] = { ...uniform }`), so every per frame
+// write has to go through `material.uniforms`, not through this object.
+const initialUniforms = {
   uTime: { value: 0 },
   uScroll: { value: 0 },
   uPixelRatio: { value: 1 },
@@ -210,6 +212,7 @@ const uniforms = {
 
 export default function GalaxyScene({ reduced, scrollRef }: GalaxySceneProps) {
   const pointsRef = useRef<Points>(null);
+  const materialRef = useRef<ShaderMaterial>(null);
 
   const geometry = useMemo(() => {
     const small = typeof window !== 'undefined' && window.innerWidth < SMALL_VIEWPORT;
@@ -226,8 +229,12 @@ export default function GalaxyScene({ reduced, scrollRef }: GalaxySceneProps) {
   }, []);
 
   useFrame((state) => {
+    const material = materialRef.current;
+    if (!material) return;
+    const u = material.uniforms;
+
     const camera = state.camera;
-    uniforms.uPixelRatio.value = state.viewport.dpr;
+    u.uPixelRatio.value = state.viewport.dpr;
 
     const narrow = state.size.width < 900;
     const offsetX = narrow ? OFFSET_X_NARROW : OFFSET_X;
@@ -244,16 +251,16 @@ export default function GalaxyScene({ reduced, scrollRef }: GalaxySceneProps) {
       // frameloop="demand" this runs once at mount and then stops.
       camera.position.set(-offsetX, -offsetY, fit);
       camera.lookAt(-offsetX, -offsetY, 0);
-      uniforms.uTime.value = 0;
-      uniforms.uScroll.value = 0;
+      u.uTime.value = 0;
+      u.uScroll.value = 0;
       return;
     }
 
     const t = state.clock.elapsedTime;
     const scroll = easeInOutCubic(scrollRef.current);
 
-    uniforms.uTime.value = t;
-    uniforms.uScroll.value = scroll;
+    u.uTime.value = t;
+    u.uScroll.value = scroll;
 
     // Camera drift on two slow sines of different periods, so the motion
     // never repeats on an obvious beat, plus a scroll driven push in. The
@@ -268,7 +275,7 @@ export default function GalaxyScene({ reduced, scrollRef }: GalaxySceneProps) {
 
     // The focal plane rides just in front of the core, so the near edge of
     // the disc softens as it passes the camera.
-    uniforms.uFocalDepth.value = distance - 0.1;
+    u.uFocalDepth.value = distance - 0.1;
   });
 
   return (
@@ -279,9 +286,10 @@ export default function GalaxyScene({ reduced, scrollRef }: GalaxySceneProps) {
       rotation={[TILT_X, 0, TILT_Z]}
     >
       <shaderMaterial
+        ref={materialRef}
         vertexShader={galaxyVertexShader}
         fragmentShader={galaxyFragmentShader}
-        uniforms={uniforms}
+        uniforms={initialUniforms}
         transparent
         blending={AdditiveBlending}
         depthTest={false}

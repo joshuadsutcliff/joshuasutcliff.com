@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, type MutableRefObject } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { AdditiveBlending, BufferAttribute, BufferGeometry, type Points } from 'three';
+import { AdditiveBlending, BufferAttribute, BufferGeometry, type Points, type ShaderMaterial } from 'three';
 import {
   starfieldFragmentShader,
   starfieldVertexShader,
@@ -292,10 +292,12 @@ function buildStars(scale: number, seed: number, aspect: number): StarBuffers {
   return { positions, props, count };
 }
 
-// Module scope singleton, matching GalaxyScene and BlackHoleScene: only one
-// StarfieldScene is ever mounted, and keeping the uniform holder out of the
-// component keeps the per frame writes off React's render path.
-const uniforms = {
+// Initial uniform values only. This object is NEVER written to after mount.
+// react-three-fiber does not adopt this object as the material's uniform
+// holder: applyProps copies it entry by entry into the material's own
+// `uniforms` map (`uniforms[name] = { ...uniform }`), so every per frame
+// write has to go through `material.uniforms`, not through this object.
+const initialUniforms = {
   uTime: { value: 0 },
   uScroll: { value: 0 },
   uPixelRatio: { value: 1 },
@@ -310,7 +312,8 @@ const uniforms = {
 // backdrop rather than as another parallax layer.
 const WASH_DEPTH = 60;
 
-const washUniforms = {
+// Same rule as initialUniforms above: initial values only, never written.
+const initialWashUniforms = {
   uWashDepth: { value: WASH_DEPTH },
   // Angular units per NDC unit of x, so the wash shader can undo the
   // conversion and evaluate the band in the same NDC space the CPU used.
@@ -324,6 +327,8 @@ const washUniforms = {
 
 export default function StarfieldScene({ reduced, scrollRef }: StarfieldSceneProps) {
   const pointsRef = useRef<Points>(null);
+  const materialRef = useRef<ShaderMaterial>(null);
+  const washMaterialRef = useRef<ShaderMaterial>(null);
 
   // Pointer target in world units, written by a window listener; pointerRef
   // is the eased value the camera actually uses. Plain numbers in refs, so
@@ -361,12 +366,17 @@ export default function StarfieldScene({ reduced, scrollRef }: StarfieldScenePro
   }, [reduced]);
 
   useFrame((state) => {
+    const material = materialRef.current;
+    const washMaterial = washMaterialRef.current;
+    if (!material || !washMaterial) return;
+    const u = material.uniforms;
+
     const camera = state.camera;
-    uniforms.uPixelRatio.value = state.viewport.dpr;
+    u.uPixelRatio.value = state.viewport.dpr;
     // The wash needs the same angular per NDC conversion the stars were built
     // with, so its band lines up with theirs. Written here rather than in the
     // geometry memo because a render pass must not mutate module state.
-    washUniforms.uNdcToU.value = NDC_TO_V * viewportAspect();
+    washMaterial.uniforms.uNdcToU.value = NDC_TO_V * viewportAspect();
 
     if (reduced) {
       // Static path. The frozen frame is the fully composed image, not a
@@ -375,15 +385,15 @@ export default function StarfieldScene({ reduced, scrollRef }: StarfieldScenePro
       // frameloop="demand" this runs once at mount and then stops.
       camera.position.set(0, 0, CAM_Z);
       camera.lookAt(0, 0, CAM_Z - 1);
-      uniforms.uTime.value = 0;
-      uniforms.uScroll.value = 0;
-      uniforms.uFocalDepth.value = FOCAL_DEPTH;
+      u.uTime.value = 0;
+      u.uScroll.value = 0;
+      u.uFocalDepth.value = FOCAL_DEPTH;
       return;
     }
 
     const t = state.clock.elapsedTime;
-    uniforms.uTime.value = t;
-    uniforms.uScroll.value = easeInOutCubic(scrollRef.current);
+    u.uTime.value = t;
+    u.uScroll.value = easeInOutCubic(scrollRef.current);
 
     // Eased pointer follow. The lerp is slow enough that a flick of the
     // mouse arrives as a glide, never as a jump.
@@ -409,9 +419,10 @@ export default function StarfieldScene({ reduced, scrollRef }: StarfieldScenePro
           args={[2 * HALF_W_PER_DEPTH * WASH_DEPTH, 2 * HALF_H_PER_DEPTH * WASH_DEPTH]}
         />
         <shaderMaterial
+          ref={washMaterialRef}
           vertexShader={starfieldWashVertexShader}
           fragmentShader={starfieldWashFragmentShader}
-          uniforms={washUniforms}
+          uniforms={initialWashUniforms}
           transparent
           blending={AdditiveBlending}
           depthTest={false}
@@ -421,9 +432,10 @@ export default function StarfieldScene({ reduced, scrollRef }: StarfieldScenePro
       </mesh>
       <points ref={pointsRef} geometry={geometry} frustumCulled={false}>
         <shaderMaterial
+          ref={materialRef}
           vertexShader={starfieldVertexShader}
           fragmentShader={starfieldFragmentShader}
-          uniforms={uniforms}
+          uniforms={initialUniforms}
           transparent
           blending={AdditiveBlending}
           depthTest={false}

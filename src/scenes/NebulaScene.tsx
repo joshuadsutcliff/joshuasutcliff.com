@@ -34,11 +34,13 @@ function easeInOutCubic(t: number): number {
   return c < 0.5 ? 4 * c * c * c : 1 - Math.pow(-2 * c + 2, 3) / 2;
 }
 
-// Module scope singleton, matching the other scenes: only one NebulaScene is
-// ever mounted, and keeping the uniform holder out of the component keeps the
-// per frame writes off React's render path.
+// Initial uniform values only. This object is NEVER written to after mount.
+// react-three-fiber does not adopt this object as the material's uniform
+// holder: applyProps copies it entry by entry into the material's own
+// `uniforms` map (`uniforms[name] = { ...uniform }`), so every per frame
+// write has to go through `material.uniforms`, not through this object.
 const budget = computeBudget();
-const uniforms = {
+const initialUniforms = {
   uTime: { value: 0 },
   uResolution: { value: new Vector2(1, 1) },
   uScroll: { value: 0 },
@@ -64,9 +66,11 @@ export default function NebulaScene({ reduced, scrollRef }: NebulaSceneProps) {
     const material = materialRef.current;
     if (!material) return;
 
+    const u = material.uniforms;
+
     const { width, height } = state.size;
     const dpr = state.viewport.dpr;
-    uniforms.uResolution.value.set(width * dpr, height * dpr);
+    u.uResolution.value.set(width * dpr, height * dpr);
 
     if (reduced) {
       // Static path: resolution only, then nothing else ever changes. No
@@ -77,9 +81,9 @@ export default function NebulaScene({ reduced, scrollRef }: NebulaSceneProps) {
     }
 
     const t = state.clock.elapsedTime;
-    uniforms.uTime.value = t;
-    uniforms.uScroll.value = easeInOutCubic(scrollRef.current);
-    uniforms.uDrift.value = t * DRIFT_RATE;
+    u.uTime.value = t;
+    u.uScroll.value = easeInOutCubic(scrollRef.current);
+    u.uDrift.value = t * DRIFT_RATE;
   });
 
   return (
@@ -89,7 +93,7 @@ export default function NebulaScene({ reduced, scrollRef }: NebulaSceneProps) {
         ref={materialRef}
         vertexShader={nebulaVertexShader}
         fragmentShader={nebulaFragmentShader}
-        uniforms={uniforms}
+        uniforms={initialUniforms}
         depthTest={false}
         depthWrite={false}
         toneMapped={false}
