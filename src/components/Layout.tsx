@@ -7,8 +7,9 @@ import useSecretAdmin from '../hooks/useSecretAdmin'
 import AccessFlourish from './AccessFlourish'
 import ParticleField, { type ParticleMode } from './ParticleField'
 import { prefersReducedMotion } from '../lib/motion'
-import { isDepthEnabled } from '../lib/depthFlag'
+import { isDepthEnabled, isDepthForced } from '../lib/depthFlag'
 import { hasWebGL2 } from '../lib/webgl'
+import { canRunDepthScenes } from '../lib/deviceTier'
 
 const DepthStage = lazy(() => import('../scenes/DepthStage'))
 
@@ -45,7 +46,11 @@ export default function Layout() {
   const mode = modeForPath(location.pathname)
   const useViewTransition = !prefersReducedMotion()
   const depthScene = isDepthEnabled() ? sceneForPath(location.pathname) : null
-  const depthActive = depthScene !== null && hasWebGL2()
+  // Gate: flag AND route match AND WebGL2 AND device capable. An
+  // explicit `?depth=1` bypasses the device gate so the scenes can be
+  // forced on for testing on real low-end hardware.
+  const depthActive =
+    depthScene !== null && hasWebGL2() && (isDepthForced() || canRunDepthScenes())
   return (
     <div className="min-h-screen text-fg">
       <div aria-hidden className="ambient-wash" />
