@@ -12,13 +12,14 @@ import { hasWebGL2 } from '../lib/webgl'
 
 const DepthStage = lazy(() => import('../scenes/DepthStage'))
 
-type DepthScene = 'blackhole' | 'galaxy' | 'starfield' | 'orbital'
+type DepthScene = 'blackhole' | 'galaxy' | 'starfield' | 'orbital' | 'nebula'
 
 function sceneForPath(pathname: string): DepthScene | null {
   if (pathname === '/') return 'starfield'
   if (pathname === '/about') return 'blackhole'
   if (pathname === '/projects') return 'galaxy'
   if (pathname === '/work') return 'orbital'
+  if (pathname === '/resume') return 'nebula'
   return null
 }
 

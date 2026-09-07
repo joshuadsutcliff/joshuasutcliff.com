@@ -5,7 +5,7 @@ import { BlendFunction } from 'postprocessing';
 import { prefersReducedMotion } from '../lib/motion';
 
 export interface DepthStageProps {
-  scene: 'blackhole' | 'galaxy' | 'starfield' | 'orbital';
+  scene: 'blackhole' | 'galaxy' | 'starfield' | 'orbital' | 'nebula';
 }
 
 // Each scene is its own lazy chunk so a visitor to one depth route never
@@ -14,6 +14,7 @@ const BlackHoleScene = lazy(() => import('./BlackHoleScene'));
 const GalaxyScene = lazy(() => import('./GalaxyScene'));
 const StarfieldScene = lazy(() => import('./StarfieldScene'));
 const OrbitalScene = lazy(() => import('./OrbitalScene'));
+const NebulaScene = lazy(() => import('./NebulaScene'));
 
 /**
  * Releases the WebGL context on unmount. Browsers cap live contexts at
@@ -136,6 +137,8 @@ export default function DepthStage({ scene }: DepthStageProps) {
             <GalaxyScene reduced={reduced} scrollRef={scrollRef} />
           ) : scene === 'orbital' ? (
             <OrbitalScene reduced={reduced} scrollRef={scrollRef} />
+          ) : scene === 'nebula' ? (
+            <NebulaScene reduced={reduced} scrollRef={scrollRef} />
           ) : (
             <StarfieldScene reduced={reduced} scrollRef={scrollRef} />
           )}
