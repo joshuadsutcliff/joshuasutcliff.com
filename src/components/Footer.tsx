@@ -1,6 +1,8 @@
 import { SITE } from '../content/site'
+import { isCliFrameEnabled } from '../lib/cliFlag'
 
 export default function Footer() {
+  const cliFrame = isCliFrameEnabled()
   return (
     <footer className="relative mt-8 border-t border-border print:hidden">
       <div className="mx-auto max-w-5xl px-6 py-12">
@@ -33,7 +35,19 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-2 border-t border-border pt-6 text-xs text-dim sm:flex-row sm:items-center sm:justify-between">
+        {cliFrame && (
+          <div className="mt-10 flex items-center gap-2 border-t border-border pt-6 font-mono text-xs text-muted">
+            <span aria-hidden className="hud-dot hud-dot--green" />
+            <span>
+              <span aria-hidden className="text-cyan">
+                &gt;
+              </span>{' '}
+              All systems nominal.
+            </span>
+          </div>
+        )}
+
+        <div className={`${cliFrame ? 'mt-6 border-t-0 pt-0' : 'mt-10 border-t border-border pt-6'} flex flex-col gap-2 text-xs text-dim sm:flex-row sm:items-center sm:justify-between`}>
           <span>
             <span data-secret-admin>©</span> {SITE.name}. Doctrine contributions ©{' '}
             {SITE.attribution.caosAuthor}, CC BY 4.0.

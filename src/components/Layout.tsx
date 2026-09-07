@@ -8,6 +8,8 @@ import AccessFlourish from './AccessFlourish'
 import ParticleField, { type ParticleMode } from './ParticleField'
 import { prefersReducedMotion } from '../lib/motion'
 import { isDepthEnabled, isDepthForced } from '../lib/depthFlag'
+import { isCliFrameEnabled } from '../lib/cliFlag'
+import CliStatusStrip from './CliStatusStrip'
 import { hasWebGL2 } from '../lib/webgl'
 import { canRunDepthScenes } from '../lib/deviceTier'
 
@@ -45,6 +47,7 @@ export default function Layout() {
   const location = useLocation()
   const mode = modeForPath(location.pathname)
   const useViewTransition = !prefersReducedMotion()
+  const cliFrame = isCliFrameEnabled()
   const depthScene = isDepthEnabled() ? sceneForPath(location.pathname) : null
   // Gate: flag AND route match AND WebGL2 AND device capable. An
   // explicit `?depth=1` bypasses the device gate so the scenes can be
@@ -63,6 +66,7 @@ export default function Layout() {
         <ParticleField mode={mode} key={mode} />
       )}
       {flourish && <AccessFlourish />}
+      {cliFrame && <CliStatusStrip pathname={location.pathname} />}
       <nav className="relative z-10 mx-auto flex max-w-5xl flex-nowrap items-center justify-between gap-x-0.5 px-2 py-6 sm:gap-x-1 sm:gap-y-3 sm:px-6 print:hidden">
         <NavLink
           to="/"
