@@ -33,43 +33,44 @@ interface LogLine {
   note?: string
 }
 
-/* Boot log copy. Drawn from the real background: contract IT in southern
-   New Mexico since 2017, Windows Server and Active Directory, firewalls and
-   managed switching, MDM, backup and recovery, monitoring, plus trumpet and
-   drum corps. Decorative only, and marked aria-hidden at the render site. */
+/* Boot log copy. A profile load, not a network audit: it draws only on
+   material already public elsewhere on this site, namely the Work page
+   summary, the About page biography, and the listed personal projects.
+   Decorative only, and marked aria-hidden at the render site. */
 const LOG: LogLine[] = [
   { text: 'kernel handoff', status: 'ok' },
   { text: 'hostname jsutcliff', status: 'ok' },
   { text: 'site las cruces, new mexico', status: 'ok' },
   { text: 'operator contract it, since 2017', status: 'ok' },
-  { text: 'mount /roles/systems-administration', status: 'ok' },
-  { text: 'mount /roles/networking', status: 'ok' },
-  { text: 'probing windows server hosts', status: 'ok' },
-  { text: 'active directory forest reachable', status: 'ok' },
-  { text: 'fsmo roles located', status: 'ok' },
-  { text: 'dns zones replicating', status: 'ok' },
-  { text: 'group policy objects parsed', status: 'ok' },
-  { text: 'dhcp scopes bound', status: 'ok' },
-  { text: 'edge firewall policy loaded', status: 'ok' },
-  { text: 'managed switching, vlans up', status: 'ok' },
-  { text: 'wireless controller adopted', status: 'ok' },
-  { text: 'site to site tunnels established', status: 'ok' },
-  { text: 'certificate store validated', status: 'warn', note: 'renewal window open' },
-  { text: 'mdm enrollment, tablet fleet', status: 'ok' },
-  { text: 'app deployment tokens current', status: 'ok' },
-  { text: 'backup targets reachable', status: 'ok' },
-  { text: 'restore test verified', status: 'ok' },
-  { text: 'monitoring agents reporting', status: 'ok' },
-  { text: 'dashboards and alert routing', status: 'armed' },
-  { text: 'ticket queue', status: 'warn', note: 'never empty' },
-  { text: 'patch ring one', status: 'ok' },
-  { text: 'patch ring two', status: 'err', note: 'retry scheduled' },
+  { text: 'mount /profile/operator', status: 'ok' },
+  { text: 'load /education/information-systems-management', status: 'ok', note: 'auburn university' },
+  { text: 'mount /skills', status: 'ok' },
+  { text: 'load /skills/systems-administration', status: 'ok' },
+  { text: 'load /skills/windows-server-and-active-directory', status: 'ok' },
+  { text: 'load /skills/firewalls-and-managed-switching', status: 'ok' },
+  { text: 'load /skills/mobile-device-management', status: 'ok' },
+  { text: 'load /skills/backup-and-recovery', status: 'ok' },
+  { text: 'load /skills/monitoring', status: 'ok' },
+  { text: 'index /skills complete', status: 'ok' },
+  { text: 'mount /projects', status: 'ok' },
+  { text: 'load /projects/home-lab', status: 'ok' },
+  { text: 'load /projects/nexus-system-monitor', status: 'ok' },
+  { text: 'load /projects/ghostpane', status: 'ok' },
+  { text: 'load /projects/agentic-monitoring-stack', status: 'ok' },
+  { text: 'load /projects/this-website', status: 'ok', note: 'you are here' },
   { text: 'load /music/trumpet', status: 'ok', note: 'since sixth grade' },
-  { text: 'drum corps 2008 and 2009', status: 'ok', note: 'crown, spirit of atlanta' },
-  { text: 'marching band, three seasons', status: 'ok', note: 'auburn university' },
+  { text: 'load /music/drum-corps', status: 'ok', note: 'crown, spirit of atlanta' },
+  { text: 'load /music/marching-band', status: 'ok', note: 'auburn, three seasons' },
   { text: 'metronome', status: 'armed' },
+  { text: 'embouchure', status: 'warn', note: 'out of practice' },
+  { text: 'mount /offline', status: 'ok' },
+  { text: 'load /offline/gaming-pc-builds', status: 'ok' },
+  { text: 'load /offline/minecraft-servers', status: 'ok', note: 'friends only' },
+  { text: 'load /offline/mountains', status: 'ok', note: 'bow, rifle, muzzleloader' },
+  { text: 'coffee reserve', status: 'err', note: 'refill required' },
   { text: 'home lab heartbeat', status: 'ok' },
   { text: 'documentation index rebuilt', status: 'ok' },
+  { text: 'curiosity', status: 'armed' },
   { text: 'all subsystems nominal', status: 'ok' },
   { text: 'SYSTEM READY', status: 'ok' },
 ]
