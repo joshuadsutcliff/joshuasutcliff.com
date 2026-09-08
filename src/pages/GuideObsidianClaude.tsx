@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { OBSIDIAN_CLAUDE_GUIDE, type GuideBlock, type GuideInline } from '../content/guides'
 import CopyButton from '../components/CopyButton'
+import { CliPanel, CliCard, CliSectionHeader } from '../components/cli'
 
 function RenderInline({ inline }: { inline: GuideInline[] }) {
   return (
@@ -10,7 +11,7 @@ function RenderInline({ inline }: { inline: GuideInline[] }) {
         switch (piece.kind) {
           case 'bold':
             return (
-              <strong key={i} className="font-semibold text-fg">
+              <strong key={i} className="text-cli-emphasis font-semibold">
                 {piece.text}
               </strong>
             )
@@ -18,14 +19,18 @@ function RenderInline({ inline }: { inline: GuideInline[] }) {
             return (
               <code
                 key={i}
-                className="rounded-md border border-border bg-bg2 px-1.5 py-0.5 font-mono text-[0.85em] text-cyan"
+                className="border-cli-dim/30 bg-cli-bg text-cli-cyan font-cli rounded-md border px-1.5 py-0.5 text-[0.85em]"
               >
                 {piece.text}
               </code>
             )
           case 'link':
             return piece.href.startsWith('/') ? (
-              <Link key={i} to={piece.href} className="text-cyan underline underline-offset-2 hover:text-purple">
+              <Link
+                key={i}
+                to={piece.href}
+                className="text-cli-cyan hover:text-cli-sakura underline underline-offset-2"
+              >
                 {piece.text}
               </Link>
             ) : (
@@ -34,7 +39,7 @@ function RenderInline({ inline }: { inline: GuideInline[] }) {
                 href={piece.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-cyan underline underline-offset-2 hover:text-purple"
+                className="text-cli-cyan hover:text-cli-sakura underline underline-offset-2"
               >
                 {piece.text}
               </a>
@@ -51,25 +56,25 @@ function RenderBlock({ block, index }: { block: GuideBlock; index: number }) {
   switch (block.kind) {
     case 'heading2':
       return (
-        <h2 key={index} className="mt-10 font-display text-2xl font-semibold tracking-tight text-fg">
+        <CliSectionHeader key={index} as="h2" divider className="mt-10">
           {block.text}
-        </h2>
+        </CliSectionHeader>
       )
     case 'heading3':
       return (
-        <h3 key={index} className="mt-6 font-display text-lg font-semibold tracking-tight text-fg">
+        <h3 key={index} className="font-cli text-cli-emphasis mt-6 text-lg tracking-tight">
           {block.text}
         </h3>
       )
     case 'paragraph':
       return (
-        <p key={index} className="mt-4 leading-relaxed text-muted">
+        <p key={index} className="cli-prose text-cli-text mt-4">
           <RenderInline inline={block.inline} />
         </p>
       )
     case 'list':
       return (
-        <ul key={index} className="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-muted">
+        <ul key={index} className="cli-prose text-cli-text mt-4 list-disc space-y-2 pl-5">
           {block.items.map((item, i) => (
             <li key={i}>
               <RenderInline inline={item} />
@@ -80,14 +85,14 @@ function RenderBlock({ block, index }: { block: GuideBlock; index: number }) {
     case 'code':
       return (
         <div key={index} className="relative mt-4">
-          <pre className="whitespace-pre-wrap [overflow-wrap:anywhere] rounded-xl border border-border bg-bg2 p-4 pr-20 text-xs leading-relaxed text-fg">
-            <code className="font-mono">{block.text}</code>
+          <pre className="border-cli-dim/30 bg-cli-bg text-cli-text whitespace-pre-wrap [overflow-wrap:anywhere] rounded-xl border p-4 pr-20 text-xs leading-relaxed">
+            <code className="font-cli">{block.text}</code>
           </pre>
           <CopyButton text={block.text} />
         </div>
       )
     case 'divider':
-      return <hr key={index} className="mt-10 border-border" />
+      return <hr key={index} className="border-cli-dim/30 mt-10" />
     default:
       return null
   }
@@ -103,24 +108,24 @@ export default function GuideObsidianClaude() {
   }, [])
 
   return (
-    <section className="mx-auto max-w-3xl px-6 py-20">
-      <p className="hud-eyebrow">Guide</p>
-      <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight text-fg sm:text-4xl">
+    <CliPanel width="narrow">
+      <p className="font-cli text-cli-dim text-[11px] uppercase tracking-[0.14em]">Guide</p>
+      <h1 className="font-cli text-cli-emphasis mt-3 text-3xl tracking-tight sm:text-4xl">
         {OBSIDIAN_CLAUDE_GUIDE.title}
       </h1>
-      <p className="mt-6 leading-relaxed text-muted">{OBSIDIAN_CLAUDE_GUIDE.intro}</p>
-      <p className="mt-4 leading-relaxed text-muted">
+      <p className="cli-prose text-cli-text mt-6">{OBSIDIAN_CLAUDE_GUIDE.intro}</p>
+      <p className="cli-prose text-cli-text mt-4">
         <RenderInline inline={OBSIDIAN_CLAUDE_GUIDE.why} />
       </p>
-      <div className="hud-panel mt-6 rounded-2xl p-5 text-sm leading-relaxed text-muted">
+      <CliCard className="cli-prose text-cli-text mt-6 text-sm">
         <RenderInline inline={OBSIDIAN_CLAUDE_GUIDE.preImportNote} />
-      </div>
+      </CliCard>
 
-      <div className="hud-panel mt-10 rounded-3xl p-8 sm:p-12">
+      <CliCard padding="lg" className="mt-10">
         {OBSIDIAN_CLAUDE_GUIDE.blocks.map((block, i) => (
           <RenderBlock key={i} block={block} index={i} />
         ))}
-      </div>
-    </section>
+      </CliCard>
+    </CliPanel>
   )
 }

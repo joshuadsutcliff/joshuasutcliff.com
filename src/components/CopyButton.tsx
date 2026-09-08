@@ -29,7 +29,7 @@ export default function CopyButton({ text }: { text: string }) {
     <button
       type="button"
       onClick={handleCopy}
-      className="absolute right-3 top-3 rounded-md border border-border bg-bg2 px-2 py-1 font-mono text-[10px] uppercase tracking-wide text-cyan shadow-[0_0_0_6px_#0b0e16] transition-colors hover:text-purple"
+      className="border-cli-dim/40 bg-cli-bg text-cli-cyan hover:text-cli-sakura font-cli absolute right-3 top-3 rounded-md border px-2 py-1 text-[10px] uppercase tracking-wide transition-colors"
     >
       {copied ? 'Copied' : 'Copy'}
     </button>

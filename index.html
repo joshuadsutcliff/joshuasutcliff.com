@@ -27,6 +27,16 @@
     <script defer src="/u/script.js" data-website-id="9eda4580-ce51-4ec8-a9ab-0b528a15cb48" data-host-url="/u"></script>
 
     <!-- Fonts -->
+    <!-- Stage 6 audit (CLI migration, final pass): Geologica (.cli-prose,
+         --font-body) and JetBrains Mono (font-cli) are the two typefaces the
+         CLI language uses everywhere visitor-facing. Archivo (--font-display)
+         and Martian Mono (--font-mono) are retained solely because
+         src/pages/Admin.tsx still sets them directly; Schibsted Grotesk
+         (--font-sans) is retained as the site's base body font-family
+         fallback in src/index.css and is also still used by Admin.tsx. None
+         of the five families were found unreferenced, so none were removed;
+         re-run the grep in src/index.css's token-audit comment before
+         dropping any of them. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Geologica:wght@100..900&family=JetBrains+Mono:wght@400..700&family=Martian+Mono:wght@300..800&family=Schibsted+Grotesk:wght@400..900&display=swap" rel="stylesheet" />

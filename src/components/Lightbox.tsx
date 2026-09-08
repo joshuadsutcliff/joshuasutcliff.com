@@ -30,7 +30,7 @@ export default function Lightbox({ src, alt, onClose }: { src: string; alt: stri
         src={src}
         alt={alt}
         onClick={(event) => event.stopPropagation()}
-        className="max-h-[90%] max-w-[90%] rounded-xl border border-border object-contain"
+        className="border-cli-dim/30 max-h-[90%] max-w-[90%] rounded-xl border object-contain"
       />
     </div>,
     document.body,

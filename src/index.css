@@ -4,6 +4,26 @@
    Design tokens - sibling-consistent with cameronsutcliff.com
    Dark-only palette.
 ---------------------------------------------------------------------------- */
+/* Stage 6 audit (CLI migration, final pass): every visitor-facing surface
+   now renders on the --cli- prefixed tokens defined below (see the "CLI
+   design language" block) via the text-cli-, bg-cli-, and border-cli-dim
+   utilities and the .cli-prose / font-cli classes. This original token
+   group (--bg, --fg,
+   --cyan, --purple, --muted, --dim, --border, --card, plus the .hud-* rules
+   further down and the --font-sans/--font-display/--font-mono families) is
+   retained ONLY because the private admin surfaces still consume it
+   directly:
+     - src/pages/Admin.tsx
+     - src/pages/AdminGlobe.tsx
+     - src/pages/CityPanel.tsx
+   Those three pages sit behind a secret entry point and were explicitly
+   excluded from the CLI rebuild, so removing this group would break them.
+   Do not delete any of these tokens, or the Google Fonts families they
+   depend on in index.html, without first re-running the grep in that
+   audit and confirming none of the three files above still reference it.
+   (The .hud-* classes are currently unreferenced by any component,
+   including the three admin pages, but are kept regardless per standing
+   instruction rather than removed as dead code.) */
 :root {
   --bg: #07090f;
   --bg2: #0b0e16;
@@ -46,6 +66,7 @@
   --cli-cyan: #00ced1;
   --cli-cyan-rgb: 0, 206, 209;
   --cli-sakura: #e75480;
+  --cli-sakura-rgb: 231, 84, 128;
   --cli-green: #4ade80;
   --cli-emphasis: #ffffff;
   --cli-warn: #f59e0b;
@@ -280,14 +301,21 @@ select:focus-visible,
   to { opacity: 1; }
 }
 
-/* Ambient background layers (mounted in Layout behind content) */
+/* Ambient background layers (mounted in Layout.tsx, aria-hidden, behind
+   content on every CLI page). Stage 6 decision: kept, not removed - the
+   faint drifting wash/grid reads as terminal-room ambience rather than as a
+   leftover of the old design, and both layers already sit at z-[-1]/-2
+   behind every CLI panel with no interactive or text content of their own.
+   Recolored onto the CLI accent pair (cli-cyan/cli-sakura) so the ambience
+   matches the palette used everywhere else instead of the retired
+   cyan/purple hues. */
 .ambient-wash {
   position: fixed;
   inset: -10%;
   z-index: -2;
   pointer-events: none;
   background:
-    linear-gradient(135deg, transparent 20%, rgba(var(--cyan-rgb), 0.05) 38%, rgba(var(--purple-rgb), 0.04) 55%, transparent 70%);
+    linear-gradient(135deg, transparent 20%, rgba(var(--cli-cyan-rgb), 0.05) 38%, rgba(var(--cli-sakura-rgb), 0.04) 55%, transparent 70%);
   animation: ambient-sway-a 38s ease-in-out infinite alternate;
 }
 .ambient-grid {
@@ -295,7 +323,7 @@ select:focus-visible,
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-image: radial-gradient(rgba(var(--cyan-rgb), 0.045) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(var(--cli-cyan-rgb), 0.045) 1px, transparent 1px);
   background-size: 24px 24px;
   mask-image: radial-gradient(ellipse 80% 60% at 50% 20%, black 30%, transparent 75%);
   animation: ambient-sway-b 47s ease-in-out infinite alternate;
@@ -327,18 +355,20 @@ select:focus-visible,
   }
 }
 
-/* Secret /admin entry flourish */
+/* Secret /admin entry flourish. Restyled onto the CLI palette (stage 6):
+   cyan pulse ring bleeding into cli-sakura at full spread, matching the CLI
+   accent pairing used everywhere else (see CliBootLog's uplink bar). */
 @keyframes secret-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(var(--cyan-rgb), 0.5);
+    box-shadow: 0 0 0 0 rgba(var(--cli-cyan-rgb), 0.5);
     opacity: 1;
     transform: scale(0.4);
   }
   70% {
-    box-shadow: 0 0 60px 30px rgba(var(--purple-rgb), 0.25);
+    box-shadow: 0 0 60px 30px rgba(var(--cli-sakura-rgb), 0.25);
   }
   100% {
-    box-shadow: 0 0 120px 60px rgba(var(--purple-rgb), 0);
+    box-shadow: 0 0 120px 60px rgba(var(--cli-sakura-rgb), 0);
     opacity: 0;
     transform: scale(2.4);
   }
@@ -357,7 +387,7 @@ select:focus-visible,
   }
 }
 .secret-pulse {
-  border: 1px solid var(--cyan);
+  border: 1px solid var(--cli-cyan);
   animation: secret-pulse 0.7s ease-out forwards;
 }
 .secret-caption {

@@ -218,15 +218,15 @@ function EdgeLabel({ point, text }: { point: Point; text: string }) {
         width={width}
         height={height}
         rx={3}
-        fill="var(--bg)"
+        fill="var(--cli-bg)"
         opacity={0.82}
       />
       <text
-        className="font-mono"
+        className="font-cli"
         textAnchor="middle"
         dominantBaseline="middle"
         fontSize={9}
-        fill="var(--dim)"
+        fill="var(--cli-dim)"
       >
         {text}
       </text>
@@ -256,24 +256,24 @@ function NodeBox({ node }: { node: SchematicNode }) {
   const isStar = node.accent === 'star'
   const toneRgb = node.tone === 'bad' ? '239, 68, 68' : node.tone === 'good' ? '34, 197, 94' : null
   const style = isStar
-    ? { boxShadow: `0 0 26px 8px rgba(var(--purple-rgb), 0.18), inset 0 0 0 1px rgba(var(--cyan-rgb), 0.3)` }
+    ? { boxShadow: `0 0 26px 8px rgba(var(--cli-sakura-rgb), 0.18), inset 0 0 0 1px rgba(var(--cli-cyan-rgb), 0.3)` }
     : toneRgb
       ? { boxShadow: `inset 0 0 0 1px rgba(${toneRgb}, 0.35)` }
       : undefined
   return (
     <div
       data-schematic-id={node.id}
-      className="hud-panel relative flex flex-col items-center justify-center gap-0.5 rounded-xl px-3 py-2 text-center"
+      className="border-cli-dim/30 bg-cli-cyan/5 relative flex flex-col items-center justify-center gap-0.5 rounded-xl border px-3 py-2 text-center"
       style={style}
     >
-      {/* Opaque backing layer, painted between the hud-panel's translucent
+      {/* Opaque backing layer, painted between the panel's translucent
           background and the label text, so an edge line routed behind this
           box (z-index below the node layer, see the SVG overlay) never
           shows through the box onto the text - even where the panel's own
-          background is only ~3% opaque. */}
-      <span aria-hidden="true" className="absolute inset-0 rounded-xl bg-bg" />
-      <span className="relative font-mono text-xs text-fg">{node.label}</span>
-      {node.sub && <span className="relative font-mono text-[10px] text-dim">{node.sub}</span>}
+          background is only ~5% opaque. */}
+      <span aria-hidden="true" className="bg-cli-bg absolute inset-0 rounded-xl" />
+      <span className="font-cli text-cli-text relative text-xs">{node.label}</span>
+      {node.sub && <span className="font-cli text-cli-dim relative text-[10px]">{node.sub}</span>}
     </div>
   )
 }
@@ -283,19 +283,19 @@ function GateChip({ gate }: { gate: SchematicGate }) {
   return (
     <div
       data-schematic-id={gate.id}
-      className="relative flex items-center gap-2 rounded-full border border-border bg-bg2 px-3 py-1.5"
+      className="border-cli-dim/30 bg-cli-bg relative flex items-center gap-2 rounded-full border px-3 py-1.5"
     >
       <span
         aria-hidden="true"
         className="inline-block h-3 w-3 shrink-0 rounded-full"
         style={{
-          border: `1px solid ${isDeny ? 'rgba(245, 158, 11, 0.6)' : 'rgba(107, 122, 146, 0.5)'}`,
+          border: `1px solid ${isDeny ? 'rgba(245, 158, 11, 0.6)' : 'rgba(124, 141, 150, 0.5)'}`,
           background: isDeny
             ? 'radial-gradient(circle, #050608 40%, rgba(245, 158, 11, 0.22) 100%)'
-            : 'radial-gradient(circle, #050608 40%, rgba(107, 122, 146, 0.18) 100%)',
+            : 'radial-gradient(circle, #050608 40%, rgba(124, 141, 150, 0.18) 100%)',
         }}
       />
-      <span className="font-mono text-[11px] text-muted">{gate.label}</span>
+      <span className="font-cli text-cli-dim text-[11px]">{gate.label}</span>
     </div>
   )
 }
@@ -347,8 +347,10 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
   const caption = deriveCaption(spec)
 
   return (
-    <div className="hud-panel rounded-2xl p-5 sm:p-6">
-      <p className="hud-eyebrow">{spec.title}</p>
+    <div className="border-cli-dim/30 bg-cli-bg rounded-2xl border p-5 sm:p-6">
+      <p className="font-cli text-cli-dim inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.14em]">
+        {spec.title}
+      </p>
 
       <div
         ref={containerRef}
@@ -367,7 +369,7 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
             {group.title && (
               <p
                 data-schematic-id={`${group.id}-title`}
-                className="mb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-dim"
+                className="font-cli text-cli-dim mb-2 text-[10px] uppercase tracking-[0.14em]"
               >
                 {group.title}
               </p>
@@ -436,7 +438,7 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
                     <path
                       d={`M ${clippedFrom.x} ${clippedFrom.y} Q ${control.x} ${control.y} ${clippedTo.x} ${clippedTo.y}`}
                       fill="none"
-                      stroke="var(--purple)"
+                      stroke="var(--cli-sakura)"
                       strokeWidth={1.25}
                       strokeDasharray="2 6"
                       strokeLinecap="round"
@@ -472,7 +474,7 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
                       y1={clippedFrom.y}
                       x2={clippedTo.x}
                       y2={clippedTo.y}
-                      stroke="var(--dim)"
+                      stroke="var(--cli-dim)"
                       strokeWidth={1}
                       strokeDasharray="1 5"
                       strokeLinecap="round"
@@ -490,7 +492,7 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
                     y1={clippedFrom.y}
                     x2={clippedTo.x}
                     y2={clippedTo.y}
-                    stroke="var(--cyan)"
+                    stroke="var(--cli-cyan)"
                     strokeWidth={1.25}
                     strokeDasharray="4 4"
                     strokeLinecap="round"
@@ -506,8 +508,8 @@ export default function Schematic({ spec }: { spec: SchematicSpec }) {
         )}
       </div>
 
-      <p className="mt-4 font-mono text-[11px] leading-relaxed text-dim md:sr-only">{caption}</p>
-      {spec.footnote && <p className="mt-3 text-xs leading-relaxed text-dim">{spec.footnote}</p>}
+      <p className="font-cli text-cli-dim mt-4 text-[11px] leading-relaxed md:sr-only">{caption}</p>
+      {spec.footnote && <p className="cli-prose text-cli-dim mt-3 text-xs leading-relaxed">{spec.footnote}</p>}
     </div>
   )
 }
