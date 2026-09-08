@@ -100,6 +100,13 @@ export default function useBootSequence(lineCount: number, enabled = true): Boot
       markBooted(true)
       return
     }
+    // A boot that already finished naturally (running === false) must not
+    // re-arm an interval on a park-then-unpark transition (e.g. a detour
+    // through an excluded route and back). `running` is the same signal
+    // `resolved` below reads as `!running`, so the guard here and that
+    // derivation agree: once running is false, only replay() (which sets it
+    // back to true) can start the clock again.
+    if (!running) return
     startedAt.current = Date.now()
     const id = window.setInterval(() => {
       const next = Date.now() - startedAt.current
@@ -111,7 +118,7 @@ export default function useBootSequence(lineCount: number, enabled = true): Boot
       }
     }, BOOT_TICK_MS)
     return () => window.clearInterval(id)
-  }, [enabled, instant, totalMs, runId])
+  }, [enabled, instant, running, totalMs, runId])
 
   const skip = useCallback(() => {
     setInstant(true)

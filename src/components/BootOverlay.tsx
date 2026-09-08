@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import useBootSequence, { RESOLVE_FADE_MS } from '../hooks/useBootSequence'
 import { BootReplayContext } from '../hooks/bootReplay'
 import { CliBootLog, CliButton } from './cli'
@@ -111,10 +111,39 @@ export default function BootOverlay({ pathname, children }: BootOverlayProps) {
 
   const show = !boot.instant && !gone
 
+  /* Focus trap. The underlying content stays fully in the DOM and the
+     accessibility tree on purpose (see the file header), which means it is
+     also fully tabbable: without this, a sighted keyboard user could Tab
+     past Skip into controls hidden behind the opaque overlay. `inert` is
+     deliberately not used here, since that would pull the real content out
+     of the accessibility tree too.
+
+     The overlay has exactly one focusable element, the Skip button, so the
+     trap collapses to "Tab or Shift+Tab always lands back on Skip". The
+     handler is gated on `!boot.resolved` so it releases the instant the
+     boot resolves, not only once the fade-out finishes and the overlay
+     unmounts; after that, Tab order is whatever the page underneath
+     provides. */
+  const overlayRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!show || boot.resolved) return
+    overlayRef.current?.querySelector<HTMLButtonElement>('button')?.focus()
+  }, [show, boot.resolved])
+
+  function handleOverlayKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+    if (boot.resolved) return
+    if (e.key !== 'Tab') return
+    e.preventDefault()
+    overlayRef.current?.querySelector<HTMLButtonElement>('button')?.focus()
+  }
+
   return (
     <BootReplayContext.Provider value={boot.replay}>
       {show && (
         <div
+          ref={overlayRef}
+          onKeyDown={handleOverlayKeyDown}
           className={`bg-cli-bg fixed inset-0 z-50 overflow-y-auto print:hidden ${
             boot.resolved ? 'pointer-events-none opacity-0' : 'opacity-100'
           }`}
