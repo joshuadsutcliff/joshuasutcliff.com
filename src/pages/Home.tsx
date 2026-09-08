@@ -23,8 +23,18 @@ export default function Home() {
       </h1>
       <p className="font-cli text-cli-text mt-3 text-base sm:text-lg">{SITE.oneLiner}</p>
 
-      {/* Long-form prose is Geologica (.cli-prose), not monospace. */}
-      <p className="cli-prose mt-5 max-w-2xl">{HOME.intro}</p>
+      {/* Long-form prose is Geologica (.cli-prose), not monospace. The
+          trailing block cursor is decorative flourish only (reads as a
+          pause mid-type), so it stays aria-hidden; a screen reader must not
+          read a stray block glyph at the end of the sentence. See
+          .home-cursor in src/index.css for the steps() blink and its
+          reduced-motion behaviour. */}
+      <p className="cli-prose mt-5 max-w-2xl">
+        {HOME.intro}
+        <span aria-hidden className="home-cursor text-cli-cyan">
+          &#9646;
+        </span>
+      </p>
 
       <div className="mt-8 flex flex-wrap items-center gap-4">
         <CliButton variant="solid" href={`mailto:${SITE.email}`}>

@@ -45,7 +45,15 @@ export default function AboutTerminal() {
 
   return (
     <CliPanel>
-      <p aria-hidden className="font-cli text-cli-emphasis text-lg tracking-[0.2em] sm:text-xl">
+      {/* wordmark-glow (src/index.css) is the resolved-decision treatment:
+          a restrained static text-shadow bloom in the active accent, built
+          from --cli-cyan-rgb so it tracks the theme. No animation, no
+          flicker, no CRT/pixel effect; see the CSS comment for why nothing
+          here needs a reduced-motion branch. */}
+      <p
+        aria-hidden
+        className="font-cli text-cli-emphasis wordmark-glow text-lg tracking-[0.2em] sm:text-xl"
+      >
         {renderWordmark()}
       </p>
       <p
