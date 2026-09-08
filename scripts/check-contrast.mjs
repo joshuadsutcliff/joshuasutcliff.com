@@ -14,7 +14,7 @@ const cssPath = path.join(__dirname, '..', 'src', 'index.css')
 const css = readFileSync(cssPath, 'utf8')
 
 const BG_TOKEN = '--cli-bg'
-const FG_TOKENS = ['--cli-text', '--cli-cyan', '--cli-sakura', '--cli-green', '--cli-emphasis', '--cli-warn', '--cli-dim']
+const FG_TOKENS = ['--cli-text', '--cli-cyan', '--cli-sakura', '--cli-green', '--cli-emphasis', '--cli-warn', '--cli-dim', '--cli-bad']
 const MIN_RATIO = 4.5
 
 function readToken(name) {

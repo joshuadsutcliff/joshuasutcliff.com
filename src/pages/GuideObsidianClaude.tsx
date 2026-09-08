@@ -63,6 +63,7 @@ function RenderBlock({ block, index }: { block: GuideBlock; index: number }) {
     case 'heading3':
       return (
         <h3 key={index} className="font-cli text-cli-emphasis mt-6 text-lg tracking-tight">
+          <span aria-hidden className="text-cli-dim">{'> '}</span>
           {block.text}
         </h3>
       )
@@ -117,8 +118,10 @@ export default function GuideObsidianClaude() {
       <p className="cli-prose text-cli-text mt-4">
         <RenderInline inline={OBSIDIAN_CLAUDE_GUIDE.why} />
       </p>
-      <CliCard className="cli-prose text-cli-text mt-6 text-sm">
-        <RenderInline inline={OBSIDIAN_CLAUDE_GUIDE.preImportNote} />
+      <CliCard className="mt-6">
+        <p className="cli-prose text-cli-text text-sm">
+          <RenderInline inline={OBSIDIAN_CLAUDE_GUIDE.preImportNote} />
+        </p>
       </CliCard>
 
       <CliCard padding="lg" className="mt-10">

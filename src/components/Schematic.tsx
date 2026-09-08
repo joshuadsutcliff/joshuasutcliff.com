@@ -254,7 +254,7 @@ function useInjectedStyles() {
 
 function NodeBox({ node }: { node: SchematicNode }) {
   const isStar = node.accent === 'star'
-  const toneRgb = node.tone === 'bad' ? '239, 68, 68' : node.tone === 'good' ? '34, 197, 94' : null
+  const toneRgb = node.tone === 'bad' ? 'var(--cli-bad-rgb)' : node.tone === 'good' ? 'var(--cli-green-rgb)' : null
   const style = isStar
     ? { boxShadow: `0 0 26px 8px rgba(var(--cli-sakura-rgb), 0.18), inset 0 0 0 1px rgba(var(--cli-cyan-rgb), 0.3)` }
     : toneRgb
@@ -289,10 +289,10 @@ function GateChip({ gate }: { gate: SchematicGate }) {
         aria-hidden="true"
         className="inline-block h-3 w-3 shrink-0 rounded-full"
         style={{
-          border: `1px solid ${isDeny ? 'rgba(245, 158, 11, 0.6)' : 'rgba(124, 141, 150, 0.5)'}`,
+          border: `1px solid ${isDeny ? 'rgba(var(--cli-warn-rgb), 0.6)' : 'rgba(var(--cli-dim-rgb), 0.5)'}`,
           background: isDeny
-            ? 'radial-gradient(circle, #050608 40%, rgba(245, 158, 11, 0.22) 100%)'
-            : 'radial-gradient(circle, #050608 40%, rgba(124, 141, 150, 0.18) 100%)',
+            ? 'radial-gradient(circle, #050608 40%, rgba(var(--cli-warn-rgb), 0.22) 100%)'
+            : 'radial-gradient(circle, #050608 40%, rgba(var(--cli-dim-rgb), 0.18) 100%)',
         }}
       />
       <span className="font-cli text-cli-dim text-[11px]">{gate.label}</span>

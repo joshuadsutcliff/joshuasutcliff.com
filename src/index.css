@@ -9,8 +9,8 @@
    design language" block) via the text-cli-, bg-cli-, and border-cli-dim
    utilities and the .cli-prose / font-cli classes. This original token
    group (--bg, --fg,
-   --cyan, --purple, --muted, --dim, --border, --card, plus the .hud-* rules
-   further down and the --font-sans/--font-display/--font-mono families) is
+   --cyan, --purple, --muted, --dim, --border, --card, and the
+   --font-sans/--font-display/--font-mono families) is
    retained ONLY because the private admin surfaces still consume it
    directly:
      - src/pages/Admin.tsx
@@ -21,9 +21,11 @@
    Do not delete any of these tokens, or the Google Fonts families they
    depend on in index.html, without first re-running the grep in that
    audit and confirming none of the three files above still reference it.
-   (The .hud-* classes are currently unreferenced by any component,
-   including the three admin pages, but are kept regardless per standing
-   instruction rather than removed as dead code.) */
+   (The .hud-* classes that used to live in this stylesheet were confirmed
+   unreferenced by any component, including the three admin pages, and were
+   removed as dead code in the final review pass. If a future admin change
+   needs HUD-style chrome, reintroduce the rules deliberately rather than
+   assuming they still exist here.) */
 :root {
   --bg: #07090f;
   --bg2: #0b0e16;
@@ -68,12 +70,21 @@
   --cli-sakura: #e75480;
   --cli-sakura-rgb: 231, 84, 128;
   --cli-green: #4ade80;
+  --cli-green-rgb: 74, 222, 128;
   --cli-emphasis: #ffffff;
   --cli-warn: #f59e0b;
+  --cli-warn-rgb: 245, 158, 11;
   /* Pre-composited equivalent of --cli-text at 70 percent opacity over
      --cli-bg. Made a real token (instead of an opacity modifier on
      --cli-text) so the contrast check covers what actually renders. */
   --cli-dim: #7c8d96;
+  --cli-dim-rgb: 124, 141, 150;
+  /* "Bad" state red for Schematic's tone=bad NodeBox styling. Not part of
+     the FG_TOKENS contrast set semantically required elsewhere, but added
+     here because it is a real UI color that needs a token like its
+     siblings; verified >=4.5:1 against --cli-bg by check-contrast.mjs. */
+  --cli-bad: #ff6b6b;
+  --cli-bad-rgb: 255, 107, 107;
 }
 
 /* Map our tokens into Tailwind's theme so utilities like text-fg, bg-card work */
@@ -138,16 +149,22 @@ body {
   background: rgba(var(--cyan-rgb), 0.3);
 }
 
-/* Keyboard focus ring - visible on near-black backgrounds, mouse clicks stay ring-free */
+/* Keyboard focus ring - visible on near-black backgrounds, mouse clicks stay
+   ring-free. Deliberately global (not scoped to .cli-scope): portaled
+   content (e.g. Lightbox, which renders to document.body) escapes any
+   ancestor scope class, so a scoped-only rule would leave it on the legacy
+   --cyan ring. This is the single source of truth for the CLI focus ring;
+   the .cli-scope rule further down exists only to win specificity ties
+   inside the CLI shell and must be kept in sync with this one. */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid var(--cyan);
+  outline: 2px solid var(--cli-cyan);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(var(--cyan-rgb), 0.25);
+  box-shadow: 0 0 0 4px rgba(var(--cli-cyan-rgb), 0.25);
 }
 
 /* Glass card utility */
@@ -160,101 +177,6 @@ select:focus-visible,
 .glass:hover {
   background: var(--glass-tint-hover);
   border-color: var(--border-bright);
-}
-
-/* HUD layer */
-.hud-panel {
-  position: relative;
-  background: rgba(var(--cyan-rgb), 0.03);
-  border: 1px solid var(--border);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  transition: border-color 0.2s ease, background 0.2s ease, transform 0.25s ease;
-}
-.hud-panel::before,
-.hud-panel::after {
-  content: '';
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  border-color: rgba(var(--cyan-rgb), 0.55);
-  border-style: solid;
-  pointer-events: none;
-  transition: border-color 0.2s ease;
-}
-.hud-panel::before { top: -1px; left: -1px; border-width: 1px 0 0 1px; border-top-left-radius: 6px; }
-.hud-panel::after { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; border-bottom-right-radius: 6px; }
-.hud-panel:hover { border-color: var(--border-bright); background: rgba(var(--cyan-rgb), 0.05); }
-.hud-panel:hover::before, .hud-panel:hover::after { border-color: var(--cyan); }
-
-/* Higher-opacity variant for panels that sit over busy animated backgrounds
-   (e.g. About page tiles over the black-hole scene) - same HUD chrome, but a
-   near-solid backing so body text stays readable. */
-.hud-panel-solid {
-  background: rgba(11, 14, 22, 0.92);
-}
-.hud-panel-solid:hover {
-  background: rgba(11, 14, 22, 0.95);
-}
-@keyframes hud-glow-in {
-  from { box-shadow: inset 0 0 0 1px rgba(var(--cyan-rgb), 0.0), 0 0 0 rgba(var(--cyan-rgb), 0); }
-  to { box-shadow: inset 0 0 0 1px rgba(var(--cyan-rgb), 0.25), 0 4px 24px rgba(var(--cyan-rgb), 0.12); }
-}
-.hud-panel:hover { animation: hud-glow-in 0.25s ease forwards; }
-
-.hud-eyebrow {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--dim);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.hud-dot { width: 6px; height: 6px; border-radius: 9999px; display: inline-block; }
-.hud-dot--green { background: #22c55e; animation: dot-pulse 3s ease-in-out infinite; }
-.hud-dot--amber { background: #f59e0b; }
-@keyframes dot-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
-  50% { box-shadow: 0 0 6px 2px rgba(34, 197, 94, 0.25); }
-}
-
-.hud-divider {
-  height: 1px;
-  border: 0;
-  background: linear-gradient(90deg, transparent, rgba(var(--cyan-rgb), 0.35), transparent);
-}
-
-/* Keep HUD chrome out of print output (e.g. the Resume page's hud-panel cards) */
-@media print {
-  .hud-panel {
-    background: transparent;
-    border-color: currentColor;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    box-shadow: none;
-    animation: none;
-  }
-  .hud-panel::before,
-  .hud-panel::after {
-    display: none;
-  }
-  .hud-eyebrow {
-    color: inherit;
-  }
-  .hud-dot {
-    animation: none;
-    box-shadow: none;
-  }
-  .hud-divider {
-    background: currentColor;
-    opacity: 0.3;
-  }
-  .ambient-wash,
-  .ambient-grid {
-    display: none;
-  }
 }
 
 .page-enter { animation: page-enter 0.2s ease both; }
@@ -300,36 +222,6 @@ select:focus-visible,
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
-/* Ambient background layers (mounted in Layout.tsx, aria-hidden, behind
-   content on every CLI page). Stage 6 decision: kept, not removed - the
-   faint drifting wash/grid reads as terminal-room ambience rather than as a
-   leftover of the old design, and both layers already sit at z-[-1]/-2
-   behind every CLI panel with no interactive or text content of their own.
-   Recolored onto the CLI accent pair (cli-cyan/cli-sakura) so the ambience
-   matches the palette used everywhere else instead of the retired
-   cyan/purple hues. */
-.ambient-wash {
-  position: fixed;
-  inset: -10%;
-  z-index: -2;
-  pointer-events: none;
-  background:
-    linear-gradient(135deg, transparent 20%, rgba(var(--cli-cyan-rgb), 0.05) 38%, rgba(var(--cli-sakura-rgb), 0.04) 55%, transparent 70%);
-  animation: ambient-sway-a 38s ease-in-out infinite alternate;
-}
-.ambient-grid {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: radial-gradient(rgba(var(--cli-cyan-rgb), 0.045) 1px, transparent 1px);
-  background-size: 24px 24px;
-  mask-image: radial-gradient(ellipse 80% 60% at 50% 20%, black 30%, transparent 75%);
-  animation: ambient-sway-b 47s ease-in-out infinite alternate;
-}
-@keyframes ambient-sway-a { from { transform: translate(-14px, 0) skew(0.4deg); } to { transform: translate(15px, -8px) skew(-0.4deg); } }
-@keyframes ambient-sway-b { from { transform: translate(6px, -4px); } to { transform: translate(-8px, 5px); } }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {

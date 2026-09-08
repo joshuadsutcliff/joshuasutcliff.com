@@ -43,8 +43,6 @@ export default function Layout() {
   return (
     <div className="cli-scope bg-cli-bg text-cli-text min-h-screen">
       <BootOverlay pathname={location.pathname}>
-        <div aria-hidden className="ambient-wash" />
-        <div aria-hidden className="ambient-grid" />
         {flourish && <AccessFlourish />}
         <header className="border-cli-dim/30 relative z-10 border-b print:hidden">
           <div className="mx-auto max-w-5xl px-4 sm:px-6">
