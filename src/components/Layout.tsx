@@ -61,7 +61,7 @@ export default function Layout() {
               aria-label="Primary"
               className="border-cli-dim/20 flex flex-nowrap items-center justify-between gap-x-2 border-t py-2"
             >
-              <ul className="flex min-w-0 flex-nowrap items-center gap-x-1 sm:gap-x-2">
+              <ul className="flex min-w-0 flex-wrap items-center gap-x-1 gap-y-1 sm:flex-nowrap sm:gap-x-2">
                 {TABS.map((t, i) => {
                   /* The tooltip anchors to its own tab's edge instead of
                      always centering, so it never pushes past the nav's

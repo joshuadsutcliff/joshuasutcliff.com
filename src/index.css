@@ -460,8 +460,8 @@ select:focus-visible,
    simple and still reads as a soft appear/disappear. */
 .nav-cmd-tooltip {
   position: absolute;
-  bottom: 100%;
-  margin-bottom: 6px;
+  top: 100%;
+  margin-top: 6px;
   padding: 4px 8px;
   max-width: min(240px, calc(100vw - 24px));
   white-space: nowrap;
@@ -473,6 +473,7 @@ select:focus-visible,
   opacity: 0;
   pointer-events: none;
   z-index: 30;
+  transition: opacity 150ms ease;
 }
 .nav-cmd-tooltip[data-align='center'] {
   left: 50%;
@@ -492,12 +493,10 @@ select:focus-visible,
 @media (hover: hover) {
   .nav-item:hover .nav-cmd-tooltip {
     opacity: 1;
-    transition: opacity 150ms ease;
   }
   .nav-item:hover .nav-pill {
     background: rgba(var(--cli-cyan-rgb), 0.1);
-    box-shadow: 0 0 12px rgba(var(--cli-cyan-rgb), 0.35);
-    animation: nav-pill-glow-pulse 1.6s ease-in-out infinite;
+    animation: nav-pill-glow-settle 200ms ease-in forwards;
   }
 }
 
@@ -512,27 +511,28 @@ select:focus-visible,
   box-shadow: 0 0 12px rgba(var(--cli-cyan-rgb), 0.35);
 }
 
-@keyframes nav-pill-glow-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 8px rgba(var(--cli-cyan-rgb), 0.25);
+@keyframes nav-pill-glow-settle {
+  from {
+    box-shadow: 0 0 0 rgba(var(--cli-cyan-rgb), 0);
   }
-  50% {
-    box-shadow: 0 0 16px rgba(var(--cli-cyan-rgb), 0.45);
+  to {
+    box-shadow: 0 0 12px rgba(var(--cli-cyan-rgb), 0.35);
   }
 }
 
-/* Reduced motion: the global block above already collapses the pulse
-   animation and the tooltip's opacity/transform transition to near-0ms, so
-   both effectively become instant rather than animated. This rule makes
-   that outcome explicit and guarantees the pill still shows its static
-   accent glow (no animation, just the plain box-shadow declaration) and
-   the tooltip still appears, just without the pulse or the slide-in. */
+/* Reduced motion: the global block above already collapses the settle
+   animation and the tooltip's opacity transition to near-0ms, so both
+   effectively become instant rather than animated. The tooltip's
+   reduced-motion path is entirely that global duration collapse, not
+   anything in this block; there is no separate tooltip rule here. This
+   block only makes the pill outcome explicit: no animation, just the
+   plain box-shadow declaration, pinned to the same static glow the
+   non-reduced settle animation ends on. */
 @media (prefers-reduced-motion: reduce) {
   .nav-item:hover .nav-pill,
   .nav-item:focus-within .nav-pill {
     animation: none;
-    box-shadow: 0 0 8px rgba(var(--cli-cyan-rgb), 0.3);
+    box-shadow: 0 0 12px rgba(var(--cli-cyan-rgb), 0.35);
   }
 }
 
