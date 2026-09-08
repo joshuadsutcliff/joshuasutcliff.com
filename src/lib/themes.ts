@@ -34,6 +34,13 @@ export type ThemeId = (typeof THEMES)[number]['id'];
 
 export const DEFAULT_THEME_ID: ThemeId = 'default';
 
+// Single source of truth for the localStorage key both the React picker
+// (ThemePicker.tsx) and the pre-paint inline script in index.html read and
+// write. index.html cannot import this module, so its copy is a hardcoded
+// string literal; themes.test.ts parses index.html and asserts that literal
+// matches this constant so the two cannot silently drift apart.
+export const THEME_STORAGE_KEY = 'cli-theme';
+
 const THEME_ID_SET = new Set<string>(THEMES.map((theme) => theme.id));
 
 export function isThemeId(value: string): value is ThemeId {

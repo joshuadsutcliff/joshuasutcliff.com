@@ -40,6 +40,34 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Geologica:wght@100..900&family=JetBrains+Mono:wght@400..700&family=Martian+Mono:wght@300..800&family=Schibsted+Grotesk:wght@400..900&display=swap" rel="stylesheet" />
+
+    <!-- Pre-paint theme apply (stage 2 of the theme picker). Runs before the
+         React bundle so a returning visitor with a non-default theme never
+         sees a flash of the Default palette while the bundle loads. Cannot
+         import src/lib/themes.ts (this is a raw inline script, no bundler
+         here), so the theme id list and the storage key are hardcoded
+         literals; src/lib/themes.test.ts parses this exact block and asserts
+         both stay in sync with the THEMES registry and THEME_STORAGE_KEY, so
+         a drift between the two fails the test suite instead of shipping
+         silently. Wrapped in try/catch because localStorage access throws
+         outright in some private-browsing modes, and an uncaught throw here
+         would break the page before React ever mounts. -->
+    <script>
+      (function () {
+        try {
+          var KNOWN_THEME_IDS = ['default', 'cherry-blossom', 'dark-sakura', 'arctic', 'outer-space', 'nord'];
+          var STORAGE_KEY = 'cli-theme';
+          var stored = window.localStorage.getItem(STORAGE_KEY);
+          if (stored && KNOWN_THEME_IDS.indexOf(stored) !== -1) {
+            document.documentElement.setAttribute('data-theme', stored);
+          }
+        } catch (e) {
+          // Storage unavailable (e.g. some private-browsing modes): fall
+          // back to the Default palette, which is already what the bare
+          // :root block renders with no attribute set at all.
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -8,7 +8,7 @@ import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import { THEMES } from './themes'
+import { THEMES, THEME_STORAGE_KEY } from './themes'
 
 // Pins the hand-synced hexes in THEMES (bg/primary/secondary) to the
 // --cli-bg / --cli-cyan / --cli-sakura values actually shipped in
@@ -91,5 +91,48 @@ describe('THEMES registry matches src/index.css', () => {
         bareValue!.toLowerCase(),
       )
     }
+  })
+})
+
+// Pins the pre-paint inline script in index.html (which cannot import
+// themes.ts, so it hardcodes its own copy of the theme id list and the
+// storage key) to the THEMES registry and THEME_STORAGE_KEY, so the two
+// cannot silently drift apart the way index.html's own comment warns they
+// might.
+describe('index.html pre-paint script matches the THEMES registry', () => {
+  const htmlPath = path.join(__dirname, '..', '..', 'index.html')
+  const html = readFileSync(htmlPath, 'utf8')
+
+  // Anchor both extractions to the body of the pre-paint <script> block
+  // itself, rather than matching KNOWN_THEME_IDS/STORAGE_KEY anywhere in
+  // the file. Matching free text would let the assertion bind to either
+  // identifier appearing inside a comment or a different script block, and
+  // would silently pass on prose that happens to contain the same name
+  // instead of failing loudly. This also fixes the previous array regex,
+  // which stopped at the first "]" in the whole document, so a nested
+  // bracket or a comment ahead of the real array literal would have
+  // truncated the match without either test noticing.
+  const scriptMatch = html.match(/<script>([\s\S]*?)<\/script>/)
+  expect(scriptMatch, 'pre-paint <script> block not found in index.html').not.toBeNull()
+  const scriptBody = scriptMatch![1]
+
+  it('KNOWN_THEME_IDS matches THEMES ids, in order', () => {
+    const match = scriptBody.match(/KNOWN_THEME_IDS\s*=\s*\[([^\]]*)\]/)
+    expect(match, 'KNOWN_THEME_IDS array not found in the pre-paint script').not.toBeNull()
+
+    const ids = match![1]
+      .split(',')
+      .map((entry) => entry.trim())
+      .filter((entry) => entry.length > 0)
+      .map((entry) => entry.replace(/^['"]|['"]$/g, ''))
+
+    expect(ids).toEqual(THEMES.map((theme) => theme.id))
+  })
+
+  it('STORAGE_KEY matches THEME_STORAGE_KEY', () => {
+    const match = scriptBody.match(/STORAGE_KEY\s*=\s*['"]([^'"]*)['"]/)
+    expect(match, 'STORAGE_KEY not found in the pre-paint script').not.toBeNull()
+
+    expect(match![1]).toBe(THEME_STORAGE_KEY)
   })
 })

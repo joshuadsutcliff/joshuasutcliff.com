@@ -7,6 +7,7 @@ import AccessFlourish from './AccessFlourish'
 import { prefersReducedMotion } from '../lib/motion'
 import BootOverlay from './BootOverlay'
 import { CliHeaderStrip } from './cli'
+import ThemePicker from './ThemePicker'
 
 const TABS = [
   { to: '/', label: 'home' },
@@ -87,15 +88,22 @@ export default function Layout() {
                   </li>
                 ))}
               </ul>
-              <a
-                href={SITE.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="GitHub"
-                className="border-cli-dim/40 text-cli-dim hover:border-cli-cyan hover:text-cli-cyan grid h-9 w-9 shrink-0 place-items-center rounded-full border transition-colors"
-              >
-                <GithubIcon />
-              </a>
+              <div className="flex shrink-0 items-center gap-2">
+                {/* Sits next to the GitHub icon link: both are the header's
+                    row of small circular icon affordances, so the picker
+                    trigger reads as one more item in that same row rather
+                    than a bolted-on control elsewhere in the shell. */}
+                <ThemePicker />
+                <a
+                  href={SITE.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="GitHub"
+                  className="border-cli-dim/40 text-cli-dim hover:border-cli-cyan hover:text-cli-cyan grid h-9 w-9 shrink-0 place-items-center rounded-full border transition-colors"
+                >
+                  <GithubIcon />
+                </a>
+              </div>
             </nav>
           </div>
         </header>
