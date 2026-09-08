@@ -1,69 +1,53 @@
-import { Link } from 'react-router-dom'
 import { GithubIcon, MailIcon } from '../components/icons'
 import { SITE } from '../content/site'
 import { HOME } from '../content/home'
 import useReveal from '../hooks/useReveal'
-import { prefersReducedMotion } from '../lib/motion'
+import { CliPanel, CliCard, CliButton, CliStatusDot } from '../components/cli'
 
 export default function Home() {
+  // Single useReveal call, ref attached to the grid CONTAINER (not inside the
+  // .map()), so every teaser is found by the container query and armed. This
+  // is not the one-ref-per-map bug fixed on the projects page.
   const teaserRef = useReveal<HTMLDivElement>()
-  const useViewTransition = !prefersReducedMotion()
+
   return (
-    <div className="relative overflow-hidden">
-      <div
-        className="absolute inset-0 -z-10"
-        style={{
-          background:
-            'radial-gradient(60% 50% at 50% 0%, rgba(var(--purple-rgb), 0.14), transparent 70%), radial-gradient(50% 40% at 80% 20%, rgba(var(--cyan-rgb), 0.12), transparent 70%)',
-        }}
-      />
-
-      <section className="relative mx-auto max-w-5xl px-6 pb-16 pt-14 sm:pt-20">
-        <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs text-muted">
-          <span className="h-1.5 w-1.5 rounded-full bg-cyan" /> {SITE.location}
+    <CliPanel>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="font-cli text-cli-cyan text-[11px] tracking-[0.24em] uppercase">
+          {SITE.location}
         </p>
-        <h1 className="font-display text-5xl font-semibold leading-[1.05] tracking-tight text-fg sm:text-7xl">
-          {SITE.name}
-        </h1>
-        <p className="mt-6 max-w-2xl text-lg text-fg sm:text-xl">{SITE.oneLiner}</p>
-        <p className="mt-4 max-w-2xl leading-relaxed text-muted">{HOME.intro}</p>
+        <CliStatusDot status="active" label="online" className="text-xs" />
+      </div>
 
-        <div className="mt-10 flex flex-wrap items-center gap-4">
-          <a
-            href={`mailto:${SITE.email}`}
-            className="inline-flex items-center gap-2 rounded-full bg-cyan px-6 py-3 text-sm font-medium text-[#07090f] shadow-[var(--shadow-neon)] transition-transform hover:scale-[1.03]"
-          >
-            <MailIcon /> Get in touch
-          </a>
-          <a
-            href={SITE.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hud-panel inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium text-fg"
-          >
-            <GithubIcon /> {SITE.githubHandle}
-          </a>
-        </div>
-      </section>
+      <h1 className="font-cli text-cli-emphasis mt-3 text-2xl tracking-tight sm:text-3xl">
+        {SITE.name}
+      </h1>
+      <p className="font-cli text-cli-text mt-3 text-base sm:text-lg">{SITE.oneLiner}</p>
 
-      <section className="relative mx-auto max-w-5xl px-6 pb-24">
-        <div ref={teaserRef} className="grid gap-5 sm:grid-cols-3">
-          {HOME.teasers.map((t) => (
-            <Link
-              key={t.to}
-              to={t.to}
-              viewTransition={useViewTransition}
-              data-reveal
-              className="hud-panel group rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1"
-            >
-              <p className="font-display text-lg font-semibold text-fg">
-                {t.title} <span className="text-cyan transition-transform group-hover:translate-x-0.5">→</span>
+      {/* Long-form prose is Geologica (.cli-prose), not monospace. */}
+      <p className="cli-prose mt-5 max-w-2xl">{HOME.intro}</p>
+
+      <div className="mt-8 flex flex-wrap items-center gap-4">
+        <CliButton variant="solid" href={`mailto:${SITE.email}`}>
+          <MailIcon /> Get in touch
+        </CliButton>
+        <CliButton href={SITE.github} target="_blank">
+          <GithubIcon className="h-4 w-4" /> {SITE.githubHandle}
+        </CliButton>
+      </div>
+
+      <div ref={teaserRef} className="mt-12 grid gap-5 sm:grid-cols-3">
+        {HOME.teasers.map((t) => (
+          <div key={t.to} data-reveal>
+            <CliCard to={t.to} aria-label={t.title} className="h-full">
+              <p className="font-cli text-cli-emphasis text-lg font-semibold">
+                {t.title} <span aria-hidden className="text-cli-cyan">&rarr;</span>
               </p>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{t.blurb}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
-    </div>
+              <p className="cli-prose text-cli-text mt-2 text-sm">{t.blurb}</p>
+            </CliCard>
+          </div>
+        ))}
+      </div>
+    </CliPanel>
   )
 }

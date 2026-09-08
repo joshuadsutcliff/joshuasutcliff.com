@@ -2,7 +2,6 @@ import {
   CliSectionHeader,
   CliKeyValue,
   CliStatusDot,
-  CliHeaderStrip,
   CliFooterStrip,
   CliPanel,
   CliButton,
@@ -42,8 +41,6 @@ export default function StyleGuide() {
   return (
     <div className="cli-scope bg-cli-bg min-h-screen px-6 py-10">
       <div className="mx-auto flex max-w-3xl flex-col gap-10">
-        <CliHeaderStrip />
-
         <div>
           <CliSectionHeader as="h1">STYLE GUIDE</CliSectionHeader>
           <p className="cli-prose mt-2">
@@ -145,7 +142,10 @@ export default function StyleGuide() {
           <CliSectionHeader>PANEL</CliSectionHeader>
           {/* CliPanel brings its own section, max width, and page padding, so
               it deliberately breaks out of this page's column. That is the
-              frame every CLI page uses. */}
+              frame every CLI page uses. Since stage 5a it renders headerless
+              by default: the site-wide shell in Layout.tsx owns the one
+              persistent terminal header strip, which is why this route no
+              longer showcases CliHeaderStrip standalone either. */}
           <CliPanel>
             <div className="px-4 py-8 sm:px-6">
               <p className="cli-prose">Page frame: section, bordered panel, header row.</p>

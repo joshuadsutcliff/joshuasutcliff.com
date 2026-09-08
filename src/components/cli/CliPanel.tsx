@@ -19,7 +19,10 @@ export interface CliPanelProps {
   children: ReactNode
   /** Merged onto the bordered panel, not onto the outer section. */
   className?: string
-  /** Set false for a page that does not want the terminal header row. */
+  /** Set true for a page that wants its own terminal header row inside the
+      panel. Defaults to false: since stage 5a the site-wide shell in
+      Layout.tsx owns the one persistent terminal header strip, so a panel
+      that mounted its own would render a second one. */
   showHeader?: boolean
   /** Outer section max width. 'default' keeps max-w-5xl; 'narrow' gives the
       max-w-3xl column a long-form page like Resume needs. This is the only
@@ -41,15 +44,17 @@ export interface CliPanelProps {
 /* The shared page frame for every CLI page: the centered section, the
    bordered rounded panel, and the terminal header row.
 
-   cli-scope ownership: this component carries the class today, so no page
-   hand-places it. When the site-wide shell lands it may take ownership of
-   cli-scope instead. Nesting the class is harmless: the rules in
-   src/index.css are plain descendant selectors, so an element inside two
-   nested cli-scope ancestors matches the same rule once. */
+   cli-scope ownership: the stage 5a shell (Layout.tsx) now also carries the
+   class on its root, so every page inherits the CLI focus ring. This
+   component keeps it too, because StyleGuide renders CLI primitives in a
+   standalone column outside any panel and still needs the scope. Nesting the
+   class is harmless: the rules in src/index.css are plain descendant
+   selectors, so an element inside two nested cli-scope ancestors matches the
+   same rule once. */
 export default function CliPanel({
   children,
   className = '',
-  showHeader = true,
+  showHeader = false,
   width = 'default',
   padded = true,
   contentClassName = '',

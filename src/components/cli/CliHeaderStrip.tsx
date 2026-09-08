@@ -21,6 +21,7 @@ export default function CliHeaderStrip({ className = '' }: CliHeaderStripProps) 
   // informational content to this component without revisiting that decision.
   return (
     <div
+      data-cli-header-strip
       className={`font-cli text-cli-text flex items-center justify-between gap-4 text-xs ${className}`}
       aria-hidden
     >

@@ -1,58 +1,69 @@
 import { SITE } from '../content/site'
-import { isCliFrameEnabled } from '../lib/cliFlag'
+import { CliFooterStrip } from './cli'
 
+/* CLI shell footer (stage 5a). The CC BY 4.0 attribution to Cameron Sutcliff
+   is a licence obligation, not decoration: it stays visible as full-size
+   .cli-prose body text on the contrast-verified --cli-text token, and is
+   never collapsed, truncated, or hidden.
+
+   The [data-secret-admin] marker stays on a visible element in the copyright
+   line. useSecretAdmin listens at document level via
+   closest('[data-secret-admin]'), so the only requirement is that the
+   attribute survives on a visible, clickable element. */
 export default function Footer() {
-  const cliFrame = isCliFrameEnabled()
   return (
-    <footer className="relative mt-8 border-t border-border print:hidden">
-      <div className="mx-auto max-w-5xl px-6 py-12">
-        <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <p className="font-display text-lg font-semibold text-fg">{SITE.name}</p>
-            <p className="mt-1 text-sm text-muted">{SITE.oneLiner}</p>
-            <div className="mt-3 flex flex-col gap-1 font-mono text-xs">
-              <a href={SITE.github} target="_blank" rel="noopener noreferrer" className="text-cyan hover:underline">
-                github.com/{SITE.githubHandle}
-              </a>
-              <a href={`mailto:${SITE.email}`} className="text-cyan hover:underline">
-                {SITE.email}
-              </a>
-            </div>
-          </div>
+    <footer className="border-cli-dim/30 relative mt-8 border-t print:hidden">
+      <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+        <CliFooterStrip status="all systems nominal" dotStatus="ok" />
 
-          {/* Attribution - CC BY 4.0 obligation to CAOS / Cameron Sutcliff */}
-          <div className="max-w-md">
-            <p className="font-mono text-[11px] uppercase tracking-wider text-dim">Built on</p>
-            <p className="mt-2 text-xs leading-relaxed text-muted">{SITE.attribution.text}</p>
-            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-xs">
-              <a href={SITE.attribution.caosSite} target="_blank" rel="noopener noreferrer" className="text-cyan hover:underline">
-                CAOS ↗
-              </a>
-              <a href={SITE.attribution.caosRepo} target="_blank" rel="noopener noreferrer" className="text-cyan hover:underline">
-                source repo ↗
-              </a>
-            </div>
+        <div className="mt-6 flex flex-col gap-2">
+          <p className="font-cli text-cli-emphasis text-sm">{SITE.name}</p>
+          <p className="font-cli text-cli-dim text-xs">{SITE.oneLiner}</p>
+          <div className="font-cli mt-1 flex flex-wrap gap-x-5 gap-y-1 text-xs">
+            <a
+              href={SITE.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cli-cyan hover:underline"
+            >
+              github.com/{SITE.githubHandle}
+            </a>
+            <a href={`mailto:${SITE.email}`} className="text-cli-cyan hover:underline">
+              {SITE.email}
+            </a>
           </div>
         </div>
 
-        {cliFrame && (
-          <div className="mt-10 flex items-center gap-2 border-t border-border pt-6 font-mono text-xs text-muted">
-            <span aria-hidden className="hud-dot hud-dot--green" />
-            <span>
-              <span aria-hidden className="text-cyan">
-                &gt;
-              </span>{' '}
-              All systems nominal.
-            </span>
+        {/* Attribution - CC BY 4.0 obligation to CAOS / Cameron Sutcliff */}
+        <div className="border-cli-dim/30 mt-8 border-t pt-6">
+          <p className="font-cli text-cli-cyan text-[11px] tracking-[0.24em] uppercase">Built on</p>
+          <p className="cli-prose mt-2 max-w-2xl">{SITE.attribution.text}</p>
+          <div className="font-cli mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs">
+            <a
+              href={SITE.attribution.caosSite}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cli-cyan hover:underline"
+            >
+              CAOS <span aria-hidden>&#8599;</span>
+            </a>
+            <a
+              href={SITE.attribution.caosRepo}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cli-cyan hover:underline"
+            >
+              source repo <span aria-hidden>&#8599;</span>
+            </a>
           </div>
-        )}
+        </div>
 
-        <div className={`${cliFrame ? 'mt-6 border-t-0 pt-0' : 'mt-10 border-t border-border pt-6'} flex flex-col gap-2 text-xs text-dim sm:flex-row sm:items-center sm:justify-between`}>
-          <span>
-            <span data-secret-admin>©</span> {SITE.name}. Doctrine contributions ©{' '}
+        <div className="border-cli-dim/30 font-cli text-cli-dim mt-6 flex flex-col gap-2 border-t pt-6 text-xs sm:flex-row sm:items-center sm:justify-between">
+          <span className="text-cli-text">
+            <span data-secret-admin>&copy;</span> {SITE.name}. Doctrine contributions &copy;{' '}
             {SITE.attribution.caosAuthor}, CC BY 4.0.
           </span>
-          <span className="font-mono">{SITE.tagline}</span>
+          <span>{SITE.tagline}</span>
         </div>
       </div>
     </footer>
