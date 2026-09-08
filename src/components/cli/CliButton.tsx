@@ -20,11 +20,22 @@ interface CliButtonCommonProps {
 type CliButtonAnchorProps = CliButtonCommonProps & {
   href: string
   onClick?: never
+  /** Anchor target, e.g. "_blank" for external links. */
+  target?: string
+  /** Anchor rel. When target is "_blank" and rel is omitted, "noopener
+      noreferrer" is applied automatically for security; an explicit rel
+      always wins. */
+  rel?: string
+  /** Forwarded straight to the anchor's download attribute. */
+  download?: boolean | string
 }
 
 type CliButtonButtonProps = CliButtonCommonProps & {
   href?: never
   onClick?: () => void
+  target?: never
+  rel?: never
+  download?: never
 }
 
 export type CliButtonProps = CliButtonAnchorProps | CliButtonButtonProps
@@ -35,7 +46,7 @@ export type CliButtonProps = CliButtonAnchorProps | CliButtonButtonProps
    with a hover scale. Composing one from the other would change what
    renders. */
 const OUTLINE_BASE =
-  'border-cli-dim/40 text-cli-dim hover:border-cli-cyan hover:text-cli-cyan font-cli rounded-full border text-[11px] tracking-[0.18em] uppercase transition-colors'
+  'border-cli-dim/40 text-cli-dim hover:border-cli-cyan hover:text-cli-cyan font-cli inline-flex items-center gap-2 rounded-full border text-[11px] tracking-[0.18em] uppercase transition-colors'
 
 const OUTLINE_SIZE: Record<CliButtonSize, string> = {
   md: 'px-4 py-2',
@@ -63,8 +74,21 @@ export default function CliButton(props: CliButtonProps) {
       : `${OUTLINE_BASE} ${OUTLINE_SIZE[size]} ${className}`.trim()
 
   if (props.href !== undefined) {
+    // Security: an explicit target="_blank" without an opener/referrer
+    // control lets the opened page reach back via window.opener. Default
+    // rel to "noopener noreferrer" whenever the caller opens a new tab and
+    // has not supplied their own rel; an explicit rel always wins.
+    const rel = props.rel ?? (props.target === '_blank' ? 'noopener noreferrer' : undefined)
+
     return (
-      <a href={props.href} aria-label={ariaLabel} className={classes}>
+      <a
+        href={props.href}
+        target={props.target}
+        rel={rel}
+        download={props.download}
+        aria-label={ariaLabel}
+        className={classes}
+      >
         {children}
       </a>
     )

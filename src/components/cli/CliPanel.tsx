@@ -1,12 +1,24 @@
 import type { ReactNode } from 'react'
 import CliHeaderStrip from './CliHeaderStrip'
 
+export type CliPanelWidth = 'default' | 'narrow'
+
+const WIDTH: Record<CliPanelWidth, string> = {
+  default: 'max-w-5xl',
+  narrow: 'max-w-3xl',
+}
+
 export interface CliPanelProps {
   children: ReactNode
   /** Merged onto the bordered panel, not onto the outer section. */
   className?: string
   /** Set false for a page that does not want the terminal header row. */
   showHeader?: boolean
+  /** Outer section max width. 'default' keeps max-w-5xl; 'narrow' gives the
+      max-w-3xl column a long-form page like Resume needs. This is the only
+      knob into the outer section; className stays scoped to the inner
+      panel. */
+  width?: CliPanelWidth
 }
 
 /* The shared page frame for every CLI page: the centered section, the
@@ -17,9 +29,14 @@ export interface CliPanelProps {
    cli-scope instead. Nesting the class is harmless: the rules in
    src/index.css are plain descendant selectors, so an element inside two
    nested cli-scope ancestors matches the same rule once. */
-export default function CliPanel({ children, className = '', showHeader = true }: CliPanelProps) {
+export default function CliPanel({
+  children,
+  className = '',
+  showHeader = true,
+  width = 'default',
+}: CliPanelProps) {
   return (
-    <section className="cli-scope bg-cli-bg mx-auto max-w-5xl px-6 py-20">
+    <section className={`cli-scope bg-cli-bg mx-auto px-6 py-20 ${WIDTH[width]}`}>
       <div
         className={`border-cli-dim/30 bg-cli-bg overflow-hidden rounded-3xl border ${className}`}
       >
