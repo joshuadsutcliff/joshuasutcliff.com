@@ -277,8 +277,24 @@
   --color-cli-dim: var(--cli-dim);
 }
 
-* {
-  border-color: var(--border);
+/* Default border color, deliberately layered into Tailwind's base layer.
+   Tailwind's utilities (including every border-cli-* class) live inside
+   @layer utilities via @import 'tailwindcss'. If this universal rule were
+   left as plain unlayered CSS like the rest of this stylesheet, it would
+   permanently beat every border-cli-* utility in the codebase, regardless
+   of specificity or source order, because an unlayered declaration always
+   wins over a layered one. That is exactly the bug this comment guards
+   against: it silently pinned every themed border back to the legacy
+   --border value and blocked the theme picker from ever re-theming
+   borders. Keeping this inside @layer base restores the intended order,
+   an element with no border utility still gets this default, and any
+   element carrying a border-cli-* (or other Tailwind border-color)
+   utility wins over it. Do not "clean this up" by unwrapping the layer,
+   that reintroduces the bug described here. */
+@layer base {
+  * {
+    border-color: var(--border);
+  }
 }
 
 html {
