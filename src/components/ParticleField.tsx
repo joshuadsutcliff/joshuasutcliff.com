@@ -12,6 +12,17 @@ interface ParticleFieldProps {
  * nebula / singularity). Pauses when the tab is hidden and renders a
  * single static frame under prefers-reduced-motion. The constellation
  * mode reproduces the original Home particle field unchanged.
+ *
+ * Theme-tokens audit (2026-09-08): this component is currently NOT mounted
+ * anywhere visitor-facing. src/scenes/routeScenes.ts only imports its
+ * ParticleMode type (that module is marked "intentionally unreferenced"
+ * pending the animated backgrounds being wired back into Layout.tsx) and
+ * no component imports ParticleField as a value. Its --cyan-rgb /
+ * --purple-rgb reads below are still on the legacy, non-themed tokens, so
+ * if this is ever remounted it will not follow the theme picker until
+ * those reads are switched to --cli-cyan-rgb / --cli-sakura-rgb (and made
+ * to re-sample on theme changes, e.g. via a MutationObserver watching the
+ * data-theme attribute on document.documentElement).
  */
 export default function ParticleField({ mode }: ParticleFieldProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
