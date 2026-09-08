@@ -2,8 +2,8 @@
 // per browser session (persisted in sessionStorage so it survives route
 // changes within a visit, but resets on a new tab/session). Every storage
 // read and write is guarded so a locked-down or quota-exhausted storage can
-// never throw into the render path, following the same defensive pattern as
-// src/lib/cliFlag.ts.
+// never throw into the render path: every accessor is wrapped in try/catch
+// and falls back to a locally generated value.
 
 const STORAGE_KEY = 'cli-session-id'
 

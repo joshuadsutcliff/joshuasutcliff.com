@@ -4,7 +4,7 @@ import { prefersReducedMotion } from '../lib/motion'
 /* ---------------------------------------------------------------------------
    Timing. Every duration in the boot sequence is named here so a pacing
    change is a one-line edit. All values are milliseconds measured from the
-   moment the About page mounts.
+   moment the shell arms the boot (first arrival at a non-excluded route).
 --------------------------------------------------------------------------- */
 
 /** Panel stays empty this long before the first log line appears. */
@@ -25,17 +25,16 @@ export const BOOT_TICK_MS = 40
 export const RESOLVE_FADE_MS = 450
 
 /** sessionStorage marker so the boot plays at most once per session.
-    The key is intentionally site-wide ('cli-booted'), not per-page: a later
-    stage plays the boot once on first arrival at ANY page and suppresses it
-    for the rest of the visit, so that stage only has to move this hook's
-    call site, not rename the key or migrate stored state.
+    The key is site-wide ('cli-booted'), not per-page: since stage 5b the
+    shell (Layout.tsx, via BootOverlay.tsx) is the ONLY caller of this hook,
+    so the flag means "this visit has already seen the boot", whichever page
+    the visitor happened to land on first. Reading it as already set by an
+    earlier arrival at a different page in the same browser session IS the
+    suppression the design asks for.
 
-    Today, however, the only writer is the About page, so the key currently
-    carries per-page meaning: "About has booted this session". When the boot
-    becomes site-wide, the key must be read as possibly ALREADY SET by an
-    earlier visit to a different page in the same browser session, which is
-    exactly the suppression that stage wants. Do not rename the key or change
-    the behavior to get there. */
+    Nothing clears this key. In particular replay() deliberately does not:
+    a page-local replay control that cleared a site-wide flag would re-arm
+    the whole-site boot on the next navigation. See replay() below. */
 const SESSION_KEY = 'cli-booted'
 
 function hasBooted(): boolean {
@@ -73,7 +72,15 @@ export interface BootState {
   replay: () => void
 }
 
-export default function useBootSequence(lineCount: number): BootState {
+/* enabled: false parks the hook without running the clock and without
+   writing the session flag, which is how the shell excludes a route from the
+   boot (see BOOT_EXCLUDED_PREFIXES in BootOverlay.tsx). Parking rather than
+   unmounting matters: the hook lives in the persistent shell, so a
+   conditional call site would violate the rules of hooks, and a conditional
+   MOUNT would restart the boot on every navigation. Landing on an excluded
+   route therefore does not silently consume the visit's one boot; the first
+   non-excluded route still gets it. */
+export default function useBootSequence(lineCount: number, enabled = true): BootState {
   const logEnd = BOOT_START_DELAY_MS + lineCount * LOG_LINE_INTERVAL_MS
   const progressStart = logEnd + UPLINK_DELAY_MS
   const progressEnd = progressStart + PROGRESS_DURATION_MS
@@ -88,6 +95,7 @@ export default function useBootSequence(lineCount: number): BootState {
 
   // Start (or restart) the clock whenever we are in an animating state.
   useEffect(() => {
+    if (!enabled) return
     if (instant) {
       markBooted(true)
       return
@@ -103,7 +111,7 @@ export default function useBootSequence(lineCount: number): BootState {
       }
     }, BOOT_TICK_MS)
     return () => window.clearInterval(id)
-  }, [instant, totalMs, runId])
+  }, [enabled, instant, totalMs, runId])
 
   const skip = useCallback(() => {
     setInstant(true)
@@ -111,8 +119,11 @@ export default function useBootSequence(lineCount: number): BootState {
     markBooted(true)
   }, [])
 
+  /* Re-runs the boot for the current view only. It intentionally leaves the
+     'cli-booted' session flag SET, so navigating away and back afterwards
+     does not re-trigger the site-wide boot. Reduced motion is not consulted
+     here on purpose: this fires only from an explicit user click. */
   const replay = useCallback(() => {
-    markBooted(false)
     setInstant(false)
     setElapsed(0)
     startedAt.current = Date.now()
@@ -120,7 +131,7 @@ export default function useBootSequence(lineCount: number): BootState {
     setRunId((n) => n + 1)
   }, [])
 
-  if (instant) {
+  if (!enabled || instant) {
     return {
       phase: 'resolved',
       visibleLines: lineCount,
