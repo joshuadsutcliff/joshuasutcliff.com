@@ -7,6 +7,8 @@ import {
   CliPanel,
   CliButton,
   CliBootLog,
+  CliCard,
+  CliChip,
 } from '../components/cli'
 import type { LogLine } from '../components/cli'
 import type { BootState } from '../hooks/useBootSequence'
@@ -149,6 +151,29 @@ export default function StyleGuide() {
               <p className="cli-prose">Page frame: section, bordered panel, header row.</p>
             </div>
           </CliPanel>
+        </section>
+
+        <section>
+          <CliSectionHeader divider>CARDS</CliSectionHeader>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <CliCard>
+              <p className="text-cli-text font-cli text-sm">Plain card</p>
+              <p className="text-cli-dim mt-1 text-xs">Not navigable, just a bordered box.</p>
+            </CliCard>
+            <CliCard to="/about" aria-label="Go to about page">
+              <p className="text-cli-text font-cli text-sm">Navigable card</p>
+              <p className="text-cli-dim mt-1 text-xs">Whole card links to /about.</p>
+            </CliCard>
+          </div>
+        </section>
+
+        <section>
+          <CliSectionHeader>CHIPS</CliSectionHeader>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <CliChip>React</CliChip>
+            <CliChip>TypeScript</CliChip>
+            <CliChip>Tailwind</CliChip>
+          </div>
         </section>
       </div>
     </div>

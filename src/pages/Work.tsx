@@ -1,28 +1,27 @@
-import { Link } from 'react-router-dom'
 import { WORK } from '../content/work'
+import { CliPanel, CliButton } from '../components/cli'
 
 export default function Work() {
   return (
-    <section className="mx-auto max-w-3xl px-6 py-20">
-      <p className="hud-eyebrow">{WORK.kicker}</p>
-      <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-fg sm:text-5xl">
+    <CliPanel width="narrow">
+      <p className="font-cli text-cli-cyan text-[11px] tracking-[0.24em] uppercase">
+        {WORK.kicker}
+      </p>
+      <h1 className="font-cli text-cli-emphasis mt-3 text-4xl tracking-tight sm:text-5xl">
         {WORK.headline}
       </h1>
       <div className="mt-8 space-y-5">
         {WORK.paragraphs.map((p) => (
-          <p key={p.slice(0, 24)} className="leading-relaxed text-muted">
+          <p key={p.slice(0, 24)} className="cli-prose">
             {p}
           </p>
         ))}
       </div>
       <div className="mt-10">
-        <Link
-          to={WORK.cta.to}
-          className="inline-flex items-center gap-2 rounded-full bg-cyan px-6 py-3 text-sm font-medium text-[#07090f] shadow-[var(--shadow-neon)] transition-transform hover:scale-[1.03]"
-        >
-          {WORK.cta.label} →
-        </Link>
+        <CliButton to={WORK.cta.to} variant="solid">
+          {WORK.cta.label} <span aria-hidden>&rarr;</span>
+        </CliButton>
       </div>
-    </section>
+    </CliPanel>
   )
 }

@@ -23,6 +23,12 @@ export { default as CliBootLog } from './CliBootLog'
 export type { CliBootLogProps, LogLine } from './CliBootLog'
 export { LOG_WINDOW_LINES, UPLINK_TEXT } from './CliBootLog'
 
+export { default as CliCard } from './CliCard'
+export type { CliCardProps, CliCardPadding } from './CliCard'
+
+export { default as CliChip } from './CliChip'
+export type { CliChipProps } from './CliChip'
+
 // The one merged CLI status vocabulary, consumed by CliStatusDot,
 // CliFooterStrip, and CliBootLog.
 export type { CliStatus } from './status'

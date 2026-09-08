@@ -372,6 +372,43 @@ select:focus-visible,
   color: var(--cli-text);
 }
 
+/* Print override for the CLI design language, unlayered on purpose.
+   Tailwind's utilities (including print:text-black) live inside
+   @layer utilities via @import 'tailwindcss'. This stylesheet has no
+   @layer blocks of its own, so every rule above is unlayered plain CSS,
+   and an unlayered declaration always beats a layered one in the cascade
+   no matter its specificity or source order. That means .cli-prose's
+   color: var(--cli-text) permanently wins over a page's print:text-black
+   utility. The only fix that respects that mechanic is to also write the
+   override here, unlayered, after .cli-prose in source order. Do not
+   "clean this up" into a Tailwind print: utility class; that would put it
+   back inside @layer utilities and silently reintroduce the bug. */
+@media print {
+  .cli-prose,
+  .text-cli-text,
+  .text-cli-dim,
+  .text-cli-emphasis {
+    color: #000000;
+  }
+  body,
+  .cli-scope,
+  .bg-cli-bg {
+    background: #ffffff;
+  }
+  .border-cli-dim\/30 {
+    border-color: currentColor;
+  }
+  /* The terminal header strip (LIVE indicator, session hex, ssh line) is
+     purely decorative chrome: already aria-hidden, no information for
+     print readers, and it prints in color on an otherwise monochrome page.
+     Must be unlayered per the .cli-prose note above, since a layered
+     print: utility here would lose to nothing directly but we keep the
+     pattern consistent with the rest of this block. */
+  .cli-header-strip-row {
+    display: none;
+  }
+}
+
 /* These rules only apply inside an ancestor carrying the cli-scope class.
    Today only StyleGuide.tsx sets that class. A later stage's site-wide
    shell must add cli-scope to its root element so every page inherits the

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 
 export type CliButtonSize = 'md' | 'sm'
 export type CliButtonVariant = 'outline' | 'solid'
@@ -13,12 +14,14 @@ interface CliButtonCommonProps {
   'aria-label'?: string
 }
 
-/* Discriminated on href: an href renders an anchor, its absence renders a
-   button. `href?: never` on the button arm is what makes TypeScript reject
-   passing both, and `onClick?: never` on the anchor arm keeps click handlers
-   off links that should just navigate. */
+/* Discriminated on href/to: an href renders an anchor, a to renders a
+   react-router Link, and the absence of both renders a button. `href?:
+   never`/`to?: never` on the other arms is what makes TypeScript reject
+   passing more than one, and `onClick?: never` on the anchor and Link arms
+   keeps click handlers off links that should just navigate. */
 type CliButtonAnchorProps = CliButtonCommonProps & {
   href: string
+  to?: never
   onClick?: never
   /** Anchor target, e.g. "_blank" for external links. */
   target?: string
@@ -32,13 +35,29 @@ type CliButtonAnchorProps = CliButtonCommonProps & {
 
 type CliButtonButtonProps = CliButtonCommonProps & {
   href?: never
+  to?: never
   onClick?: () => void
   target?: never
   rel?: never
   download?: never
 }
 
-export type CliButtonProps = CliButtonAnchorProps | CliButtonButtonProps
+/* Internal SPA navigation: renders a react-router Link instead of a full
+   page reload anchor. Mutually exclusive with the href/onClick/target/rel/
+   download props of the other two arms. */
+type CliButtonLinkProps = CliButtonCommonProps & {
+  to: string
+  href?: never
+  onClick?: never
+  target?: never
+  rel?: never
+  download?: never
+  /** Forwarded to react-router's Link. Left undefined by default so the
+      caller decides; this component does not call prefersReducedMotion. */
+  viewTransition?: boolean
+}
+
+export type CliButtonProps = CliButtonAnchorProps | CliButtonButtonProps | CliButtonLinkProps
 
 /* Exact class strings preserved from the stage 3 call sites. The two
    variants are not one base plus overrides: outline is an uppercase tracked
@@ -72,6 +91,19 @@ export default function CliButton(props: CliButtonProps) {
     variant === 'solid'
       ? `${SOLID_BASE} ${className}`.trim()
       : `${OUTLINE_BASE} ${OUTLINE_SIZE[size]} ${className}`.trim()
+
+  if (props.to !== undefined) {
+    return (
+      <Link
+        to={props.to}
+        viewTransition={props.viewTransition}
+        aria-label={ariaLabel}
+        className={classes}
+      >
+        {children}
+      </Link>
+    )
+  }
 
   if (props.href !== undefined) {
     // Security: an explicit target="_blank" without an opener/referrer

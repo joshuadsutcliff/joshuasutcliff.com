@@ -2,66 +2,83 @@ import { Link } from 'react-router-dom'
 import { MailIcon } from '../components/icons'
 import { SITE } from '../content/site'
 import { RESUME } from '../content/resume'
+import { CliPanel, CliButton, CliCard, CliSectionHeader } from '../components/cli'
 
 export default function Resume() {
   return (
-    <section className="mx-auto max-w-3xl px-6 py-20 print:py-4">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="font-display text-4xl font-semibold tracking-tight text-fg">{SITE.name}</h1>
-          <p className="mt-1 text-muted">{RESUME.experience[0].role}</p>
-          <p className="mt-1 font-mono text-xs text-dim">
-            {SITE.location} · {SITE.email} · github.com/{SITE.githubHandle}
-          </p>
+    <CliPanel width="narrow" className="print:border-black print:bg-white">
+      <div className="px-4 py-8 sm:px-6 sm:py-10 print:px-0 print:py-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            {/* Only heading on the page, so heading order cannot skip a
+                level. */}
+            <h1 className="font-cli text-cli-emphasis text-4xl font-semibold tracking-tight print:text-black">
+              {SITE.name}
+            </h1>
+            <p className="font-cli text-cli-dim mt-1 print:text-black">{RESUME.experience[0].role}</p>
+            <p className="font-cli text-cli-dim mt-1 text-xs print:text-black">
+              {SITE.location} · {SITE.email} · github.com/{SITE.githubHandle}
+            </p>
+          </div>
+          <CliButton variant="solid" href={`mailto:${SITE.email}`} className="print:hidden">
+            <MailIcon /> Get in touch
+          </CliButton>
         </div>
-        <a
-          href={`mailto:${SITE.email}`}
-          className="inline-flex items-center gap-2 rounded-full bg-cyan px-5 py-2.5 text-sm font-medium text-[#07090f] transition-transform hover:scale-[1.03] print:hidden"
-        >
-          <MailIcon /> Get in touch
-        </a>
-      </div>
 
-      <h2 className="mt-10 hud-eyebrow">Summary</h2>
-      <p className="mt-3 leading-relaxed text-muted">{RESUME.summary}</p>
+        <CliSectionHeader as="h2" divider className="mt-10 print:text-black">
+          Summary
+        </CliSectionHeader>
+        <p className="cli-prose text-cli-text mt-3 print:text-black">{RESUME.summary}</p>
 
-      <h2 className="mt-10 hud-eyebrow">Skills</h2>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {RESUME.skills.map((s) => (
-          <div key={s.area} className="hud-panel rounded-xl p-4">
-            <p className="text-sm font-medium text-fg">{s.area}</p>
-            <p className="mt-1 text-xs leading-relaxed text-muted">{s.detail}</p>
+        <CliSectionHeader as="h2" divider className="mt-10 print:text-black">
+          Skills
+        </CliSectionHeader>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {RESUME.skills.map((s) => (
+            <CliCard key={s.area} padding="md" className="print:border-black print:bg-white">
+              <p className="font-cli text-cli-emphasis text-sm font-medium print:text-black">{s.area}</p>
+              <p className="cli-prose text-cli-dim mt-1 text-xs print:text-black">{s.detail}</p>
+            </CliCard>
+          ))}
+        </div>
+
+        <CliSectionHeader as="h2" divider className="mt-10 print:text-black">
+          Experience
+        </CliSectionHeader>
+        {RESUME.experience.map((e) => (
+          <div key={e.role} className="mt-4">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <p className="font-cli text-cli-emphasis font-medium print:text-black">
+                {e.role} · <span className="text-cli-dim print:text-black">{e.org}</span>
+              </p>
+              <p className="font-cli text-cli-dim text-xs print:text-black">
+                {e.where} · {e.when}
+              </p>
+            </div>
+            <ul className="cli-prose text-cli-text mt-3 list-disc space-y-1.5 pl-5 text-sm print:text-black">
+              {e.bullets.map((b) => (
+                <li key={b.slice(0, 24)}>{b}</li>
+              ))}
+            </ul>
           </div>
         ))}
+
+        <CliSectionHeader as="h2" divider className="mt-10 print:text-black">
+          Education
+        </CliSectionHeader>
+        <p className="cli-prose text-cli-text mt-3 print:text-black">
+          <span className="text-cli-emphasis font-semibold">{RESUME.education.school}</span> ·{' '}
+          {RESUME.education.degree}
+        </p>
+
+        <p className="font-cli text-cli-dim mt-10 text-sm print:hidden">
+          Selected work lives on the{' '}
+          <Link to="/projects" className="text-cli-cyan hover:underline">
+            projects page
+          </Link>
+          .
+        </p>
       </div>
-
-      <h2 className="mt-10 hud-eyebrow">Experience</h2>
-      {RESUME.experience.map((e) => (
-        <div key={e.role} className="mt-4">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <p className="font-medium text-fg">
-              {e.role} · <span className="text-muted">{e.org}</span>
-            </p>
-            <p className="font-mono text-xs text-dim">
-              {e.where} · {e.when}
-            </p>
-          </div>
-          <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-muted">
-            {e.bullets.map((b) => (
-              <li key={b.slice(0, 24)}>{b}</li>
-            ))}
-          </ul>
-        </div>
-      ))}
-
-      <h2 className="mt-10 hud-eyebrow">Education</h2>
-      <p className="mt-3 text-muted">
-        <span className="font-medium text-fg">{RESUME.education.school}</span> · {RESUME.education.degree}
-      </p>
-
-      <p className="mt-10 text-sm text-dim print:hidden">
-        Selected work lives on the <Link to="/projects" className="text-cyan hover:underline">projects page</Link>.
-      </p>
-    </section>
+    </CliPanel>
   )
 }

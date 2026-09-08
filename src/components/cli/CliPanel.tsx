@@ -36,13 +36,16 @@ export default function CliPanel({
   width = 'default',
 }: CliPanelProps) {
   return (
-    <section className={`cli-scope bg-cli-bg mx-auto px-6 py-20 ${WIDTH[width]}`}>
+    <section className={`cli-scope bg-cli-bg mx-auto px-6 py-20 print:py-4 ${WIDTH[width]}`}>
       <div
         className={`border-cli-dim/30 bg-cli-bg overflow-hidden rounded-3xl border ${className}`}
       >
         {showHeader && (
-          /* Decorative chrome, shared primitive. */
-          <div aria-hidden className="border-cli-dim/30 border-b px-4 py-3 sm:px-6">
+          /* Decorative chrome, shared primitive. Hidden from print via the
+             .cli-header-strip-row rule in src/index.css: it carries no
+             information (already aria-hidden) and prints in color, which
+             looks wrong on a monochrome page. */
+          <div aria-hidden className="cli-header-strip-row border-cli-dim/30 border-b px-4 py-3 sm:px-6">
             <CliHeaderStrip />
           </div>
         )}

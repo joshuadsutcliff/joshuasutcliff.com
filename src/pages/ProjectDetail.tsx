@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 import { GithubIcon } from '../components/icons'
 import Lightbox from '../components/Lightbox'
 import Schematic from '../components/Schematic'
@@ -8,6 +8,7 @@ import { PROJECT_DETAILS } from '../content/projects-detail'
 import { CHANGELOG_ENTRIES, CHANGELOG_HEADING, CHANGELOG_INTRO } from '../content/changelog'
 import { DIAGRAMS_ENTRIES, DIAGRAMS_HEADING, DIAGRAMS_INTRO } from '../content/diagrams'
 import { SCHEMATICS } from '../content/schematics'
+import { CliPanel, CliSectionHeader, CliCard, CliButton, CliChip, CliStatusDot } from '../components/cli'
 
 export default function ProjectDetail() {
   const { slug } = useParams<{ slug: string }>()
@@ -32,241 +33,234 @@ export default function ProjectDetail() {
   }
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-20">
-      <Link to="/projects" className="font-mono text-xs text-dim hover:text-cyan">
-        &larr; back to projects
-      </Link>
+    <CliPanel>
+      <div className="px-4 py-8 sm:px-6 sm:py-10">
+        <CliButton to="/projects" size="sm">
+          &larr; back to projects
+        </CliButton>
 
-      <div className="mt-6 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-dim">
-        <span
-          className={`hud-dot ${card.statusTone === 'green' ? 'hud-dot--green' : 'hud-dot--amber'}`}
-        />
-        {detail.group} &middot; {card.status}
-      </div>
-      <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight text-fg sm:text-4xl">{card.title}</h1>
-      <p className="mt-4 text-lg leading-relaxed text-muted">{card.tldr}</p>
-
-      {(card.href || (card.secondaryHref && card.secondaryLabel)) && (
-        <div className="mt-6 flex flex-wrap items-center gap-4">
-          {card.href && (
-            <a
-              href={card.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hud-panel inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-fg"
-            >
-              <GithubIcon className="h-4 w-4" />
-              View on GitHub
-            </a>
-          )}
-          {card.secondaryHref && card.secondaryLabel && (
-            <Link
-              to={card.secondaryHref}
-              className="inline-flex items-center gap-2 font-mono text-xs text-cyan hover:text-purple"
-            >
-              {card.secondaryLabel} &rarr;
-            </Link>
-          )}
+        <div className="mt-6">
+          <CliStatusDot
+            status={card.statusTone === 'green' ? 'ok' : 'warn'}
+            label={`${detail.group} · ${card.status}`}
+          />
         </div>
-      )}
-      {card.note && <p className="mt-3 text-xs leading-relaxed text-dim">{card.note}</p>}
+        <h1 className="font-cli text-cli-emphasis mt-3 text-2xl tracking-tight sm:text-3xl">
+          {card.title}
+        </h1>
+        <p className="cli-prose text-cli-text mt-4 text-lg">{card.tldr}</p>
 
-      <div className="hud-panel mt-10 rounded-3xl p-8 sm:p-12">
-        {detail.overview.map((paragraph, i) => (
-          <p key={i} className={`leading-relaxed text-muted ${i === 0 ? '' : 'mt-4'}`}>
-            {paragraph}
-          </p>
-        ))}
-      </div>
-
-      <div className="mt-10">
-        <div className="flex items-center gap-3">
-          <h2 className="hud-eyebrow">Stack</h2>
-          <div className="hud-divider flex-1" />
-        </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {detail.stack.map((item) => (
-            <span
-              key={item}
-              className="rounded-full border border-border px-3 py-1 font-mono text-xs text-muted"
-            >
-              {item}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-10">
-        <div className="flex items-center gap-3">
-          <h2 className="hud-eyebrow">Highlights</h2>
-          <div className="hud-divider flex-1" />
-        </div>
-        <ul className="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-muted">
-          {detail.highlights.map((highlight, i) => (
-            <li key={i}>{highlight}</li>
-          ))}
-        </ul>
-      </div>
-
-      {detail.extraSections?.map((section) => (
-        <div key={section.heading} className="mt-10">
-          <div className="flex items-center gap-3">
-            <h2 className="hud-eyebrow">{section.heading}</h2>
-            <div className="hud-divider flex-1" />
+        {(card.href || (card.secondaryHref && card.secondaryLabel)) && (
+          <div className="mt-6 flex flex-wrap items-center gap-4">
+            {card.href && (
+              <CliButton href={card.href} target="_blank" variant="solid">
+                <GithubIcon className="h-4 w-4" />
+                View on GitHub
+              </CliButton>
+            )}
+            {card.secondaryHref && card.secondaryLabel && (
+              <CliButton to={card.secondaryHref}>{card.secondaryLabel} &rarr;</CliButton>
+            )}
           </div>
-          <div className="hud-panel mt-4 rounded-3xl p-8 sm:p-12">
-            {section.paragraphs.map((paragraph, i) => (
-              <p key={i} className={`leading-relaxed text-muted ${i === 0 ? '' : 'mt-4'}`}>
-                {paragraph}
-              </p>
+        )}
+        {card.note && <p className="cli-prose text-cli-dim mt-3 text-xs">{card.note}</p>}
+
+        <CliCard padding="lg" className="mt-10">
+          {detail.overview.map((paragraph, i) => (
+            <p key={i} className={`cli-prose text-cli-text ${i === 0 ? '' : 'mt-4'}`}>
+              {paragraph}
+            </p>
+          ))}
+        </CliCard>
+
+        <div className="mt-10">
+          <CliSectionHeader as="h2" divider>
+            Stack
+          </CliSectionHeader>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {detail.stack.map((item) => (
+              <CliChip key={item}>{item}</CliChip>
             ))}
           </div>
-          {section.schematicId && SCHEMATICS[section.schematicId] && (
-            <div className="mt-6">
-              <Schematic spec={SCHEMATICS[section.schematicId]!} />
-            </div>
-          )}
         </div>
-      ))}
 
-      {detail.showDiagrams && (
         <div className="mt-10">
-          <div className="flex items-center gap-3">
-            <h2 className="hud-eyebrow">{DIAGRAMS_HEADING}</h2>
-            <div className="hud-divider flex-1" />
+          <CliSectionHeader as="h2" divider>
+            Highlights
+          </CliSectionHeader>
+          <ul className="cli-prose text-cli-text mt-4 list-disc space-y-2 pl-5">
+            {detail.highlights.map((highlight, i) => (
+              <li key={i}>{highlight}</li>
+            ))}
+          </ul>
+        </div>
+
+        {detail.extraSections?.map((section) => (
+          <div key={section.heading} className="mt-10">
+            <CliSectionHeader as="h2" divider>
+              {section.heading}
+            </CliSectionHeader>
+            <CliCard padding="lg" className="mt-4">
+              {section.paragraphs.map((paragraph, i) => (
+                <p key={i} className={`cli-prose text-cli-text ${i === 0 ? '' : 'mt-4'}`}>
+                  {paragraph}
+                </p>
+              ))}
+            </CliCard>
+            {section.schematicId && SCHEMATICS[section.schematicId] && (
+              <div className="mt-6">
+                <Schematic spec={SCHEMATICS[section.schematicId]!} />
+              </div>
+            )}
           </div>
-          <p className="mt-3 text-sm leading-relaxed text-muted">{DIAGRAMS_INTRO}</p>
-          <div className="mt-6 space-y-8">
-            {DIAGRAMS_ENTRIES.map((entry, index) => {
-              const isOddRow = index % 2 === 0
-              const schematic = SCHEMATICS[entry.id]
-              return (
-                <div key={entry.id} className="grid gap-5 md:grid-cols-[2fr_3fr]">
-                  <div className={isOddRow ? 'md:order-2' : ''}>
-                    {schematic ? (
-                      <Schematic spec={schematic} />
-                    ) : (
-                      /* Deliberate safety net, not currently reachable: every
-                         DIAGRAMS_ENTRIES id has a matching SCHEMATICS spec
-                         today, but this keeps a raw-PNG fallback in place for
-                         any future entry that doesn't. */
-                      entry.image ? (
+        ))}
+
+        {detail.showDiagrams && (
+          <div className="mt-10">
+            <CliSectionHeader as="h2" divider>
+              {DIAGRAMS_HEADING}
+            </CliSectionHeader>
+            <p className="cli-prose text-cli-text mt-3 text-sm">{DIAGRAMS_INTRO}</p>
+            <div className="mt-6 space-y-8">
+              {DIAGRAMS_ENTRIES.map((entry, index) => {
+                const isOddRow = index % 2 === 0
+                const schematic = SCHEMATICS[entry.id]
+                return (
+                  <div key={entry.id} className="grid gap-5 md:grid-cols-[2fr_3fr]">
+                    <div className={isOddRow ? 'md:order-2' : ''}>
+                      {schematic ? (
+                        <Schematic spec={schematic} />
+                      ) : (
+                        /* Deliberate safety net, not currently reachable: every
+                           DIAGRAMS_ENTRIES id has a matching SCHEMATICS spec
+                           today, but this keeps a raw-PNG fallback in place for
+                           any future entry that doesn't. */
+                        entry.image ? (
+                          <button
+                            type="button"
+                            onClick={() => setLightboxImage({ src: entry.image!, alt: entry.alt })}
+                            className="block w-full text-left"
+                          >
+                            <img
+                              src={entry.image}
+                              alt={entry.alt}
+                              loading="lazy"
+                              className="border-cli-dim/30 w-full rounded-xl border"
+                            />
+                          </button>
+                        ) : null
+                      )}
+                      {entry.image && (
                         <button
                           type="button"
                           onClick={() => setLightboxImage({ src: entry.image!, alt: entry.alt })}
-                          className="block w-full text-left"
+                          aria-label={'View original diagram: ' + entry.title}
+                          className="font-cli text-cli-dim hover:text-cli-cyan mt-2 text-[11px]"
                         >
-                          <img
-                            src={entry.image}
-                            alt={entry.alt}
-                            loading="lazy"
-                            className="w-full rounded-xl border border-border"
-                          />
+                          view original
                         </button>
-                      ) : null
-                    )}
-                    {entry.image && (
-                      <button
-                        type="button"
-                        onClick={() => setLightboxImage({ src: entry.image!, alt: entry.alt })}
-                        aria-label={'View original diagram: ' + entry.title}
-                        className="mt-2 font-mono text-[11px] text-dim hover:text-cyan"
-                      >
-                        view original
-                      </button>
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-display text-lg font-semibold text-fg">{entry.title}</p>
-                    <div className="mt-3 space-y-3">
-                      <div>
-                        <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-dim">What it shows</p>
-                        <p className="mt-1 text-sm text-muted">{entry.what}</p>
-                      </div>
-                      <div>
-                        <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-dim">
-                          Why it's built this way
-                        </p>
-                        <p className="mt-1 text-sm text-muted">{entry.why}</p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-cli text-cli-emphasis text-lg font-semibold">{entry.title}</p>
+                      <div className="mt-3 space-y-3">
+                        <div>
+                          <p className="font-cli text-cli-dim text-[11px] uppercase tracking-[0.15em]">
+                            What it shows
+                          </p>
+                          <p className="cli-prose text-cli-text mt-1 text-sm">{entry.what}</p>
+                        </div>
+                        <div>
+                          <p className="font-cli text-cli-dim text-[11px] uppercase tracking-[0.15em]">
+                            Why it's built this way
+                          </p>
+                          <p className="cli-prose text-cli-text mt-1 text-sm">{entry.why}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {detail.showChangelog && (
-        <div className="mt-10">
-          <details className="group hud-panel rounded-2xl p-6 sm:p-8">
-            <summary className="hud-eyebrow cursor-pointer">
-              <span aria-hidden className="inline-block transition-transform group-open:rotate-90">
-                &rsaquo;
-              </span>
-              {CHANGELOG_HEADING}
-            </summary>
-            <p className="mt-3 text-sm leading-relaxed text-muted">{CHANGELOG_INTRO}</p>
-            <div className="mt-5 grid gap-5">
-              {CHANGELOG_ENTRIES.map((entry) => (
-                <div key={entry.title} className="flex flex-col rounded-2xl border border-border bg-bg2/40 p-7">
-                  <div className="flex items-start justify-between gap-3">
-                    <p className="font-display text-xl font-semibold text-fg">{entry.title}</p>
-                    <span className="shrink-0 rounded-full border border-border px-2.5 py-0.5 font-mono text-[11px] text-muted">
-                      {entry.date}
-                    </span>
-                  </div>
-                  <div className="mt-4 space-y-3">
-                    <div>
-                      <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-dim">What changed</p>
-                      <p className="mt-1 text-sm leading-relaxed text-muted">{entry.what}</p>
+        {detail.showChangelog && (
+          <div className="mt-10">
+            {/* The disclosure needs the border/rounded/padding treatment of a
+                CliCard but <details> is not a div, so the box is built
+                directly with the same border-cli-dim/30 bg-cli-bg tokens
+                CliCard uses, keeping the two visually identical. */}
+            <details className="group border-cli-dim/30 bg-cli-bg rounded-2xl border p-6 sm:p-8">
+              <summary className="font-cli text-cli-sakura flex cursor-pointer items-center gap-1 tracking-wide">
+                <span
+                  aria-hidden
+                  className="motion-reduce:transition-none inline-block transition-transform group-open:rotate-90"
+                >
+                  &rsaquo;
+                </span>
+                {CHANGELOG_HEADING}
+              </summary>
+              <p className="cli-prose text-cli-text mt-3 text-sm">{CHANGELOG_INTRO}</p>
+              <div className="mt-5 grid gap-5">
+                {CHANGELOG_ENTRIES.map((entry) => (
+                  <CliCard key={entry.title} padding="lg" className="flex flex-col">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="font-cli text-cli-emphasis text-xl font-semibold">{entry.title}</p>
+                      <CliChip className="shrink-0">{entry.date}</CliChip>
                     </div>
-                    <div>
-                      <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-dim">Why</p>
-                      <p className="mt-1 text-sm leading-relaxed text-muted">{entry.why}</p>
+                    <div className="mt-4 space-y-3">
+                      <div>
+                        <p className="font-cli text-cli-dim text-[11px] uppercase tracking-[0.15em]">
+                          What changed
+                        </p>
+                        <p className="cli-prose text-cli-text mt-1 text-sm">{entry.what}</p>
+                      </div>
+                      <div>
+                        <p className="font-cli text-cli-dim text-[11px] uppercase tracking-[0.15em]">Why</p>
+                        <p className="cli-prose text-cli-text mt-1 text-sm">{entry.why}</p>
+                      </div>
+                      <div>
+                        <p className="font-cli text-cli-dim text-[11px] uppercase tracking-[0.15em]">The win</p>
+                        <p className="cli-prose text-cli-text mt-1 text-sm">{entry.improvement}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-dim">The win</p>
-                      <p className="mt-1 text-sm leading-relaxed text-muted">{entry.improvement}</p>
-                    </div>
-                  </div>
-                </div>
+                  </CliCard>
+                ))}
+              </div>
+            </details>
+          </div>
+        )}
+
+        {detail.images && detail.images.length > 0 && (
+          <div className="mt-10">
+            <CliSectionHeader as="h2" divider>
+              Screenshots
+            </CliSectionHeader>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              {detail.images.map((image) => (
+                <button
+                  key={image.src}
+                  type="button"
+                  onClick={() => setLightboxImage(image)}
+                  className="border-cli-dim/30 bg-cli-bg overflow-hidden rounded-2xl border text-left"
+                >
+                  <img src={image.src} alt={image.alt} loading="lazy" className="w-full" />
+                  {image.caption && <p className="text-cli-dim font-cli p-3 text-xs">{image.caption}</p>}
+                </button>
               ))}
             </div>
-          </details>
-        </div>
-      )}
-
-      {detail.images && detail.images.length > 0 && (
-        <div className="mt-10">
-          <div className="flex items-center gap-3">
-            <h2 className="hud-eyebrow">Screenshots</h2>
-            <div className="hud-divider flex-1" />
           </div>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            {detail.images.map((image) => (
-              <button
-                key={image.src}
-                type="button"
-                onClick={() => setLightboxImage(image)}
-                className="hud-panel overflow-hidden rounded-2xl text-left"
-              >
-                <img src={image.src} alt={image.alt} loading="lazy" className="w-full" />
-                {image.caption && <p className="p-3 text-xs text-dim">{image.caption}</p>}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+        )}
 
-      {lightboxImage && (
-        <Lightbox
-          src={lightboxImage.src}
-          alt={lightboxImage.alt}
-          onClose={() => setLightboxImage(null)}
-        />
-      )}
-    </section>
+        {lightboxImage && (
+          <Lightbox
+            src={lightboxImage.src}
+            alt={lightboxImage.alt}
+            onClose={() => setLightboxImage(null)}
+          />
+        )}
+      </div>
+    </CliPanel>
   )
 }
