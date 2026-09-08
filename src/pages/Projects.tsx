@@ -72,18 +72,14 @@ export default function Projects() {
 
   return (
     <CliPanel>
-      <div className="px-4 py-8 sm:px-6 sm:py-10">
-        <p aria-hidden className="font-cli text-cli-cyan text-[11px] tracking-[0.24em] uppercase">
-          Projects
-        </p>
-        <h1 className="font-cli text-cli-emphasis mt-3 text-2xl tracking-tight sm:text-3xl">
-          Things I build and run.
-        </h1>
+      <p className="font-cli text-cli-cyan text-[11px] tracking-[0.24em] uppercase">Projects</p>
+      <h1 className="font-cli text-cli-emphasis mt-3 text-2xl tracking-tight sm:text-3xl">
+        Things I build and run.
+      </h1>
 
-        {PROJECT_GROUPS.map((group) => (
-          <ProjectGroupSection key={group.heading} group={group} useViewTransition={useViewTransition} />
-        ))}
-      </div>
+      {PROJECT_GROUPS.map((group) => (
+        <ProjectGroupSection key={group.heading} group={group} useViewTransition={useViewTransition} />
+      ))}
     </CliPanel>
   )
 }

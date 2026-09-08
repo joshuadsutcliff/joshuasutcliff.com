@@ -13,8 +13,8 @@ export type { CliHeaderStripProps } from './CliHeaderStrip'
 export { default as CliFooterStrip } from './CliFooterStrip'
 export type { CliFooterStripProps } from './CliFooterStrip'
 
-export { default as CliPanel } from './CliPanel'
-export type { CliPanelProps } from './CliPanel'
+export { default as CliPanel, CLI_CONTENT_PADDING } from './CliPanel'
+export type { CliPanelProps, CliPanelWidth } from './CliPanel'
 
 export { default as CliButton } from './CliButton'
 export type { CliButtonProps, CliButtonSize, CliButtonVariant } from './CliButton'

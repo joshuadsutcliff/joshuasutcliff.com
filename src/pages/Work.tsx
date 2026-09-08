@@ -7,7 +7,7 @@ export default function Work() {
       <p className="font-cli text-cli-cyan text-[11px] tracking-[0.24em] uppercase">
         {WORK.kicker}
       </p>
-      <h1 className="font-cli text-cli-emphasis mt-3 text-4xl tracking-tight sm:text-5xl">
+      <h1 className="font-cli text-cli-emphasis mt-3 text-2xl tracking-tight sm:text-3xl">
         {WORK.headline}
       </h1>
       <div className="mt-8 space-y-5">

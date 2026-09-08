@@ -387,7 +387,8 @@ select:focus-visible,
   .cli-prose,
   .text-cli-text,
   .text-cli-dim,
-  .text-cli-emphasis {
+  .text-cli-emphasis,
+  .text-cli-sakura {
     color: #000000;
   }
   body,

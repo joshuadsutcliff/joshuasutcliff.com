@@ -2,7 +2,7 @@ import { MailIcon } from './icons'
 import { SITE } from '../content/site'
 import { ABOUT } from '../content/about'
 import useBootSequence, { RESOLVE_FADE_MS } from '../hooks/useBootSequence'
-import { CliPanel, CliButton, CliBootLog, CliKeyValue, CliFooterStrip } from './cli'
+import { CliPanel, CliButton, CliBootLog, CliKeyValue, CliFooterStrip, CLI_CONTENT_PADDING } from './cli'
 import type { LogLine } from './cli'
 
 /* ---------------------------------------------------------------------------
@@ -81,7 +81,7 @@ export default function AboutTerminal() {
   const showBoot = !boot.resolved
 
   return (
-    <CliPanel>
+    <CliPanel padded={false}>
       {showBoot && (
         <div className="px-4 py-6 sm:px-6">
           <CliBootLog lines={LOG} boot={boot} />
@@ -94,7 +94,7 @@ export default function AboutTerminal() {
       {/* Real content. Always in the DOM and in the accessibility tree from
           the first frame. The boot sequence only fades it in visually. */}
       <div
-        className={`px-4 py-8 sm:px-6 sm:py-10 ${showBoot ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
+        className={`${CLI_CONTENT_PADDING} ${showBoot ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
         style={{ transition: `opacity ${RESOLVE_FADE_MS}ms ease` }}
       >
         <p aria-hidden className="font-cli text-cli-emphasis text-lg tracking-[0.2em] sm:text-xl">

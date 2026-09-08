@@ -3,6 +3,13 @@ import CliHeaderStrip from './CliHeaderStrip'
 
 export type CliPanelWidth = 'default' | 'narrow'
 
+/* The single shared inner content padding for a CLI page. CliPanel applies
+   this by default (see padded below); a page that must opt out of the
+   single wrapper (About, which staggers two differently padded regions)
+   imports this constant instead of hand-rolling the string, so the value
+   still lives in exactly one place. */
+export const CLI_CONTENT_PADDING = 'px-4 py-8 sm:px-6 sm:py-10'
+
 const WIDTH: Record<CliPanelWidth, string> = {
   default: 'max-w-5xl',
   narrow: 'max-w-3xl',
@@ -19,6 +26,16 @@ export interface CliPanelProps {
       knob into the outer section; className stays scoped to the inner
       panel. */
   width?: CliPanelWidth
+  /** When true (the default), children are wrapped in the standard content
+      padding (px-4 py-8 sm:px-6 sm:py-10) so every page gets identical
+      inset without hand-rolling the wrapper. Set false when a page manages
+      its own padding at a finer grain than a single wrapper allows, as
+      About does for its boot log versus its resolved content. */
+  padded?: boolean
+  /** Merged onto the padding wrapper div when padded is true. Lets a page
+      layer print-only padding overrides (see Resume) without breaking the
+      single shared source of the base padding string. */
+  contentClassName?: string
 }
 
 /* The shared page frame for every CLI page: the centered section, the
@@ -34,6 +51,8 @@ export default function CliPanel({
   className = '',
   showHeader = true,
   width = 'default',
+  padded = true,
+  contentClassName = '',
 }: CliPanelProps) {
   return (
     <section className={`cli-scope bg-cli-bg mx-auto px-6 py-20 print:py-4 ${WIDTH[width]}`}>
@@ -49,7 +68,11 @@ export default function CliPanel({
             <CliHeaderStrip />
           </div>
         )}
-        {children}
+        {padded ? (
+          <div className={`${CLI_CONTENT_PADDING} ${contentClassName}`}>{children}</div>
+        ) : (
+          children
+        )}
       </div>
     </section>
   )
