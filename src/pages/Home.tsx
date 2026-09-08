@@ -2,7 +2,7 @@ import { GithubIcon, MailIcon } from '../components/icons'
 import { SITE } from '../content/site'
 import { HOME } from '../content/home'
 import useReveal from '../hooks/useReveal'
-import { CliPanel, CliCard, CliButton, CliStatusDot } from '../components/cli'
+import { CliPanel, CliCard, CliButton } from '../components/cli'
 
 export default function Home() {
   // Single useReveal call, ref attached to the grid CONTAINER (not inside the
@@ -16,7 +16,6 @@ export default function Home() {
         <p className="font-cli text-cli-cyan text-[11px] tracking-[0.24em] uppercase">
           {SITE.location}
         </p>
-        <CliStatusDot status="active" label="online" className="text-xs" />
       </div>
 
       <h1 className="font-cli text-cli-emphasis mt-3 text-2xl tracking-tight sm:text-3xl">
@@ -29,7 +28,7 @@ export default function Home() {
 
       <div className="mt-8 flex flex-wrap items-center gap-4">
         <CliButton variant="solid" href={`mailto:${SITE.email}`}>
-          <MailIcon /> Get in touch
+          <MailIcon className="h-4 w-4" /> Get in touch
         </CliButton>
         <CliButton href={SITE.github} target="_blank">
           <GithubIcon className="h-4 w-4" /> {SITE.githubHandle}

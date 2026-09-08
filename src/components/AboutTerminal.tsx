@@ -133,7 +133,7 @@ export default function AboutTerminal() {
         </div>
         <div className="mt-8">
           <CliButton variant="solid" href={`mailto:${SITE.email}`}>
-            <MailIcon /> Say hello
+            <MailIcon className="h-4 w-4" /> Say hello
           </CliButton>
         </div>
 

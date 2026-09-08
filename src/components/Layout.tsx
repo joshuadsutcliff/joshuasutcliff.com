@@ -43,7 +43,7 @@ export default function Layout() {
               ssh line. Kept aria-hidden, and hidden from print by the
               .cli-header-strip-row rule in src/index.css. */}
           <div aria-hidden className="cli-header-strip-row py-2.5">
-            <CliHeaderStrip />
+            <CliHeaderStrip pathname={location.pathname} />
           </div>
           <nav
             aria-label="Primary"
@@ -64,8 +64,18 @@ export default function Layout() {
                       }`
                     }
                   >
-                    <span aria-hidden>/</span>
-                    {t.label}
+                    {({ isActive }) => (
+                      <>
+                        {/* Colour is a weak affordance on its own for a
+                            low-vision user, so the active tab also gets a
+                            non-colour marker glyph. aria-hidden keeps it out
+                            of the link's accessible name; the visible label
+                            text is unchanged either way. */}
+                        {isActive && <span aria-hidden>&gt;</span>}
+                        <span aria-hidden>/</span>
+                        {t.label}
+                      </>
+                    )}
                   </NavLink>
                 </li>
               ))}

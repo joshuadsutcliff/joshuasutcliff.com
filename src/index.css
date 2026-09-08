@@ -411,9 +411,10 @@ select:focus-visible,
 }
 
 /* These rules only apply inside an ancestor carrying the cli-scope class.
-   Today only StyleGuide.tsx sets that class. A later stage's site-wide
-   shell must add cli-scope to its root element so every page inherits the
-   CLI focus ring; the primitives here deliberately do not self-apply it. */
+   The site-wide shell (Layout.tsx) sets that class on its root, so every
+   real page inherits the CLI focus ring from there. StyleGuide.tsx also
+   sets it on its own root, since it renders CLI primitives outside the
+   site shell. The primitives here deliberately do not self-apply it. */
 .cli-scope a:focus-visible,
 .cli-scope button:focus-visible,
 .cli-scope input:focus-visible,

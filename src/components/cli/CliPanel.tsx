@@ -44,13 +44,11 @@ export interface CliPanelProps {
 /* The shared page frame for every CLI page: the centered section, the
    bordered rounded panel, and the terminal header row.
 
-   cli-scope ownership: the stage 5a shell (Layout.tsx) now also carries the
-   class on its root, so every page inherits the CLI focus ring. This
-   component keeps it too, because StyleGuide renders CLI primitives in a
-   standalone column outside any panel and still needs the scope. Nesting the
-   class is harmless: the rules in src/index.css are plain descendant
-   selectors, so an element inside two nested cli-scope ancestors matches the
-   same rule once. */
+   cli-scope ownership: since stage 5a the shell root (Layout.tsx) is the
+   sole owner of cli-scope for every real page render, so it is not repeated
+   here. StyleGuide.tsx still self-scopes its own root, because it renders
+   CLI primitives in a standalone column outside any panel or the site
+   shell. */
 export default function CliPanel({
   children,
   className = '',
@@ -60,7 +58,7 @@ export default function CliPanel({
   contentClassName = '',
 }: CliPanelProps) {
   return (
-    <section className={`cli-scope bg-cli-bg mx-auto px-6 py-20 print:py-4 ${WIDTH[width]}`}>
+    <section className={`bg-cli-bg mx-auto px-6 py-20 print:py-4 ${WIDTH[width]}`}>
       <div
         className={`border-cli-dim/30 bg-cli-bg overflow-hidden rounded-3xl border ${className}`}
       >
