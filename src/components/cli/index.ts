@@ -12,3 +12,18 @@ export type { CliHeaderStripProps } from './CliHeaderStrip'
 
 export { default as CliFooterStrip } from './CliFooterStrip'
 export type { CliFooterStripProps } from './CliFooterStrip'
+
+export { default as CliPanel } from './CliPanel'
+export type { CliPanelProps } from './CliPanel'
+
+export { default as CliButton } from './CliButton'
+export type { CliButtonProps, CliButtonSize, CliButtonVariant } from './CliButton'
+
+export { default as CliBootLog } from './CliBootLog'
+export type { CliBootLogProps, LogLine } from './CliBootLog'
+export { LOG_WINDOW_LINES, UPLINK_TEXT } from './CliBootLog'
+
+// The one merged CLI status vocabulary, consumed by CliStatusDot,
+// CliFooterStrip, and CliBootLog.
+export type { CliStatus } from './status'
+export { STATUS_LABEL, STATUS_CLASS } from './status'

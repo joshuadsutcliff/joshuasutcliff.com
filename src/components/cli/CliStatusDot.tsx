@@ -1,15 +1,23 @@
-export type CliStatusDotStatus = 'ok' | 'active' | 'warn'
+import type { CliStatus } from './status'
+
+/* The dot consumes the one merged CLI status vocabulary (see status.ts).
+   This alias is kept so existing imports of CliStatusDotStatus keep working. */
+export type CliStatusDotStatus = CliStatus
 
 export interface CliStatusDotProps {
-  status: CliStatusDotStatus
+  status: CliStatus
   label: string
   className?: string
 }
 
-const STATUS_COLOR: Record<CliStatusDotStatus, string> = {
+/* 'active' and 'armed' are both cyan: same visual, different call-site
+   wording. 'err' is sakura, matching the boot log's error class. */
+const STATUS_COLOR: Record<CliStatus, string> = {
   ok: 'bg-cli-green',
   active: 'bg-cli-cyan',
+  armed: 'bg-cli-cyan',
   warn: 'bg-cli-warn',
+  err: 'bg-cli-sakura',
 }
 
 // "[●]" status indicator. The bracket glyphs and the dot are decorative and

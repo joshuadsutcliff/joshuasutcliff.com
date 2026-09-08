@@ -1,9 +1,9 @@
 import CliStatusDot from './CliStatusDot'
-import type { CliStatusDotStatus } from './CliStatusDot'
+import type { CliStatus } from './status'
 
 export interface CliFooterStripProps {
   status?: string
-  dotStatus?: CliStatusDotStatus
+  dotStatus?: CliStatus
   className?: string
 }
 

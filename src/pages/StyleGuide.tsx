@@ -4,7 +4,34 @@ import {
   CliStatusDot,
   CliHeaderStrip,
   CliFooterStrip,
+  CliPanel,
+  CliButton,
+  CliBootLog,
 } from '../components/cli'
+import type { LogLine } from '../components/cli'
+import type { BootState } from '../hooks/useBootSequence'
+
+// Static sample data for the boot log showcase. The style guide does not run
+// the real boot clock: it renders a frozen mid-uplink frame so a reviewer can
+// see every status colour and the progress bar at once.
+const SAMPLE_LOG: LogLine[] = [
+  { text: 'kernel handoff', status: 'ok' },
+  { text: 'mount /skills', status: 'ok', note: 'sample note' },
+  { text: 'deploy pipeline', status: 'active' },
+  { text: 'metronome', status: 'armed' },
+  { text: 'embouchure', status: 'warn', note: 'out of practice' },
+  { text: 'coffee reserve', status: 'err', note: 'refill required' },
+]
+
+const SAMPLE_BOOT: BootState = {
+  phase: 'uplink',
+  visibleLines: SAMPLE_LOG.length,
+  progress: 64,
+  resolved: false,
+  instant: true,
+  skip: () => {},
+  replay: () => {},
+}
 
 // Unlinked proof route for the stage 1 CLI token/component work. Not wired
 // into Layout's TABS nav on purpose: this exists so a human and a reviewer
@@ -92,6 +119,36 @@ export default function StyleGuide() {
           <div className="mt-4">
             <CliFooterStrip />
           </div>
+        </section>
+
+        <section>
+          <CliSectionHeader>BUTTONS</CliSectionHeader>
+          <div className="mt-4 flex flex-wrap items-center gap-4">
+            <CliButton>Outline md</CliButton>
+            <CliButton size="sm">Outline sm</CliButton>
+            <CliButton variant="solid" href="#buttons">
+              Solid anchor
+            </CliButton>
+          </div>
+        </section>
+
+        <section>
+          <CliSectionHeader>BOOT LOG</CliSectionHeader>
+          <div className="mt-4">
+            <CliBootLog lines={SAMPLE_LOG} boot={SAMPLE_BOOT} />
+          </div>
+        </section>
+
+        <section>
+          <CliSectionHeader>PANEL</CliSectionHeader>
+          {/* CliPanel brings its own section, max width, and page padding, so
+              it deliberately breaks out of this page's column. That is the
+              frame every CLI page uses. */}
+          <CliPanel>
+            <div className="px-4 py-8 sm:px-6">
+              <p className="cli-prose">Page frame: section, bordered panel, header row.</p>
+            </div>
+          </CliPanel>
         </section>
       </div>
     </div>

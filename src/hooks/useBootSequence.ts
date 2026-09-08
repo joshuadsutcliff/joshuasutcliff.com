@@ -28,7 +28,14 @@ export const RESOLVE_FADE_MS = 450
     The key is intentionally site-wide ('cli-booted'), not per-page: a later
     stage plays the boot once on first arrival at ANY page and suppresses it
     for the rest of the visit, so that stage only has to move this hook's
-    call site, not rename the key or migrate stored state. */
+    call site, not rename the key or migrate stored state.
+
+    Today, however, the only writer is the About page, so the key currently
+    carries per-page meaning: "About has booted this session". When the boot
+    becomes site-wide, the key must be read as possibly ALREADY SET by an
+    earlier visit to a different page in the same browser session, which is
+    exactly the suppression that stage wants. Do not rename the key or change
+    the behavior to get there. */
 const SESSION_KEY = 'cli-booted'
 
 function hasBooted(): boolean {
