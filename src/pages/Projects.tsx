@@ -24,7 +24,7 @@ function ProjectGroupSection({
 
   return (
     <div className="mt-12">
-      <CliSectionHeader as="h2" divider>
+      <CliSectionHeader as="h2" divider command={group.command}>
         {group.heading}
       </CliSectionHeader>
       <div ref={gridRef} className="mt-5 grid gap-5 sm:grid-cols-2">
@@ -72,7 +72,12 @@ export default function Projects() {
 
   return (
     <CliPanel>
-      <p className="font-cli text-cli-cyan text-[11px] tracking-[0.24em] uppercase">Projects</p>
+      <p className="font-cli text-cli-cyan text-[11px] tracking-[0.24em] uppercase">
+        {/* Prompt glyph only, aria-hidden, so the kicker still reads as the
+            single word it is. The page has no section headings above the
+            groups, so this is where the terminal prefix belongs here. */}
+        <span aria-hidden>&gt;&nbsp;</span>Projects
+      </p>
       <h1 className="font-cli text-cli-emphasis mt-3 text-2xl tracking-tight sm:text-3xl">
         Things I build and run.
       </h1>

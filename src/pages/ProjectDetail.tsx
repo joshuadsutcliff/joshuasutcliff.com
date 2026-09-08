@@ -73,7 +73,12 @@ export default function ProjectDetail() {
       </CliCard>
 
       <div className="mt-10">
-        <CliSectionHeader as="h2" divider>
+        {/* Stack and Highlights are the two sections every detail page
+            has, so prefixing exactly those two gives a consistent rhythm.
+            The variable sections below (extras, diagrams, changelog,
+            screenshots) stay unprefixed on purpose: a command on every
+            heading reads as noise rather than as terminal chrome. */}
+        <CliSectionHeader as="h2" divider command="cat stack">
           Stack
         </CliSectionHeader>
         <div className="mt-4 flex flex-wrap gap-2">
@@ -84,7 +89,7 @@ export default function ProjectDetail() {
       </div>
 
       <div className="mt-10">
-        <CliSectionHeader as="h2" divider>
+        <CliSectionHeader as="h2" divider command="cat highlights">
           Highlights
         </CliSectionHeader>
         <ul className="cli-prose text-cli-text mt-4 list-disc space-y-2 pl-5">
