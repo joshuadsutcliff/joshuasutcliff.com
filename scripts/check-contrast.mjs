@@ -59,7 +59,16 @@ function contrastRatio(hexA, hexB) {
 // property blocks here contain no nested braces, so a simple
 // "up to the next top-level closing brace" scan is sufficient; we still
 // walk brace depth defensively in case a future block gains a nested rule.
+// Strips CSS comments before scanning, so a comment that happens to
+// mention a token (e.g. "/* was --cli-bg: #000 */") inside an unrelated
+// block cannot make this treat that block as a theme block, or make
+// readToken / readRgbToken below pick up a commented-out value.
+function stripComments(source) {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '')
+}
+
 function findThemeBlocks(source) {
+  source = stripComments(source)
   const blocks = []
   const headerRe = /:root(\[data-theme=['"]([a-z0-9-]+)['"]\])?\s*\{/g
   let match
