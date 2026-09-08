@@ -1,39 +1,9 @@
-import { MailIcon } from '../components/icons'
-import { SITE } from '../content/site'
-import { ABOUT } from '../content/about'
 import AboutTerminal from '../components/AboutTerminal'
-import { isAboutTerminalEnabled } from '../lib/terminalFlag'
 
+// The About page is the CLI reference implementation (stage 3). The old
+// feature-flagged sans-serif fallback is gone: the terminal renders
+// unconditionally. src/lib/terminalFlag.ts is intentionally left on disk
+// with no consumer here; a later stage retires the file.
 export default function About() {
-  if (isAboutTerminalEnabled()) return <AboutTerminal />
-
-  return (
-    <section className="mx-auto max-w-5xl px-6 py-20">
-      <div className="hud-panel hud-panel-solid rounded-3xl p-8 sm:p-12">
-        <p className="hud-eyebrow">{ABOUT.kicker}</p>
-        <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight text-fg sm:text-4xl">
-          {ABOUT.headline}
-        </h1>
-        <div className="mt-6">
-          <a
-            href={`mailto:${SITE.email}`}
-            className="inline-flex items-center gap-2 rounded-full bg-cyan px-5 py-2.5 text-sm font-medium text-[#07090f] transition-transform hover:scale-[1.03]"
-          >
-            <MailIcon /> Say hello
-          </a>
-        </div>
-      </div>
-
-      <div className="mt-6 grid gap-6 sm:grid-cols-2">
-        {ABOUT.paragraphs.map((p, i) => (
-          <div
-            key={p.slice(0, 24)}
-            className={`hud-panel hud-panel-solid rounded-3xl p-8 ${i === 0 ? 'sm:col-span-2' : ''}`}
-          >
-            <p className="leading-relaxed text-muted">{p}</p>
-          </div>
-        ))}
-      </div>
-    </section>
-  )
+  return <AboutTerminal />
 }

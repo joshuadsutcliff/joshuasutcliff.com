@@ -15,12 +15,17 @@ export default function CliHeaderStrip({ className = '' }: CliHeaderStripProps) 
   // missing window/sessionStorage.
   const [sessionId] = useState(() => getSessionId())
 
+  // Decorative terminal chrome (live indicator, session hex, ssh string).
+  // Hidden from the accessibility tree on purpose: contains no information
+  // or interaction for screen reader users. Do not add interactive or
+  // informational content to this component without revisiting that decision.
   return (
     <div
       className={`font-cli text-cli-text flex items-center justify-between gap-4 text-xs ${className}`}
+      aria-hidden
     >
       <span className="text-cli-green flex items-center gap-1.5">
-        <span aria-hidden>&#9654;</span>
+        <span>&#9654;</span>
         LIVE
       </span>
       <span className="text-cli-dim">

@@ -9,8 +9,10 @@ import { prefersReducedMotion } from '../lib/motion'
 
 /** Panel stays empty this long before the first log line appears. */
 export const BOOT_START_DELAY_MS = 2500
-/** Gap between consecutive log lines. */
-export const LOG_LINE_INTERVAL_MS = 150
+/** Gap between consecutive log lines. THIS IS THE PACING TUNING KNOB: the
+    owner wants roughly 90 to 110 ms per line and will tune from here, so it
+    stays a named exported constant and is never inlined at a call site. */
+export const LOG_LINE_INTERVAL_MS = 100
 /** Pause after the last log line before the uplink line and bar appear. */
 export const UPLINK_DELAY_MS = 200
 /** How long the progress bar takes to run from 0 to 100 percent. */
@@ -22,8 +24,12 @@ export const BOOT_TICK_MS = 40
 /** Fade used when the resolved content crosses in. */
 export const RESOLVE_FADE_MS = 450
 
-/** sessionStorage marker so the boot plays at most once per session. */
-const SESSION_KEY = 'about-terminal-booted'
+/** sessionStorage marker so the boot plays at most once per session.
+    The key is intentionally site-wide ('cli-booted'), not per-page: a later
+    stage plays the boot once on first arrival at ANY page and suppresses it
+    for the rest of the visit, so that stage only has to move this hook's
+    call site, not rename the key or migrate stored state. */
+const SESSION_KEY = 'cli-booted'
 
 function hasBooted(): boolean {
   try {

@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { MailIcon } from './icons'
 import { SITE } from '../content/site'
 import { ABOUT } from '../content/about'
 import useBootSequence, { RESOLVE_FADE_MS } from '../hooks/useBootSequence'
+import { CliHeaderStrip, CliKeyValue, CliFooterStrip } from './cli'
 
 /* ---------------------------------------------------------------------------
    Wordmark. Not final copy, so it lives here as a single swappable constant.
@@ -16,14 +17,13 @@ function renderWordmark() {
   return (
     <>
       {WORDMARK.slice(0, i)}
-      <span className="text-accent-sakura">::</span>
+      <span className="text-cli-sakura">::</span>
       {WORDMARK.slice(i + 2)}
     </>
   )
 }
 
 const SUBHEAD = ':: CORE ::'
-const SSH_STRING = 'ssh visitor@joshuasutcliff.com'
 
 type Status = 'ok' | 'armed' | 'warn' | 'err'
 
@@ -89,11 +89,13 @@ const STATUS_LABEL: Record<Status, string> = {
   err: '[ERR]',
 }
 
+/* CLI palette only. Every value here is a token the contrast script checks;
+   no opacity modifiers, no hardcoded hex. */
 const STATUS_CLASS: Record<Status, string> = {
-  ok: 'text-accent-cli',
-  armed: 'text-cyan',
-  warn: 'text-[#f59e0b]',
-  err: 'text-accent-sakura',
+  ok: 'text-cli-green',
+  armed: 'text-cli-cyan',
+  warn: 'text-cli-warn',
+  err: 'text-cli-sakura',
 }
 
 /* Operator status block. Real facts, so it stays in the accessibility tree. */
@@ -105,15 +107,8 @@ const STATUS_ROWS: Array<[string, string]> = [
   ['status', 'open to a good problem'],
 ]
 
-function sessionHex(): string {
-  let out = ''
-  for (let i = 0; i < 8; i += 1) out += Math.floor(Math.random() * 16).toString(16)
-  return out
-}
-
 export default function AboutTerminal() {
   const boot = useBootSequence(LOG.length)
-  const [hex] = useState(sessionHex)
   const lines = useMemo(
     () => LOG.slice(0, boot.visibleLines).slice(-LOG_WINDOW_LINES),
     [boot.visibleLines],
@@ -121,55 +116,47 @@ export default function AboutTerminal() {
   const showBoot = !boot.resolved
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-20">
-      <div className="hud-panel hud-panel-solid overflow-hidden rounded-3xl">
-        {/* Header strip: decorative chrome. */}
-        <div
-          aria-hidden
-          className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 font-mono text-[10px] tracking-[0.14em] uppercase sm:px-6 sm:text-[11px]"
-        >
-          <span className="flex items-center gap-2 whitespace-nowrap">
-            <span className="text-accent-cli">&#9654;</span>
-            <span className="text-accent-cli">LIVE</span>
-            <span className="text-dim">{hex}</span>
-          </span>
-          <span className="truncate text-dim">{SSH_STRING}</span>
+    <section className="cli-scope bg-cli-bg mx-auto max-w-5xl px-6 py-20">
+      <div className="border-cli-dim/30 bg-cli-bg overflow-hidden rounded-3xl border">
+        {/* Header strip: decorative chrome, shared primitive. */}
+        <div aria-hidden className="border-cli-dim/30 border-b px-4 py-3 sm:px-6">
+          <CliHeaderStrip />
         </div>
 
         {showBoot && (
           <div className="px-4 py-6 sm:px-6">
             <div
               aria-hidden
-              className="flex flex-col justify-start font-mono text-[11px] leading-6 sm:text-xs"
+              className="font-cli flex flex-col justify-start text-[11px] leading-6 sm:text-xs"
               style={{ minHeight: `${LOG_WINDOW_LINES * 1.5}rem` }}
             >
               {lines.map((l) => (
                 <div key={l.text} className="flex flex-wrap gap-x-2">
-                  <span className="text-dim">&gt;&gt;</span>
-                  <span className="text-muted">{l.text}</span>
+                  <span className="text-cli-dim">&gt;&gt;</span>
+                  <span className="text-cli-text">{l.text}</span>
                   <span className={STATUS_CLASS[l.status]}>{STATUS_LABEL[l.status]}</span>
-                  {l.note && <span className="text-dim">{l.note}</span>}
+                  {l.note && <span className="text-cli-dim">{l.note}</span>}
                 </div>
               ))}
               {boot.phase === 'uplink' && (
                 <>
                   <div className="flex flex-wrap gap-x-2">
-                    <span className="text-dim">&gt;&gt;</span>
-                    <span className="text-muted">{UPLINK_TEXT}</span>
-                    <span className="text-cyan">[ARMED]</span>
+                    <span className="text-cli-dim">&gt;&gt;</span>
+                    <span className="text-cli-text">{UPLINK_TEXT}</span>
+                    <span className="text-cli-cyan">[ARMED]</span>
                   </div>
                   <div className="mt-3 flex items-center gap-3">
-                    <div className="h-1.5 w-full max-w-md overflow-hidden rounded-full bg-bg3">
+                    <div className="bg-cli-dim/20 h-1.5 w-full max-w-md overflow-hidden rounded-full">
                       <div
                         className="h-full rounded-full"
                         style={{
                           width: `${boot.progress}%`,
                           background:
-                            'linear-gradient(90deg, var(--cyan), var(--accent-sakura))',
+                            'linear-gradient(90deg, var(--cli-cyan), var(--cli-sakura))',
                         }}
                       />
                     </div>
-                    <span className="tabular-nums text-cyan">{boot.progress}%</span>
+                    <span className="text-cli-cyan tabular-nums">{boot.progress}%</span>
                   </div>
                 </>
               )}
@@ -178,7 +165,7 @@ export default function AboutTerminal() {
               <button
                 type="button"
                 onClick={boot.skip}
-                className="rounded-full border border-border px-4 py-2 font-mono text-[11px] tracking-[0.18em] text-dim uppercase transition-colors hover:border-cyan hover:text-cyan"
+                className="border-cli-dim/40 text-cli-dim hover:border-cli-cyan hover:text-cli-cyan font-cli rounded-full border px-4 py-2 text-[11px] tracking-[0.18em] uppercase transition-colors"
               >
                 Skip
               </button>
@@ -192,31 +179,33 @@ export default function AboutTerminal() {
           className={`px-4 py-8 sm:px-6 sm:py-10 ${showBoot ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
           style={{ transition: `opacity ${RESOLVE_FADE_MS}ms ease` }}
         >
-          <p aria-hidden className="font-mono text-lg tracking-[0.2em] text-fg sm:text-xl">
+          <p aria-hidden className="font-cli text-cli-emphasis text-lg tracking-[0.2em] sm:text-xl">
             {renderWordmark()}
           </p>
-          <p className="mt-2 font-mono text-[11px] tracking-[0.24em] text-accent-sakura uppercase">
+          <p aria-hidden className="font-cli text-cli-sakura mt-2 text-[11px] tracking-[0.24em] uppercase">
             {SUBHEAD}
           </p>
 
-          <dl className="mt-6 grid gap-x-6 gap-y-1 font-mono text-[11px] sm:grid-cols-[10rem_1fr] sm:text-xs">
-            {STATUS_ROWS.map(([k, v]) => (
-              <div key={k} className="contents">
-                <dt className="text-cyan">{k}</dt>
-                <dd className="mb-2 text-muted sm:mb-0">{v}</dd>
-              </div>
-            ))}
-          </dl>
+          <CliKeyValue
+            className="mt-6 text-[11px] sm:text-xs"
+            rows={STATUS_ROWS.map(([key, value]) => ({ key, value }))}
+          />
 
-          <hr className="hud-divider my-8" />
+          <hr className="border-cli-dim/30 my-8" />
 
-          <p className="hud-eyebrow">{ABOUT.kicker}</p>
-          <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight text-fg sm:text-4xl">
+          <p className="font-cli text-cli-cyan text-[11px] tracking-[0.24em] uppercase">
+            {ABOUT.kicker}
+          </p>
+          {/* Only heading on the page, so heading order cannot skip a level. */}
+          <h1 className="font-cli text-cli-emphasis mt-3 text-2xl tracking-tight sm:text-3xl">
             {ABOUT.headline}
           </h1>
+          {/* Biography prose is deliberately Geologica (.cli-prose), not
+              monospace: the two-typeface system is what keeps long-form
+              reading comfortable inside the terminal panel. */}
           <div className="mt-6 space-y-5">
             {ABOUT.paragraphs.map((p) => (
-              <p key={p.slice(0, 24)} className="leading-relaxed text-muted">
+              <p key={p.slice(0, 24)} className="cli-prose">
                 {p}
               </p>
             ))}
@@ -224,23 +213,20 @@ export default function AboutTerminal() {
           <div className="mt-8">
             <a
               href={`mailto:${SITE.email}`}
-              className="inline-flex items-center gap-2 rounded-full bg-cyan px-5 py-2.5 text-sm font-medium text-[#07090f] transition-transform hover:scale-[1.03]"
+              className="bg-cli-cyan text-cli-bg font-cli inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-transform hover:scale-[1.03]"
             >
               <MailIcon /> Say hello
             </a>
           </div>
 
-          <hr className="hud-divider my-8" />
+          <hr className="border-cli-dim/30 my-8" />
 
-          <div className="flex flex-wrap items-center justify-between gap-3 font-mono text-[10px] tracking-[0.14em] text-dim uppercase sm:text-[11px]">
-            <span className="flex items-center gap-2">
-              <span className="hud-dot hud-dot--green" />
-              online
-            </span>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <CliFooterStrip status="online" dotStatus="ok" />
             <button
               type="button"
               onClick={boot.replay}
-              className="rounded-full border border-border px-3 py-1.5 tracking-[0.18em] uppercase transition-colors hover:border-cyan hover:text-cyan"
+              className="border-cli-dim/40 text-cli-dim hover:border-cli-cyan hover:text-cli-cyan font-cli rounded-full border px-3 py-1.5 text-[11px] tracking-[0.18em] uppercase transition-colors"
             >
               Replay boot
             </button>
