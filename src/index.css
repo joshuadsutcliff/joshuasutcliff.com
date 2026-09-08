@@ -318,7 +318,12 @@ html.lenis {
 
 body {
   margin: 0;
-  background: var(--bg);
+  /* Themed --cli-bg, not the legacy --bg, so the base layer matches the
+     active theme. This is what shows through the elastic overscroll
+     gutter (macOS/iOS rubber-band scrolling) past the .cli-scope wrapper's
+     edges; leaving it on --bg made that gutter flash near-black on every
+     theme regardless of the theme's actual ground colour. */
+  background: var(--cli-bg);
   color: var(--text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
