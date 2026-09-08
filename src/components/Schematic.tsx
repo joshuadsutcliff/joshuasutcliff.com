@@ -291,8 +291,8 @@ function GateChip({ gate }: { gate: SchematicGate }) {
         style={{
           border: `1px solid ${isDeny ? 'rgba(var(--cli-warn-rgb), 0.6)' : 'rgba(var(--cli-dim-rgb), 0.5)'}`,
           background: isDeny
-            ? 'radial-gradient(circle, #050608 40%, rgba(var(--cli-warn-rgb), 0.22) 100%)'
-            : 'radial-gradient(circle, #050608 40%, rgba(var(--cli-dim-rgb), 0.18) 100%)',
+            ? 'radial-gradient(circle, var(--cli-bg) 40%, rgba(var(--cli-warn-rgb), 0.22) 100%)'
+            : 'radial-gradient(circle, var(--cli-bg) 40%, rgba(var(--cli-dim-rgb), 0.18) 100%)',
         }}
       />
       <span className="font-cli text-cli-dim text-[11px]">{gate.label}</span>

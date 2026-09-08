@@ -87,6 +87,171 @@
   --cli-bad-rgb: 255, 107, 107;
 }
 
+/* Theme token architecture (stage 1 of the theme picker). Each block below
+   redefines the full CLI token group for one named theme, keyed off a
+   data-theme attribute placed on document.documentElement. The bare :root
+   block above IS the "Default" theme and its values must never change;
+   :root[data-theme="default"] is an explicit alias so a stored "default"
+   value in localStorage also resolves correctly, without the attribute
+   needing to be absent.
+
+   Source hexes are the theme's own primary/secondary accent and background,
+   pulled from Nexus System Monitor's BuiltInThemePresets.cs per the design
+   brief. Every token in the CLI group is redefined here, including the
+   -rgb companions (they feed rgba() glows and borders elsewhere in this
+   file, so a theme that redefines --cli-cyan but leaves --cli-cyan-rgb at
+   the Default triple would render those effects in the wrong colour).
+
+   --cli-dim is documented above as --cli-text pre-composited at 70 percent
+   opacity over --cli-bg. Because it depends on both text and bg, it is
+   recomputed per theme from that theme's own values (never copied from
+   Default), and same for its -rgb companion.
+
+   Where a source hex measured below 4.5:1 against its own theme bg, it was
+   nudged toward the background's opposite pole and the original hex plus
+   the failing ratio are noted inline; check-contrast.mjs verifies every
+   theme block's final numbers on every run. */
+:root[data-theme='default'] {
+  --cli-bg: #121319;
+  --cli-text: #aac1cb;
+  --cli-cyan: #00ced1;
+  --cli-cyan-rgb: 0, 206, 209;
+  --cli-sakura: #e75480;
+  --cli-sakura-rgb: 231, 84, 128;
+  --cli-green: #4ade80;
+  --cli-green-rgb: 74, 222, 128;
+  --cli-emphasis: #ffffff;
+  --cli-warn: #f59e0b;
+  --cli-warn-rgb: 245, 158, 11;
+  --cli-dim: #7c8d96;
+  --cli-dim-rgb: 124, 141, 150;
+  --cli-bad: #ff6b6b;
+  --cli-bad-rgb: 255, 107, 107;
+}
+
+/* Cherry Blossom. Source theme is light in Nexus; adapted onto a warm
+   near-black ground per the brief rather than importing the light bg.
+   Pink-forward: primary accent #E84393, secondary #D63384. */
+:root[data-theme='cherry-blossom'] {
+  --cli-bg: #17101a;
+  --cli-text: #aac1cb;
+  --cli-cyan: #E84393;
+  --cli-cyan-rgb: 232, 67, 147;
+  /* Source secondary #D63384 measured 4.15:1 against #17101a (fails 4.5:1).
+     Lightened to #DB4A93, 4.81:1. */
+  --cli-sakura: #DB4A93;
+  --cli-sakura-rgb: 219, 74, 147;
+  /* Deliberate: kept Default's #4ade80 status green rather than nudging it
+     for the warm #17101a ground. Judged it reads clearly as "ok/online"
+     against the pink accents without clashing, and it clears contrast with
+     large margin (10.71:1) so there was no accessibility reason to change
+     it either. */
+  --cli-green: #4ade80;
+  --cli-green-rgb: 74, 222, 128;
+  --cli-emphasis: #ffffff;
+  --cli-warn: #f59e0b;
+  --cli-warn-rgb: 245, 158, 11;
+  --cli-dim: #7e8c96;
+  --cli-dim-rgb: 126, 140, 150;
+  --cli-bad: #ff6b6b;
+  --cli-bad-rgb: 255, 107, 107;
+}
+
+/* Dark Sakura. Already dark in Nexus, used verbatim: primary #FF6B9D,
+   secondary #FFB0CC. */
+:root[data-theme='dark-sakura'] {
+  --cli-bg: #1A0F15;
+  --cli-text: #aac1cb;
+  --cli-cyan: #FF6B9D;
+  --cli-cyan-rgb: 255, 107, 157;
+  --cli-sakura: #FFB0CC;
+  --cli-sakura-rgb: 255, 176, 204;
+  --cli-green: #4ade80;
+  --cli-green-rgb: 74, 222, 128;
+  --cli-emphasis: #ffffff;
+  --cli-warn: #f59e0b;
+  --cli-warn-rgb: 245, 158, 11;
+  --cli-dim: #7f8c94;
+  --cli-dim-rgb: 127, 140, 148;
+  --cli-bad: #ff6b6b;
+  --cli-bad-rgb: 255, 107, 107;
+}
+
+/* Arctic. Source theme is light in Nexus; adapted onto a cool near-black
+   ground per the brief. Cool blue: primary accent #0288D1, secondary
+   #0277BD. */
+:root[data-theme='arctic'] {
+  --cli-bg: #0A1420;
+  --cli-text: #aac1cb;
+  --cli-cyan: #0288D1;
+  --cli-cyan-rgb: 2, 136, 209;
+  /* Source secondary #0277BD measured 3.86:1 against #0A1420 (fails
+     4.5:1). Lightened to #1490D8, 5.30:1. */
+  --cli-sakura: #1490D8;
+  --cli-sakura-rgb: 20, 144, 216;
+  --cli-green: #4ade80;
+  --cli-green-rgb: 74, 222, 128;
+  --cli-emphasis: #ffffff;
+  --cli-warn: #f59e0b;
+  --cli-warn-rgb: 245, 158, 11;
+  --cli-dim: #7a8d98;
+  --cli-dim-rgb: 122, 141, 152;
+  --cli-bad: #ff6b6b;
+  --cli-bad-rgb: 255, 107, 107;
+}
+
+/* Outer Space. Already dark in Nexus, used verbatim: primary #7C5CFC,
+   secondary #B8A9FF. Deep violet. */
+:root[data-theme='outer-space'] {
+  --cli-bg: #05050F;
+  --cli-text: #aac1cb;
+  --cli-cyan: #7C5CFC;
+  --cli-cyan-rgb: 124, 92, 252;
+  --cli-sakura: #B8A9FF;
+  --cli-sakura-rgb: 184, 169, 255;
+  --cli-green: #4ade80;
+  --cli-green-rgb: 74, 222, 128;
+  --cli-emphasis: #ffffff;
+  --cli-warn: #f59e0b;
+  --cli-warn-rgb: 245, 158, 11;
+  --cli-dim: #788993;
+  --cli-dim-rgb: 120, 137, 147;
+  --cli-bad: #ff6b6b;
+  --cli-bad-rgb: 255, 107, 107;
+}
+
+/* Nord. Already dark in Nexus, used verbatim: primary #88C0D0, secondary
+   #81A1C1. Nord's #2E3440 ground is much lighter than Default's #121319,
+   so two values needed adjustment to clear 4.5:1 here that pass unmodified
+   everywhere else. */
+:root[data-theme='nord'] {
+  --cli-bg: #2E3440;
+  /* Default --cli-text (#aac1cb) itself passes here at 6.66:1, but its
+     70-percent composite (--cli-dim below) measured 4.13:1 against
+     #2E3440, failing 4.5:1. Lightened text to #C8D8DF (8.53:1) so the
+     composited --cli-dim also clears the bar. */
+  --cli-text: #C8D8DF;
+  --cli-cyan: #88C0D0;
+  --cli-cyan-rgb: 136, 192, 208;
+  --cli-sakura: #81A1C1;
+  --cli-sakura-rgb: 129, 161, 193;
+  /* A saturated spring green (#4ade80) is off-identity against Nord's grey
+     ground, so status green/warn are swapped for Nord's own Aurora palette
+     (green #A3BE8C, yellow #EBCB8B) instead of the Default hues. Both
+     clear 4.5:1 against #2E3440 (6.13:1 and 8.00:1). */
+  --cli-green: #A3BE8C;
+  --cli-green-rgb: 163, 190, 140;
+  --cli-emphasis: #ECEFF4;
+  --cli-warn: #EBCB8B;
+  --cli-warn-rgb: 235, 203, 139;
+  --cli-dim: #9aa7af;
+  --cli-dim-rgb: 154, 167, 175;
+  /* Source --cli-bad #ff6b6b measured 4.50:1 against #2E3440, right at the
+     floor with no rounding margin. Lightened to #FF8888, 5.43:1. */
+  --cli-bad: #FF8888;
+  --cli-bad-rgb: 255, 136, 136;
+}
+
 /* Map our tokens into Tailwind's theme so utilities like text-fg, bg-card work */
 @theme inline {
   --font-sans: 'Schibsted Grotesk', system-ui, sans-serif;
@@ -121,8 +286,24 @@
   --color-cli-dim: var(--cli-dim);
 }
 
-* {
-  border-color: var(--border);
+/* Default border color, deliberately layered into Tailwind's base layer.
+   Tailwind's utilities (including every border-cli-* class) live inside
+   @layer utilities via @import 'tailwindcss'. If this universal rule were
+   left as plain unlayered CSS like the rest of this stylesheet, it would
+   permanently beat every border-cli-* utility in the codebase, regardless
+   of specificity or source order, because an unlayered declaration always
+   wins over a layered one. That is exactly the bug this comment guards
+   against: it silently pinned every themed border back to the legacy
+   --border value and blocked the theme picker from ever re-theming
+   borders. Keeping this inside @layer base restores the intended order,
+   an element with no border utility still gets this default, and any
+   element carrying a border-cli-* (or other Tailwind border-color)
+   utility wins over it. Do not "clean this up" by unwrapping the layer,
+   that reintroduces the bug described here. */
+@layer base {
+  * {
+    border-color: var(--border);
+  }
 }
 
 html {
@@ -146,7 +327,7 @@ body {
 }
 
 ::selection {
-  background: rgba(var(--cyan-rgb), 0.3);
+  background: rgba(var(--cli-cyan-rgb), 0.3);
 }
 
 /* Keyboard focus ring - visible on near-black backgrounds, mouse clicks stay
@@ -229,10 +410,10 @@ select:focus-visible,
   height: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg2);
+  background: var(--cli-bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-bright);
+  background: var(--cli-dim);
   border-radius: 6px;
 }
 
