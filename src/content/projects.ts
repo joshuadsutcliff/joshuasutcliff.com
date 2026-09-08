@@ -12,12 +12,17 @@ export type ProjectCard = {
 
 export type ProjectGroup = {
   heading: string
+  /** Decorative shell command shown ahead of the group heading. Purely
+      presentational: it is rendered aria-hidden, so it never becomes part
+      of the heading's accessible name. */
+  command?: string
   cards: ProjectCard[]
 }
 
 export const PROJECT_GROUPS: ProjectGroup[] = [
   {
     heading: 'Infrastructure',
+    command: 'ls -la /infra',
     cards: [
       {
         slug: 'home-lab',
@@ -37,6 +42,7 @@ export const PROJECT_GROUPS: ProjectGroup[] = [
   },
   {
     heading: 'Apps & Tools',
+    command: 'ls -la /apps',
     cards: [
       {
         slug: 'nexus-system-monitor',
@@ -66,6 +72,7 @@ export const PROJECT_GROUPS: ProjectGroup[] = [
   },
   {
     heading: 'AI Operations',
+    command: 'ls -la /ai-ops',
     cards: [
       {
         slug: 'ai-operations',
