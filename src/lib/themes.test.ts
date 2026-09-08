@@ -8,7 +8,7 @@ import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import { THEMES } from './themes'
+import { THEMES, THEME_STORAGE_KEY } from './themes'
 
 // Pins the hand-synced hexes in THEMES (bg/primary/secondary) to the
 // --cli-bg / --cli-cyan / --cli-sakura values actually shipped in
@@ -91,5 +91,35 @@ describe('THEMES registry matches src/index.css', () => {
         bareValue!.toLowerCase(),
       )
     }
+  })
+})
+
+// Pins the pre-paint inline script in index.html (which cannot import
+// themes.ts, so it hardcodes its own copy of the theme id list and the
+// storage key) to the THEMES registry and THEME_STORAGE_KEY, so the two
+// cannot silently drift apart the way index.html's own comment warns they
+// might.
+describe('index.html pre-paint script matches the THEMES registry', () => {
+  const htmlPath = path.join(__dirname, '..', '..', 'index.html')
+  const html = readFileSync(htmlPath, 'utf8')
+
+  it('KNOWN_THEME_IDS matches THEMES ids, in order', () => {
+    const match = html.match(/KNOWN_THEME_IDS\s*=\s*\[([^\]]*)\]/)
+    expect(match, 'KNOWN_THEME_IDS array not found in index.html').not.toBeNull()
+
+    const ids = match![1]
+      .split(',')
+      .map((entry) => entry.trim())
+      .filter((entry) => entry.length > 0)
+      .map((entry) => entry.replace(/^['"]|['"]$/g, ''))
+
+    expect(ids).toEqual(THEMES.map((theme) => theme.id))
+  })
+
+  it('STORAGE_KEY matches THEME_STORAGE_KEY', () => {
+    const match = html.match(/STORAGE_KEY\s*=\s*['"]([^'"]*)['"]/)
+    expect(match, 'STORAGE_KEY not found in index.html').not.toBeNull()
+
+    expect(match![1]).toBe(THEME_STORAGE_KEY)
   })
 })
