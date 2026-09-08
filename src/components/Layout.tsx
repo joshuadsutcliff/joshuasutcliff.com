@@ -9,12 +9,16 @@ import BootOverlay from './BootOverlay'
 import { CliHeaderStrip } from './cli'
 import ThemePicker from './ThemePicker'
 
+/* cmd is the decorative terminal-command string shown in the hover/focus
+   tooltip (see .nav-cmd-tooltip in src/index.css). It is never part of the
+   link's accessible name: the span that renders it stays aria-hidden, the
+   same treatment the active-tab marker glyph below already gets. */
 const TABS = [
-  { to: '/', label: 'home' },
-  { to: '/work', label: 'work' },
-  { to: '/projects', label: 'projects' },
-  { to: '/about', label: 'about' },
-  { to: '/resume', label: 'resume' },
+  { to: '/', label: 'home', cmd: '> cd ~' },
+  { to: '/work', label: 'work', cmd: '> cat /var/log/work.log // history' },
+  { to: '/projects', label: 'projects', cmd: '> ls -la /projects/' },
+  { to: '/about', label: 'about', cmd: '> ssh visitor@joshuasutcliff.com' },
+  { to: '/resume', label: 'resume', cmd: '> cat resume.pdf' },
 ]
 
 /* The site-wide CLI shell (stage 5a).
@@ -58,35 +62,49 @@ export default function Layout() {
               className="border-cli-dim/20 flex flex-nowrap items-center justify-between gap-x-2 border-t py-2"
             >
               <ul className="flex min-w-0 flex-nowrap items-center gap-x-1 sm:gap-x-2">
-                {TABS.map((t) => (
-                  <li key={t.to}>
-                    <NavLink
-                      to={t.to}
-                      end={t.to === '/'}
-                      viewTransition={useViewTransition}
-                      className={({ isActive }) =>
-                        `font-cli inline-flex min-h-11 items-center whitespace-nowrap rounded-md px-2 py-2 text-[11px] tracking-[0.14em] uppercase transition-colors sm:px-3 sm:text-xs ${
-                          isActive
-                            ? 'text-cli-cyan border-cli-cyan/60 border-b'
-                            : 'text-cli-dim hover:text-cli-text border-b border-transparent'
-                        }`
-                      }
-                    >
-                      {({ isActive }) => (
-                        <>
-                          {/* Colour is a weak affordance on its own for a
-                              low-vision user, so the active tab also gets a
-                              non-colour marker glyph. aria-hidden keeps it out
-                              of the link's accessible name; the visible label
-                              text is unchanged either way. */}
-                          {isActive && <span aria-hidden>&gt;</span>}
-                          <span aria-hidden>/</span>
-                          {t.label}
-                        </>
-                      )}
-                    </NavLink>
-                  </li>
-                ))}
+                {TABS.map((t, i) => {
+                  /* The tooltip anchors to its own tab's edge instead of
+                     always centering, so it never pushes past the nav's
+                     left/right bound on a narrow viewport. See the
+                     data-align styling in src/index.css. */
+                  const align = i === 0 ? 'start' : i === TABS.length - 1 ? 'end' : 'center'
+                  return (
+                    <li key={t.to} className="nav-item">
+                      <NavLink
+                        to={t.to}
+                        end={t.to === '/'}
+                        viewTransition={useViewTransition}
+                        className={({ isActive }) =>
+                          `nav-pill font-cli inline-flex min-h-11 items-center whitespace-nowrap rounded-md px-2 py-2 text-[11px] tracking-[0.14em] uppercase transition-colors sm:px-3 sm:text-xs ${
+                            isActive
+                              ? 'text-cli-cyan border-cli-cyan/60 border-b'
+                              : 'text-cli-dim hover:text-cli-text border-b border-transparent'
+                          }`
+                        }
+                      >
+                        {({ isActive }) => (
+                          <>
+                            {/* Colour is a weak affordance on its own for a
+                                low-vision user, so the active tab also gets a
+                                non-colour marker glyph. aria-hidden keeps it out
+                                of the link's accessible name; the visible label
+                                text is unchanged either way. */}
+                            {isActive && <span aria-hidden>&gt;</span>}
+                            <span aria-hidden>/</span>
+                            {t.label}
+                          </>
+                        )}
+                      </NavLink>
+                      {/* Decorative command bubble: aria-hidden keeps it out
+                          of the link's accessible name (same rationale as the
+                          marker glyph above), and it is positioned absolute
+                          so its appearance/disappearance never shifts layout. */}
+                      <span aria-hidden data-align={align} className="nav-cmd-tooltip">
+                        {t.cmd}
+                      </span>
+                    </li>
+                  )
+                })}
               </ul>
               <div className="flex shrink-0 items-center gap-2">
                 {/* Sits next to the GitHub icon link: both are the header's

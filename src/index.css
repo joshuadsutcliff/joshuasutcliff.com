@@ -428,6 +428,158 @@ select:focus-visible,
   }
 }
 
+/* Nav hover command tooltip + pill glow (stage 3 flourish).
+
+   .nav-item wraps each tab's <li>: it is the positioning context the
+   tooltip is absolutely placed against, so the tooltip appearing and
+   disappearing never affects layout (it is out of flow, top: 100% of the
+   nav itself does not move).
+
+   The near-black tooltip ground is derived from --cli-bg via color-mix
+   rather than a hardcoded hex, so it still reads as "near-black" chrome
+   under every theme while staying on the themed token instead of a fixed
+   color that would go wrong on a light-adjacent theme like Nord. The
+   border and text color are the -rgb/plain companions of --cli-cyan, per
+   the theming rule at the top of this file: never hardcode a glow/fill
+   color, always build it from the CLI tokens so it swaps with the theme. */
+.nav-item {
+  position: relative;
+}
+/* Horizontal placement is driven by a data-align attribute set per tab in
+   Layout.tsx ('start' | 'center' | 'end'), not by a Tailwind translate
+   utility: this file is entirely unlayered plain CSS (see the cascade
+   hazard comment near the top), so an unlayered transform declaration
+   here would always beat a layered Tailwind translate-x-* utility applied
+   to the same element regardless of source order. Keeping the full
+   transform (including the centering translateX) inside this one
+   unlayered rule sidesteps that trap entirely. The first and last tabs
+   anchor to their own edge instead of centering, so the bubble never
+   pushes past the nav's left/right bound on a narrow viewport. The
+   transform is fixed per alignment (not animated): only opacity
+   transitions on show/hide, which keeps the custom-property plumbing
+   simple and still reads as a soft appear/disappear. */
+.nav-cmd-tooltip {
+  position: absolute;
+  bottom: 100%;
+  margin-bottom: 6px;
+  padding: 4px 8px;
+  max-width: min(240px, calc(100vw - 24px));
+  white-space: nowrap;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  background: color-mix(in srgb, var(--cli-bg) 55%, #000);
+  border: 1px solid rgba(var(--cli-cyan-rgb), 0.5);
+  color: var(--cli-cyan);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 30;
+}
+.nav-cmd-tooltip[data-align='center'] {
+  left: 50%;
+  transform: translateX(-50%);
+}
+.nav-cmd-tooltip[data-align='start'] {
+  left: 0;
+}
+.nav-cmd-tooltip[data-align='end'] {
+  right: 0;
+}
+
+/* Hover-driven affordance is gated behind (hover: hover) so a touch device
+   never has to tap-to-dismiss a tooltip before the link itself works; touch
+   users get the tooltip only via the focus-visible rule below, which fires
+   regardless of input modality. */
+@media (hover: hover) {
+  .nav-item:hover .nav-cmd-tooltip {
+    opacity: 1;
+    transition: opacity 150ms ease;
+  }
+  .nav-item:hover .nav-pill {
+    background: rgba(var(--cli-cyan-rgb), 0.1);
+    box-shadow: 0 0 12px rgba(var(--cli-cyan-rgb), 0.35);
+    animation: nav-pill-glow-pulse 1.6s ease-in-out infinite;
+  }
+}
+
+/* :focus-visible affordance, unconditional on hover capability, so a
+   keyboard user always gets the tooltip. The tooltip stays out of the
+   accessible name either way; see the aria-hidden span in Layout.tsx. */
+.nav-item:focus-within .nav-cmd-tooltip {
+  opacity: 1;
+}
+.nav-item:focus-within .nav-pill {
+  background: rgba(var(--cli-cyan-rgb), 0.1);
+  box-shadow: 0 0 12px rgba(var(--cli-cyan-rgb), 0.35);
+}
+
+@keyframes nav-pill-glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(var(--cli-cyan-rgb), 0.25);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(var(--cli-cyan-rgb), 0.45);
+  }
+}
+
+/* Reduced motion: the global block above already collapses the pulse
+   animation and the tooltip's opacity/transform transition to near-0ms, so
+   both effectively become instant rather than animated. This rule makes
+   that outcome explicit and guarantees the pill still shows its static
+   accent glow (no animation, just the plain box-shadow declaration) and
+   the tooltip still appears, just without the pulse or the slide-in. */
+@media (prefers-reduced-motion: reduce) {
+  .nav-item:hover .nav-pill,
+  .nav-item:focus-within .nav-pill {
+    animation: none;
+    box-shadow: 0 0 8px rgba(var(--cli-cyan-rgb), 0.3);
+  }
+}
+
+/* Home intro blinking cursor (stage 3 flourish). A CSS steps() animation,
+   not a JS interval, so it costs nothing at runtime beyond the initial
+   layout. Reduced motion: the global prefers-reduced-motion block above
+   forces animation-iteration-count to 1 and the duration to ~0ms, which
+   collapses the blink to a single, effectively instant frame, i.e. a
+   static cursor. That is the "static block" branch required by the brief;
+   no separate override is needed for this element. */
+.home-cursor {
+  display: inline-block;
+  animation: home-cursor-blink 1s steps(1, start) infinite;
+}
+@keyframes home-cursor-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+@media print {
+  .home-cursor {
+    display: none;
+  }
+}
+
+/* Wordmark neon glow (stage 3 flourish, resolved decision: restrained
+   bloom only, no flicker/glitch/scanline/animation of any kind). Built
+   from --cli-cyan-rgb so the glow color tracks the active theme. Two
+   stacked text-shadow layers: a tight inner bloom for legibility contrast
+   and a wider soft outer bloom for the neon feel, both low alpha so the
+   glow never washes out the solid --cli-emphasis fill color underneath. */
+.wordmark-glow {
+  text-shadow:
+    0 0 6px rgba(var(--cli-cyan-rgb), 0.55),
+    0 0 18px rgba(var(--cli-cyan-rgb), 0.3);
+}
+@media print {
+  .wordmark-glow {
+    text-shadow: none;
+  }
+}
+
 /* Secret /admin entry flourish. Restyled onto the CLI palette (stage 6):
    cyan pulse ring bleeding into cli-sakura at full spread, matching the CLI
    accent pairing used everywhere else (see CliBootLog's uplink bar). */
